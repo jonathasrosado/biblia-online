@@ -23,7 +23,7 @@ if (!apiKey) {
 
 const ai = new GoogleGenAI({ apiKey: apiKey || 'dummy_key_to_prevent_crash' });
 
-const modelName = 'gemini-2.0-flash';
+const modelName = 'gemini-1.5-flash';
 
 // --- CACHE HELPERS ---
 const CACHE_PREFIX = 'bible_app_v1_';

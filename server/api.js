@@ -643,7 +643,7 @@ app.post('/api/audio/edge', async (req, res) => {
         }
 
         log(`Setting metadata for ${voiceId}`);
-        await tts.setMetadata(voiceId, OUTPUT_FORMAT.WEBM_24KHZ_16BIT_MONO_OPUS);
+        await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
 
         log("Calling toStream");
         const result = await tts.toStream(text);
