@@ -640,7 +640,8 @@ function decode(base64: string) {
 
 
 
-export const generateAudioFromText = async (text: string, voice: 'male' | 'female' = 'male'): Promise<AudioBuffer | null> => {
+// Return Data URI string instead of AudioBuffer for better compatibility
+export const generateAudioFromText = async (text: string, voice: 'male' | 'female' = 'male'): Promise<string | null> => {
   try {
     console.log(`[Audio] Generating audio for text: "${text.substring(0, 20)}..." with voice: ${voice}`);
 
@@ -657,27 +658,9 @@ export const generateAudioFromText = async (text: string, voice: 'male' | 'femal
     const data = await response.json();
 
     if (data.base64) {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const outputAudioContext = new AudioCtx();
-
-      const uint8Array = decode(data.base64);
-      // Create a fresh ArrayBuffer copy to avoid offset issues
-      const arrayBuffer = new ArrayBuffer(uint8Array.length);
-      new Uint8Array(arrayBuffer).set(uint8Array);
-
-      const audioBuffer = await outputAudioContext.decodeAudioData(arrayBuffer);
-
-      // Close context safely
-      try {
-        if (outputAudioContext.state !== 'closed') {
-          await outputAudioContext.close();
-        }
-      } catch (e) {
-        // Ignore errors on close
-      }
-
-      console.log("[Audio] Edge TTS Audio decoded successfully");
-      return audioBuffer;
+      // Simplified: Return the Data URI directly for HTML5 Audio
+      // This bypasses complex AudioContext decoding issues on iOS
+      return `data:audio/mp3;base64,${data.base64}`;
     }
 
     return null;

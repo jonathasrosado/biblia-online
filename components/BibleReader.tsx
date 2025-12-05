@@ -159,42 +159,15 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     }
   };
 
-  // --- AUDIO LOGIC ---
+  // --- AUDIO LOGIC (HTML5 Audio for iOS Compatibility) ---
 
-  const initAudioContext = async () => {
-    if (!audioContextRef.current) {
-      // Remove specific sampleRate to let browser/OS decide (Crucial for iOS)
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-
-    const ctx = audioContextRef.current;
-
-    // iOS "Unlock" - play a tiny silent buffer instantly to gain control
-    if (ctx.state === 'suspended') {
-      await ctx.resume();
-    }
-
-    // Double check unlock with silent playback (Common iOS Hack)
-    try {
-      const buffer = ctx.createBuffer(1, 1, 22050);
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(ctx.destination);
-      source.start(0);
-    } catch (e) {
-      console.warn("Silent unlock failed", e);
-    }
-  };
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
   const stopAudio = () => {
-    isPlayingRef.current = false;
-    if (sourceNodeRef.current) {
-      try {
-        sourceNodeRef.current.stop();
-      } catch (e) {
-        // Ignore errors if already stopped
-      }
-      sourceNodeRef.current = null;
+    if (audioElement) {
+      audioElement.pause();
+      audioElement.src = "";
+      setAudioElement(null);
     }
     // Ensure Web Speech also stops
     if (window.speechSynthesis) {
@@ -202,14 +175,8 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     }
     setIsPlaying(false);
     setIsAudioLoading(false);
-    audioCacheRef.current.clear();
     activeFetchRef.current.clear();
     setCurrentPlayingChunk(0);
-
-    if (audioContextRef.current) {
-      audioContextRef.current.close().catch(console.error);
-      audioContextRef.current = null;
-    }
   };
 
   const playAudio = async () => {
@@ -219,183 +186,128 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     }
 
     setIsPlaying(true);
-    isPlayingRef.current = true;
     setIsAudioLoading(true);
 
-    try {
-      // iOS Requirement: Resume/Create AudioContext inside a user gesture
-      if (!audioContextRef.current) {
-        await initAudioContext();
-      } else if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
-      }
+    const chunks = verses.map(v => v.text.replace(/[*#_`\[\]]/g, ''));
+    setTotalChunks(chunks.length);
 
-      const chunks = verses.map(v => v.text.replace(/[*#_`\[\]]/g, ''));
-      setTotalChunks(chunks.length);
-
-      // Start fetching and playing
-      processAudioQueue(chunks);
-
-    } catch (error) {
-      console.error("Audio Init Error", error);
-      stopAudio();
-    }
+    processAudioQueue(chunks, 0);
   };
 
-  const processAudioQueue = async (chunks: string[]) => {
-    let chunkIndex = 0;
-    const MAX_RETRIES = 2;
-    const retryCounts = new Map<number, number>();
-    let useWebSpeech = false;
+  const processAudioQueue = async (chunks: string[], startIndex: number) => {
+    let index = startIndex;
 
-    // Helper for Web Speech API
-    const speakWithWebSpeech = (text: string): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        if (!window.speechSynthesis) {
-          reject("Web Speech API not supported");
-          return;
-        }
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = language === 'en' ? 'en-US' : language === 'es' ? 'es-ES' : 'pt-BR';
-        utterance.rate = 1.0;
-
-        // Try to select a voice based on preference
-        const voices = window.speechSynthesis.getVoices();
-        const preferredGender = preferences.voice || 'male';
-
-        // Simple heuristic for gender (not perfect as names vary by OS)
-        const selectedVoice = voices.find(v =>
-          v.lang.startsWith(utterance.lang.split('-')[0]) &&
-          (preferredGender === 'female' ? v.name.includes('Female') || v.name.includes('Maria') : v.name.includes('Male') || v.name.includes('David'))
-        ) || voices.find(v => v.lang.startsWith(utterance.lang.split('-')[0]));
-
-        if (selectedVoice) {
-          utterance.voice = selectedVoice;
-        }
-
-        utterance.onend = () => resolve();
-        utterance.onerror = (e) => reject(e);
-
-        window.speechSynthesis.speak(utterance);
-      });
-    };
-
-    const fetchChunk = async (index: number) => {
-      if (useWebSpeech) return; // Don't fetch if using fallback
-      if (activeFetchRef.current.has(index) || audioCacheRef.current.has(index)) return;
-      if (index >= chunks.length) return;
-
-      const currentRetries = retryCounts.get(index) || 0;
-      if (currentRetries >= MAX_RETRIES) {
-        console.warn(`Max retries reached for chunk ${index}. Switching to Web Speech API.`);
-        useWebSpeech = true;
-        return;
-      }
-
-      activeFetchRef.current.add(index);
-
-      try {
-        // generateAudioFromText returns an AudioBuffer (already decoded)
-        const audioBuffer = await generateAudioFromText(chunks[index], preferences.voice || 'male');
-        if (audioBuffer) {
-          audioCacheRef.current.set(index, audioBuffer);
-        } else {
-          throw new Error("No audio data returned");
-        }
-      } catch (err) {
-        console.error(`Error fetching chunk ${index}`, err);
-        retryCounts.set(index, currentRetries + 1);
-        // If first chunk fails, switch immediately to avoid delay
-        if (index === 0) {
-          useWebSpeech = true;
-        }
-      } finally {
-        activeFetchRef.current.delete(index);
-      }
-    };
-
-    // Initial pre-fetch
-    fetchChunk(0);
-    fetchChunk(1);
-
-    const playNextChunk = async () => {
-      if (!isPlayingRef.current) return;
-
-      if (chunkIndex >= chunks.length) {
+    const playNext = async () => {
+      if (index >= chunks.length || !isPlayingRef.current) {
         stopAudio();
         return;
       }
 
-      setCurrentPlayingChunk(chunkIndex);
+      setCurrentPlayingChunk(index);
 
       // Scroll to verse
-      const verseElement = document.getElementById(`v${verses[chunkIndex].number}`);
+      const verseElement = document.getElementById(`v${verses[index].number}`);
       if (verseElement) {
         verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
-      if (useWebSpeech) {
-        // Web Speech Fallback Mode
-        setIsAudioLoading(false);
-        try {
-          await speakWithWebSpeech(chunks[chunkIndex]);
-          chunkIndex++;
-          playNextChunk();
-        } catch (e) {
-          console.error("Web Speech API failed", e);
-          stopAudio();
+      setIsAudioLoading(true);
+
+      try {
+        // Try Edge TTS first
+        const audioUrl = await generateAudioFromText(chunks[index], preferences.voice || 'male');
+
+        if (audioUrl && isPlayingRef.current) {
+          const audio = new Audio(audioUrl);
+          // Vital for iOS to allow playback after async fetch
+          (audio as any).playsInline = true;
+
+          audio.oncanplaythrough = () => {
+            if (isPlayingRef.current) {
+              setIsAudioLoading(false);
+              audio.play().catch(e => {
+                console.error("Playback failed", e);
+                // Fallback to Web Speech if play fails (e.g. user interaction lost)
+                speakWithWebSpeech(chunks[index]).then(() => {
+                  index++;
+                  playNext();
+                });
+              });
+            }
+          };
+
+          audio.onended = () => {
+            index++;
+            playNext();
+          };
+
+          audio.onerror = () => {
+            console.error("Audio Load Error");
+            // Fallback
+            speakWithWebSpeech(chunks[index]).then(() => {
+              index++;
+              playNext();
+            });
+          };
+
+          setAudioElement(audio);
+
+        } else {
+          // Fallback to Web Speech
+          await speakWithWebSpeech(chunks[index]);
+          index++;
+          playNext();
         }
-        return;
-      }
-
-      // Ensure current chunk is ready (Gemini Mode)
-      let attempts = 0;
-      while (!audioCacheRef.current.has(chunkIndex) && isPlayingRef.current && !useWebSpeech) {
-        await new Promise(r => setTimeout(r, 200));
-        attempts++;
-
-        if (useWebSpeech) break; // Switched during wait
-
-        if (attempts > 30) { // 6 seconds timeout
-          console.warn("Timeout waiting for audio. Switching to fallback.");
-          useWebSpeech = true;
-          break;
-        }
-
-        if (!activeFetchRef.current.has(chunkIndex) && !audioCacheRef.current.has(chunkIndex)) {
-          fetchChunk(chunkIndex);
-        }
-      }
-
-      if (!isPlayingRef.current) return;
-
-      if (useWebSpeech) {
-        // Recursive call to handle the switch
-        playNextChunk();
-        return;
-      }
-
-      const buffer = audioCacheRef.current.get(chunkIndex);
-      if (buffer) {
-        setIsAudioLoading(false); // First chunk ready, stop loading spinner
-
-        const source = audioContextRef.current!.createBufferSource();
-        source.buffer = buffer;
-        source.connect(audioContextRef.current!.destination);
-        source.onended = () => {
-          chunkIndex++;
-          playNextChunk();
-        };
-        sourceNodeRef.current = source;
-        source.start();
-
-        if (chunkIndex + 2 < chunks.length) fetchChunk(chunkIndex + 2);
-        if (chunkIndex > 2) audioCacheRef.current.delete(chunkIndex - 2);
+      } catch (err) {
+        console.error("Audio generation failed", err);
+        await speakWithWebSpeech(chunks[index]);
+        index++;
+        playNext();
       }
     };
 
-    playNextChunk();
+    // Update ref for cleanup checks
+    isPlayingRef.current = true;
+    playNext();
+  };
+
+  // Helper for Web Speech API (Fallback)
+  const speakWithWebSpeech = (text: string): Promise<void> => {
+    return new Promise((resolve) => {
+      if (!window.speechSynthesis) {
+        resolve(); // Resolve silently if not supported
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language === 'en' ? 'en-US' : language === 'es' ? 'es-ES' : 'pt-BR';
+      utterance.rate = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      const preferredGender = preferences.voice || 'male';
+      const selectedVoice = voices.find(v =>
+        v.lang.startsWith(utterance.lang.split('-')[0]) &&
+        (preferredGender === 'female' ? v.name.includes('Female') || v.name.includes('Maria') : v.name.includes('Male') || v.name.includes('David'))
+      ) || voices.find(v => v.lang.startsWith(utterance.lang.split('-')[0]));
+
+      if (selectedVoice) utterance.voice = selectedVoice;
+
+      utterance.onend = () => {
+        setIsAudioLoading(false);
+        resolve();
+      };
+
+      utterance.onerror = () => {
+        setIsAudioLoading(false);
+        resolve();
+      };
+
+      window.speechSynthesis.speak(utterance);
+      // If it hangs, we manually resolve after timeout
+      setTimeout(() => {
+        if (window.speechSynthesis.speaking) resolve();
+      }, text.length * 100 + 2000);
+    });
   };
 
   // Image Generator State
