@@ -389,6 +389,30 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
     return results;
   }
 }
+// Search Blog Posts (Local Filter)
+import { BlogPost } from '../types';
+
+export const searchBlogPosts = async (query: string): Promise<BlogPost[]> => {
+  try {
+    const response = await fetch('/api/blog/posts?status=published');
+    if (!response.ok) return [];
+
+    const posts: BlogPost[] = await response.json();
+    if (!Array.isArray(posts)) return [];
+
+    const lowerQuery = query.toLowerCase();
+
+    // Simple relevance filtering
+    return posts.filter(post =>
+      post.title.toLowerCase().includes(lowerQuery) ||
+      (post.excerpt && post.excerpt.toLowerCase().includes(lowerQuery)) ||
+      (post.tags && post.tags.some(tag => tag.toLowerCase().includes(lowerQuery)))
+    ).slice(0, 5); // Return top 5
+  } catch (error) {
+    console.error("Blog Search Error:", error);
+    return [];
+  }
+};
 
 // New Smart Search Summary
 export const getDetailedAnswer = async (query: string, language: string = 'pt'): Promise<string> => {
@@ -396,10 +420,19 @@ export const getDetailedAnswer = async (query: string, language: string = 'pt'):
     const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
     const response = await ai.models.generateContent({
       model: modelName,
-      contents: `You are a bible expert. The user is searching for: "${query}".
-      Provide a direct, helpful, and theologically sound summary answer to this query.
-      If it's a question, answer it. If it's a topic, summarize what the Bible says about it.
-      Keep it under 3 paragraphs. Use ${langName}.`,
+      contents: `You are a wise and knowledgeable Bible assistant. 
+      Users are searching for: "${query}".
+      
+      Your goal is to provide a "smart answer" that:
+      1. Directly answers the question if it is a question (e.g. "Who is David?").
+      2. Summarizes the biblical perspective if it is a topic (e.g. "Faith").
+      3. provides context if it is a keyword.
+
+      Format:
+      - Use **Markdown** for emphasis.
+      - Be concise (max 3 short paragraphs).
+      - Include 2-3 key bible references (e.g. Joao 3:16) if applicable.
+      - Answer in ${langName}.`,
     });
     return response.text ? response.text.trim() : "";
   } catch (error) {

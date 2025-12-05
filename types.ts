@@ -48,3 +48,15 @@ export interface FluidChapterContent {
   title: string;
   paragraphs: string[];
 }
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt?: string;
+  image?: string;
+  date: string;
+  content?: string;
+  status: 'published' | 'draft';
+  tags?: string[];
+}
