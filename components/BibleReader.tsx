@@ -273,221 +273,222 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                 });
               });
           }
-        } catch (err) {
-          console.error("Audio generation failed", err);
-          await speakWithWebSpeech(chunks[index]);
-          index++;
-          playNext();
         }
+      } catch (err) {
+        console.error("Audio generation failed", err);
+        await speakWithWebSpeech(chunks[index]);
+        index++;
+        playNext();
+      }
+    };
+
+    // Update ref for cleanup checks
+    isPlayingRef.current = true;
+    playNext();
+  };
+
+
+
+  // Helper for Web Speech API (Fallback)
+  const speakWithWebSpeech = (text: string): Promise<void> => {
+    return new Promise((resolve) => {
+      if (!window.speechSynthesis) {
+        resolve(); // Resolve silently if not supported
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language === 'en' ? 'en-US' : language === 'es' ? 'es-ES' : 'pt-BR';
+      utterance.rate = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      const preferredGender = preferences.voice || 'male';
+      const selectedVoice = voices.find(v =>
+        v.lang.startsWith(utterance.lang.split('-')[0]) &&
+        (preferredGender === 'female' ? v.name.includes('Female') || v.name.includes('Maria') : v.name.includes('Male') || v.name.includes('David'))
+      ) || voices.find(v => v.lang.startsWith(utterance.lang.split('-')[0]));
+
+      if (selectedVoice) utterance.voice = selectedVoice;
+
+      utterance.onend = () => {
+        setIsAudioLoading(false);
+        resolve();
       };
 
-      // Update ref for cleanup checks
-      isPlayingRef.current = true;
-      playNext();
-    };
+      utterance.onerror = () => {
+        setIsAudioLoading(false);
+        resolve();
+      };
+
+      window.speechSynthesis.speak(utterance);
+      // If it hangs, we manually resolve after timeout
+      setTimeout(() => {
+        if (window.speechSynthesis.speaking) resolve();
+      }, text.length * 100 + 2000);
+    });
+  };
+
+  // Image Generator State
+  const [showImageGenerator, setShowImageGenerator] = useState(false);
+
+  const handleOpenImageGenerator = () => {
+    setShowImageGenerator(true);
+  };
 
 
 
-    // Helper for Web Speech API (Fallback)
-    const speakWithWebSpeech = (text: string): Promise<void> => {
-      return new Promise((resolve) => {
-        if (!window.speechSynthesis) {
-          resolve(); // Resolve silently if not supported
-          return;
-        }
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = language === 'en' ? 'en-US' : language === 'es' ? 'es-ES' : 'pt-BR';
-        utterance.rate = 1.0;
-
-        const voices = window.speechSynthesis.getVoices();
-        const preferredGender = preferences.voice || 'male';
-        const selectedVoice = voices.find(v =>
-          v.lang.startsWith(utterance.lang.split('-')[0]) &&
-          (preferredGender === 'female' ? v.name.includes('Female') || v.name.includes('Maria') : v.name.includes('Male') || v.name.includes('David'))
-        ) || voices.find(v => v.lang.startsWith(utterance.lang.split('-')[0]));
-
-        if (selectedVoice) utterance.voice = selectedVoice;
-
-        utterance.onend = () => {
-          setIsAudioLoading(false);
-          resolve();
-        };
-
-        utterance.onerror = () => {
-          setIsAudioLoading(false);
-          resolve();
-        };
-
-        window.speechSynthesis.speak(utterance);
-        // If it hangs, we manually resolve after timeout
-        setTimeout(() => {
-          if (window.speechSynthesis.speaking) resolve();
-        }, text.length * 100 + 2000);
-      });
-    };
-
-    // Image Generator State
-    const [showImageGenerator, setShowImageGenerator] = useState(false);
-
-    const handleOpenImageGenerator = () => {
-      setShowImageGenerator(true);
-    };
-
-
-
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8 animate-fadeIn">
-        {/* Verses List */}
-        <div className="space-y-4">
-          {verses.map((verse) => {
-            const isSelected = selectedVerses.has(verse.number);
-            const isPlayingThisVerse = isPlaying && currentPlayingChunk === verses.findIndex(v => v.number === verse.number);
-            return (
-              <div
-                key={verse.number}
-                id={`v${verse.number}`}
-                onClick={() => handleVerseClick(verse)}
-                className={`flex gap-3 p-2 rounded-lg transition-all cursor-pointer duration-300
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-8 animate-fadeIn">
+      {/* Verses List */}
+      <div className="space-y-4">
+        {verses.map((verse) => {
+          const isSelected = selectedVerses.has(verse.number);
+          const isPlayingThisVerse = isPlaying && currentPlayingChunk === verses.findIndex(v => v.number === verse.number);
+          return (
+            <div
+              key={verse.number}
+              id={`v${verse.number}`}
+              onClick={() => handleVerseClick(verse)}
+              className={`flex gap-3 p-2 rounded-lg transition-all cursor-pointer duration-300
                         ${isSelected
-                    ? 'bg-yellow-200/50 dark:bg-yellow-900/30 ring-1 ring-yellow-400/50'
-                    : isPlayingThisVerse
-                      ? 'bg-bible-gold/10 ring-1 ring-bible-gold/30'
-                      : 'hover:bg-stone-100 dark:hover:bg-stone-800/50'}
+                  ? 'bg-yellow-200/50 dark:bg-yellow-900/30 ring-1 ring-yellow-400/50'
+                  : isPlayingThisVerse
+                    ? 'bg-bible-gold/10 ring-1 ring-bible-gold/30'
+                    : 'hover:bg-stone-100 dark:hover:bg-stone-800/50'}
                     `}
-              >
-                <span className="text-xs font-bold text-bible-gold/70 select-none w-6 text-right pt-1.5 shrink-0">
-                  {verse.number}
-                </span>
-                <p
-                  className={`text-lg md:text-xl font-serif
+            >
+              <span className="text-xs font-bold text-bible-gold/70 select-none w-6 text-right pt-1.5 shrink-0">
+                {verse.number}
+              </span>
+              <p
+                className={`text-lg md:text-xl font-serif
                             ${preferences.fontFamily === 'sans' ? 'font-sans' : 'font-serif'}
                             ${preferences.textAlign === 'justify' ? 'text-justify' : 'text-left'}
                         `}
-                  style={{
-                    fontSize: `${preferences.fontSize}%`,
-                    lineHeight: '1.6'
-                  }}
-                >
-                  {verse.text}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+                style={{
+                  fontSize: `${preferences.fontSize}%`,
+                  lineHeight: '1.6'
+                }}
+              >
+                {verse.text}
+              </p>
+            </div>
+          );
+        })}
+      </div>
 
-        {/* Floating Audio Player Indicator (visible when playing) */}
-        {isPlaying && (
-          <div className="fixed bottom-20 right-6 z-40 animate-slideUp">
-            <div className={`p-4 rounded-full shadow-lg flex items-center gap-3 pr-6
+      {/* Floating Audio Player Indicator (visible when playing) */}
+      {isPlaying && (
+        <div className="fixed bottom-20 right-6 z-40 animate-slideUp">
+          <div className={`p-4 rounded-full shadow-lg flex items-center gap-3 pr-6
              ${preferences.theme === 'sepia' ? 'bg-[#5c4b37] text-[#f4ecd8]' : 'bg-stone-900 text-white'}`}>
-              <div className="flex gap-1 h-4 items-end">
-                <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_1s_infinite]' : 'h-1'}`}></span>
-                <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_1.2s_infinite]' : 'h-1'}`}></span>
-                <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_0.8s_infinite]' : 'h-1'}`}></span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium">{t.listeningTo} {book} {chapter}</span>
-                {totalChunks > 0 && (
-                  <span className="text-[10px] opacity-70">
-                    {t.excerpt} {currentPlayingChunk + 1} / {totalChunks}
-                  </span>
-                )}
-              </div>
+            <div className="flex gap-1 h-4 items-end">
+              <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_1s_infinite]' : 'h-1'}`}></span>
+              <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_1.2s_infinite]' : 'h-1'}`}></span>
+              <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_0.8s_infinite]' : 'h-1'}`}></span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{t.listeningTo} {book} {chapter}</span>
+              {totalChunks > 0 && (
+                <span className="text-[10px] opacity-70">
+                  {t.excerpt} {currentPlayingChunk + 1} / {totalChunks}
+                </span>
+              )}
+            </div>
 
-              <button onClick={stopAudio} className="ml-2 hover:text-red-400 transition-colors">
-                <Square size={16} className="fill-current" />
+            <button onClick={stopAudio} className="ml-2 hover:text-red-400 transition-colors">
+              <Square size={16} className="fill-current" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Action Menu (When verses are selected) */}
+      {selectedVerses.size > 0 && (
+        <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-white dark:bg-stone-900 shadow-2xl border border-stone-200 dark:border-stone-700 rounded-full px-6 py-3 flex items-center gap-4 z-50 animate-slideUp">
+          <span className="text-sm font-bold text-stone-500 dark:text-stone-400 border-r border-stone-200 dark:border-stone-700 pr-4">
+            {selectedVerses.size} selecionado{selectedVerses.size > 1 ? 's' : ''}
+          </span>
+
+          <button
+            onClick={handleCopy}
+            className="flex flex-col items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-bible-gold transition-colors"
+            title="Copiar Texto"
+          >
+            <Copy size={20} />
+          </button>
+
+          <button
+            onClick={handleOpenImageGenerator}
+            className="flex flex-col items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-bible-gold transition-colors"
+            title="Criar Imagem"
+          >
+            <ImageIcon size={20} />
+          </button>
+
+          <button
+            onClick={handleExplain}
+            className="flex flex-col items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-bible-gold transition-colors"
+            title="Explicar com IA"
+          >
+            <Sparkles size={20} />
+          </button>
+
+          <button
+            onClick={clearSelection}
+            className="ml-2 p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-red-500 transition-colors"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
+      {/* AI Explanation Modal/Panel */}
+      {explanation && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn" onClick={() => setExplanation(null)}>
+          <div className="bg-white dark:bg-stone-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-slideUp" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center bg-stone-50 dark:bg-stone-950">
+              <div className="flex items-center gap-2 text-bible-gold font-bold">
+                <Sparkles size={18} />
+                <span>Explicação IA</span>
+              </div>
+              <button onClick={() => setExplanation(null)} className="p-1 hover:bg-stone-200 dark:hover:bg-stone-800 rounded-full transition-colors">
+                <X size={18} />
               </button>
             </div>
-          </div>
-        )}
-
-        {/* Floating Action Menu (When verses are selected) */}
-        {selectedVerses.size > 0 && (
-          <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-white dark:bg-stone-900 shadow-2xl border border-stone-200 dark:border-stone-700 rounded-full px-6 py-3 flex items-center gap-4 z-50 animate-slideUp">
-            <span className="text-sm font-bold text-stone-500 dark:text-stone-400 border-r border-stone-200 dark:border-stone-700 pr-4">
-              {selectedVerses.size} selecionado{selectedVerses.size > 1 ? 's' : ''}
-            </span>
-
-            <button
-              onClick={handleCopy}
-              className="flex flex-col items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-bible-gold transition-colors"
-              title="Copiar Texto"
-            >
-              <Copy size={20} />
-            </button>
-
-            <button
-              onClick={handleOpenImageGenerator}
-              className="flex flex-col items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-bible-gold transition-colors"
-              title="Criar Imagem"
-            >
-              <ImageIcon size={20} />
-            </button>
-
-            <button
-              onClick={handleExplain}
-              className="flex flex-col items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-bible-gold transition-colors"
-              title="Explicar com IA"
-            >
-              <Sparkles size={20} />
-            </button>
-
-            <button
-              onClick={clearSelection}
-              className="ml-2 p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-red-500 transition-colors"
-            >
-              <X size={18} />
-            </button>
-          </div>
-        )}
-
-        {/* AI Explanation Modal/Panel */}
-        {explanation && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn" onClick={() => setExplanation(null)}>
-            <div className="bg-white dark:bg-stone-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-slideUp" onClick={e => e.stopPropagation()}>
-              <div className="p-4 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center bg-stone-50 dark:bg-stone-950">
-                <div className="flex items-center gap-2 text-bible-gold font-bold">
-                  <Sparkles size={18} />
-                  <span>Explicação IA</span>
-                </div>
-                <button onClick={() => setExplanation(null)} className="p-1 hover:bg-stone-200 dark:hover:bg-stone-800 rounded-full transition-colors">
-                  <X size={18} />
-                </button>
-              </div>
-              <div className="p-6 max-h-[70vh] overflow-y-auto">
-                <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
-                  {explanation.split('\n').map((line, i) => (
-                    <p key={i} className="mb-3" dangerouslySetInnerHTML={{
-                      __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    }} />
-                  ))}
-                </div>
+            <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
+                {explanation.split('\n').map((line, i) => (
+                  <p key={i} className="mb-3" dangerouslySetInnerHTML={{
+                    __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                  }} />
+                ))}
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Image Generator Modal */}
-        {showImageGenerator && (
-          <VerseImageGenerator
-            verseText={getSelectedText()}
-            verseReference={getSelectedRef()}
-            onClose={() => setShowImageGenerator(false)}
-          />
-        )}
+      {/* Image Generator Modal */}
+      {showImageGenerator && (
+        <VerseImageGenerator
+          verseText={getSelectedText()}
+          verseReference={getSelectedRef()}
+          onClose={() => setShowImageGenerator(false)}
+        />
+      )}
 
-        {/* Loading Overlay for AI */}
-        {loadingExplanation && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-            <div className="bg-white dark:bg-stone-900 p-6 rounded-2xl shadow-xl flex flex-col items-center gap-4">
-              <Loader2 size={32} className="animate-spin text-bible-gold" />
-              <p className="font-medium animate-pulse">Gerando explicação...</p>
-            </div>
+      {/* Loading Overlay for AI */}
+      {loadingExplanation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="bg-white dark:bg-stone-900 p-6 rounded-2xl shadow-xl flex flex-col items-center gap-4">
+            <Loader2 size={32} className="animate-spin text-bible-gold" />
+            <p className="font-medium animate-pulse">Gerando explicação...</p>
           </div>
-        )}
-      </div>
-    );
-  });
+        </div>
+      )}
+    </div>
+  );
+});
 
 export default BibleReader;
