@@ -657,17 +657,26 @@ export const generateAudioFromText = async (text: string, voice: 'male' | 'femal
     const data = await response.json();
 
     if (data.base64) {
-      const outputAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const outputAudioContext = new AudioCtx();
+
       const uint8Array = decode(data.base64);
-      // Copy header-safe buffer
-      const arrayBuffer = uint8Array.buffer.slice(uint8Array.byteOffset, uint8Array.byteOffset + uint8Array.byteLength);
+      // Create a fresh ArrayBuffer copy to avoid offset issues
+      const arrayBuffer = new ArrayBuffer(uint8Array.length);
+      new Uint8Array(arrayBuffer).set(uint8Array);
 
       const audioBuffer = await outputAudioContext.decodeAudioData(arrayBuffer);
-      await outputAudioContext.close(); // Close immediately to free resources
 
+      // Close context safely
+      try {
+        if (outputAudioContext.state !== 'closed') {
+          await outputAudioContext.close();
+        }
+      } catch (e) {
+        // Ignore errors on close
+      }
 
       console.log("[Audio] Edge TTS Audio decoded successfully");
-      // Also cache the URL if needed, but for now we operate on buffer logic
       return audioBuffer;
     }
 

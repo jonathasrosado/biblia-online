@@ -207,7 +207,13 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     setIsAudioLoading(true);
 
     try {
-      await initAudioContext();
+      // iOS Requirement: Resume/Create AudioContext inside a user gesture
+      if (!audioContextRef.current) {
+        await initAudioContext();
+      } else if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+
       const chunks = verses.map(v => v.text.replace(/[*#_`\[\]]/g, ''));
       setTotalChunks(chunks.length);
 
