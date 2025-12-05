@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type, Chat, Modality } from "@google/genai";
-import { Verse, SearchResult, DevotionalContent } from '../types';
+import { Verse, SearchResult, DevotionalContent, BlogPost } from '../types';
 import { getChapterContentLocal } from './localBibleService';
 
 // IMPORTANT: Handle both Vite (browser) and Node (server) environments
@@ -390,7 +390,7 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
   }
 }
 // Search Blog Posts (Local Filter)
-import { BlogPost } from '../types';
+
 
 export const searchBlogPosts = async (query: string): Promise<BlogPost[]> => {
   try {
