@@ -163,10 +163,26 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
   const initAudioContext = async () => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      // Remove specific sampleRate to let browser/OS decide (Crucial for iOS)
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
-    if (audioContextRef.current.state === 'suspended') {
-      await audioContextRef.current.resume();
+
+    const ctx = audioContextRef.current;
+
+    // iOS "Unlock" - play a tiny silent buffer instantly to gain control
+    if (ctx.state === 'suspended') {
+      await ctx.resume();
+    }
+
+    // Double check unlock with silent playback (Common iOS Hack)
+    try {
+      const buffer = ctx.createBuffer(1, 1, 22050);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(ctx.destination);
+      source.start(0);
+    } catch (e) {
+      console.warn("Silent unlock failed", e);
     }
   };
 
