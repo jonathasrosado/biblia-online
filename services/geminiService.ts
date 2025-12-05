@@ -334,10 +334,10 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
       results = localResults;
       // If we have plenty of exact matches, we might not need AI, 
       // but let's keep AI for "semantic" understanding if local results are few
-      if (results.length >= 5) {
-        saveToCache(cacheKey, results);
-        return results;
-      }
+      // if (results.length >= 5) {
+      //   saveToCache(cacheKey, results);
+      //   return results;
+      // }
     }
   }
 
