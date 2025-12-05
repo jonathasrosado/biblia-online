@@ -1,0 +1,23 @@
+{
+  "siteTitle": "BíbliaOnline.me",
+  "siteDescription": "Sua fonte de estudos bíblicos e leitura diária.",
+  "footerLinks": [
+    {
+      "label": "Sobre Nós",
+      "url": "/sobre"
+    },
+    {
+      "label": "Contato",
+      "url": "/contato"
+    },
+    {
+      "label": "Política de Privacidade",
+      "url": "/privacidade"
+    }
+  ],
+  "socialLinks": {
+    "facebook": "",
+    "instagram": "",
+    "youtube": ""
+  }
+}

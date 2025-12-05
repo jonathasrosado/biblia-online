@@ -1,0 +1,17 @@
+{
+  "openrouter": {
+    "valid": true,
+    "message": "Conexão com OpenRouter bem-sucedida! (Limite: 10)",
+    "lastChecked": "2025-12-04T14:06:42.065Z"
+  },
+  "freepik": {
+    "valid": true,
+    "message": "Conexão com Freepik bem-sucedida!",
+    "lastChecked": "2025-12-03T22:59:52.503Z"
+  },
+  "gemini": {
+    "valid": true,
+    "message": "Conexão com Gemini bem-sucedida!",
+    "lastChecked": "2025-12-04T14:06:33.841Z"
+  }
+}

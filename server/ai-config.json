@@ -1,0 +1,29 @@
+{
+  "apiKeys": {
+    "gemini": "AIzaSyANJ9tY2cBqyLOpxgpanvq5iJNytGXO4C0",
+    "openrouter": "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",
+    "freepik": "FPSX938d6430ab7fd18096f8a840fb659cda"
+  },
+  "features": {
+    "blog_post": {
+      "provider": "gemini",
+      "model": "gemini-2.0-flash-exp"
+    },
+    "blog_title": {
+      "provider": "gemini",
+      "model": "gemini-2.0-flash-exp"
+    },
+    "seo_metadata": {
+      "provider": "gemini",
+      "model": "gemini-2.0-flash"
+    },
+    "images": {
+      "provider": "openrouter",
+      "model": "google/gemini-2.5-flash-image-preview"
+    },
+    "chat": {
+      "provider": "gemini",
+      "model": "gemini-2.0-flash-exp"
+    }
+  }
+}

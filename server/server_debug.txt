@@ -1,0 +1,1055 @@
+[2025-12-05T14:53:29.469Z] Endpoint hit
+[2025-12-05T14:53:29.470Z] Generating for: Teste 123... Voice: male
+[2025-12-05T14:53:29.471Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T14:53:30.147Z] Catch Error: ReferenceError: stream is not defined
+Stack: ReferenceError: stream is not defined
+    at file:///C:/Users/Dondon/Desktop/biblia/server/api.js:637:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[2025-12-05T14:55:13.392Z] Endpoint hit
+[2025-12-05T14:55:13.392Z] Generating for: Teste 123... Voice: male
+[2025-12-05T14:55:13.393Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T14:55:14.072Z] Calling toStream
+[2025-12-05T14:55:14.073Z] Stream obtained. Setting up events.
+[2025-12-05T14:55:14.616Z] Stream ended
+[2025-12-05T14:55:14.616Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764946514616.webm
+[2025-12-05T14:57:19.139Z] Endpoint hit
+[2025-12-05T14:57:19.139Z] Generating for: No princíp... Voice: male
+[2025-12-05T14:57:19.140Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T14:57:19.140Z] Endpoint hit
+[2025-12-05T14:57:19.141Z] Generating for: E a terra ... Voice: male
+[2025-12-05T14:57:19.141Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T14:57:19.785Z] Calling toStream
+[2025-12-05T14:57:19.786Z] Stream obtained. Setting up events.
+[2025-12-05T14:57:19.834Z] Calling toStream
+[2025-12-05T14:57:19.834Z] Stream obtained. Setting up events.
+[2025-12-05T14:57:20.341Z] Stream ended
+[2025-12-05T14:57:20.342Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764946640342.webm
+[2025-12-05T14:57:21.587Z] Stream ended
+[2025-12-05T14:57:21.588Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764946641588.webm
+[2025-12-05T15:13:34.099Z] Endpoint hit
+[2025-12-05T15:13:34.100Z] Generating for: Teste 123... Voice: male
+[2025-12-05T15:13:34.100Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:13:34.750Z] Calling toStream
+[2025-12-05T15:13:34.751Z] Stream obtained. Setting up events.
+[2025-12-05T15:13:35.632Z] Stream ended
+[2025-12-05T15:13:35.632Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947615632.webm
+[2025-12-05T15:14:32.243Z] Endpoint hit
+[2025-12-05T15:14:32.243Z] Generating for: Olá, este ... Voice: male
+[2025-12-05T15:14:32.243Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:14:32.864Z] Calling toStream
+[2025-12-05T15:14:32.865Z] Stream obtained. Setting up events.
+[2025-12-05T15:14:33.434Z] Stream ended
+[2025-12-05T15:14:33.435Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947673435.webm
+[2025-12-05T15:15:51.079Z] Endpoint hit
+[2025-12-05T15:15:51.079Z] Generating for: Teste de d... Voice: male
+[2025-12-05T15:15:51.079Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:15:51.744Z] Calling toStream
+[2025-12-05T15:15:51.745Z] Stream obtained. Setting up events.
+[2025-12-05T15:15:52.513Z] Stream ended
+[2025-12-05T15:15:52.513Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947752513.webm
+[2025-12-05T15:18:35.893Z] Endpoint hit
+[2025-12-05T15:18:35.894Z] Generating for: **No princ... Voice: male
+[2025-12-05T15:18:35.894Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:18:35.894Z] Endpoint hit
+[2025-12-05T15:18:35.895Z] Generating for: Em seguida... Voice: male
+[2025-12-05T15:18:35.895Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:18:36.529Z] Calling toStream
+[2025-12-05T15:18:36.530Z] Stream obtained. Setting up events.
+[2025-12-05T15:18:36.542Z] Calling toStream
+[2025-12-05T15:18:36.542Z] Stream obtained. Setting up events.
+[2025-12-05T15:18:38.424Z] Stream ended
+[2025-12-05T15:18:38.425Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947918425.webm
+[2025-12-05T15:18:38.427Z] Stream ended
+[2025-12-05T15:18:38.427Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947918427.webm
+[2025-12-05T15:18:38.724Z] Endpoint hit
+[2025-12-05T15:18:38.724Z] Generating for: Então Deus... Voice: male
+[2025-12-05T15:18:38.725Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:18:39.357Z] Calling toStream
+[2025-12-05T15:18:39.357Z] Stream obtained. Setting up events.
+[2025-12-05T15:18:42.617Z] Stream ended
+[2025-12-05T15:18:42.618Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947922618.webm
+[2025-12-05T15:19:12.216Z] Endpoint hit
+[2025-12-05T15:19:12.216Z] Generating for: Em seguida... Voice: male
+[2025-12-05T15:19:12.216Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:12.855Z] Calling toStream
+[2025-12-05T15:19:12.856Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:16.874Z] Stream ended
+[2025-12-05T15:19:16.875Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947956875.webm
+[2025-12-05T15:19:20.361Z] Endpoint hit
+[2025-12-05T15:19:20.362Z] Generating for: No princíp... Voice: male
+[2025-12-05T15:19:20.362Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:20.662Z] Endpoint hit
+[2025-12-05T15:19:20.663Z] Generating for: E a terra ... Voice: male
+[2025-12-05T15:19:20.663Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:21.011Z] Calling toStream
+[2025-12-05T15:19:21.011Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:21.284Z] Calling toStream
+[2025-12-05T15:19:21.284Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:21.873Z] Stream ended
+[2025-12-05T15:19:21.874Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947961874.webm
+[2025-12-05T15:19:22.278Z] Endpoint hit
+[2025-12-05T15:19:22.278Z] Generating for: E disse De... Voice: male
+[2025-12-05T15:19:22.278Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:22.943Z] Calling toStream
+[2025-12-05T15:19:22.944Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:23.045Z] Stream ended
+[2025-12-05T15:19:23.045Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947963045.webm
+[2025-12-05T15:19:24.054Z] Stream ended
+[2025-12-05T15:19:24.055Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947964054.webm
+[2025-12-05T15:19:25.636Z] Endpoint hit
+[2025-12-05T15:19:25.636Z] Generating for: E viu Deus... Voice: male
+[2025-12-05T15:19:25.636Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:26.283Z] Calling toStream
+[2025-12-05T15:19:26.284Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:26.876Z] Stream ended
+[2025-12-05T15:19:26.877Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947966877.webm
+[2025-12-05T15:19:33.786Z] Endpoint hit
+[2025-12-05T15:19:33.787Z] Generating for: E Deus cha... Voice: male
+[2025-12-05T15:19:33.788Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:34.447Z] Calling toStream
+[2025-12-05T15:19:34.448Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:35.347Z] Stream ended
+[2025-12-05T15:19:35.347Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947975347.webm
+[2025-12-05T15:19:37.913Z] Endpoint hit
+[2025-12-05T15:19:37.913Z] Generating for: E disse De... Voice: male
+[2025-12-05T15:19:37.914Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:38.535Z] Calling toStream
+[2025-12-05T15:19:38.535Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:39.427Z] Stream ended
+[2025-12-05T15:19:39.427Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947979427.webm
+[2025-12-05T15:19:43.207Z] Endpoint hit
+[2025-12-05T15:19:43.208Z] Generating for: E fez Deus... Voice: male
+[2025-12-05T15:19:43.208Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:43.858Z] Calling toStream
+[2025-12-05T15:19:43.859Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:44.722Z] Stream ended
+[2025-12-05T15:19:44.722Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947984722.webm
+[2025-12-05T15:19:50.781Z] Endpoint hit
+[2025-12-05T15:19:50.782Z] Generating for: E chamou D... Voice: male
+[2025-12-05T15:19:50.782Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:51.399Z] Calling toStream
+[2025-12-05T15:19:51.399Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:52.226Z] Stream ended
+[2025-12-05T15:19:52.227Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947992227.webm
+[2025-12-05T15:19:56.746Z] Endpoint hit
+[2025-12-05T15:19:56.747Z] Generating for: E disse De... Voice: male
+[2025-12-05T15:19:56.747Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:19:57.357Z] Calling toStream
+[2025-12-05T15:19:57.358Z] Stream obtained. Setting up events.
+[2025-12-05T15:19:58.312Z] Stream ended
+[2025-12-05T15:19:58.312Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764947998312.webm
+[2025-12-05T15:20:06.143Z] Endpoint hit
+[2025-12-05T15:20:06.143Z] Generating for: E chamou D... Voice: male
+[2025-12-05T15:20:06.143Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:20:06.756Z] Calling toStream
+[2025-12-05T15:20:06.757Z] Stream obtained. Setting up events.
+[2025-12-05T15:20:07.740Z] Stream ended
+[2025-12-05T15:20:07.741Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948007741.webm
+[2025-12-05T15:20:34.849Z] Endpoint hit
+[2025-12-05T15:20:34.850Z] Generating for: No princíp... Voice: male
+[2025-12-05T15:20:34.850Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:20:34.851Z] Endpoint hit
+[2025-12-05T15:20:34.851Z] Generating for: E a terra ... Voice: male
+[2025-12-05T15:20:34.851Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:20:35.492Z] Calling toStream
+[2025-12-05T15:20:35.492Z] Stream obtained. Setting up events.
+[2025-12-05T15:20:35.515Z] Calling toStream
+[2025-12-05T15:20:35.515Z] Stream obtained. Setting up events.
+[2025-12-05T15:20:36.282Z] Stream ended
+[2025-12-05T15:20:36.282Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948036282.webm
+[2025-12-05T15:20:36.349Z] Endpoint hit
+[2025-12-05T15:20:36.349Z] Generating for: E disse De... Voice: male
+[2025-12-05T15:20:36.349Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:20:36.912Z] Stream ended
+[2025-12-05T15:20:36.912Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948036912.webm
+[2025-12-05T15:20:36.976Z] Calling toStream
+[2025-12-05T15:20:36.977Z] Stream obtained. Setting up events.
+[2025-12-05T15:20:37.766Z] Stream ended
+[2025-12-05T15:20:37.766Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948037766.webm
+[2025-12-05T15:20:40.011Z] Endpoint hit
+[2025-12-05T15:20:40.011Z] Generating for: E viu Deus... Voice: male
+[2025-12-05T15:20:40.011Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:20:40.629Z] Calling toStream
+[2025-12-05T15:20:40.629Z] Stream obtained. Setting up events.
+[2025-12-05T15:20:41.128Z] Stream ended
+[2025-12-05T15:20:41.129Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948041129.webm
+[2025-12-05T15:20:48.170Z] Endpoint hit
+[2025-12-05T15:20:48.170Z] Generating for: E Deus cha... Voice: male
+[2025-12-05T15:20:48.170Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:20:48.802Z] Calling toStream
+[2025-12-05T15:20:48.803Z] Stream obtained. Setting up events.
+[2025-12-05T15:20:49.295Z] Stream ended
+[2025-12-05T15:20:49.295Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948049295.webm
+[2025-12-05T15:20:52.281Z] Endpoint hit
+[2025-12-05T15:20:52.281Z] Generating for: E disse De... Voice: male
+[2025-12-05T15:20:52.281Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:20:52.894Z] Calling toStream
+[2025-12-05T15:20:52.894Z] Stream obtained. Setting up events.
+[2025-12-05T15:20:53.795Z] Stream ended
+[2025-12-05T15:20:53.796Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948053796.webm
+[2025-12-05T15:21:15.461Z] Endpoint hit
+[2025-12-05T15:21:15.462Z] Generating for: No princíp... Voice: female
+[2025-12-05T15:21:15.462Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:21:15.777Z] Endpoint hit
+[2025-12-05T15:21:15.777Z] Generating for: E a terra ... Voice: female
+[2025-12-05T15:21:15.777Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:21:16.090Z] Calling toStream
+[2025-12-05T15:21:16.091Z] Stream obtained. Setting up events.
+[2025-12-05T15:21:16.391Z] Calling toStream
+[2025-12-05T15:21:16.392Z] Stream obtained. Setting up events.
+[2025-12-05T15:21:17.004Z] Stream ended
+[2025-12-05T15:21:17.004Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948077004.webm
+[2025-12-05T15:21:17.290Z] Stream ended
+[2025-12-05T15:21:17.291Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948077291.webm
+[2025-12-05T15:21:17.378Z] Endpoint hit
+[2025-12-05T15:21:17.378Z] Generating for: E disse De... Voice: female
+[2025-12-05T15:21:17.379Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:21:18.004Z] Calling toStream
+[2025-12-05T15:21:18.004Z] Stream obtained. Setting up events.
+[2025-12-05T15:21:18.641Z] Stream ended
+[2025-12-05T15:21:18.642Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948078642.webm
+[2025-12-05T15:21:20.702Z] Endpoint hit
+[2025-12-05T15:21:20.702Z] Generating for: E viu Deus... Voice: female
+[2025-12-05T15:21:20.703Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:21:21.300Z] Calling toStream
+[2025-12-05T15:21:21.300Z] Stream obtained. Setting up events.
+[2025-12-05T15:21:22.151Z] Stream ended
+[2025-12-05T15:21:22.152Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948082152.webm
+[2025-12-05T15:21:28.659Z] Endpoint hit
+[2025-12-05T15:21:28.659Z] Generating for: E Deus cha... Voice: female
+[2025-12-05T15:21:28.660Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:21:29.303Z] Calling toStream
+[2025-12-05T15:21:29.304Z] Stream obtained. Setting up events.
+[2025-12-05T15:21:30.767Z] Stream ended
+[2025-12-05T15:21:30.768Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948090767.webm
+[2025-12-05T15:21:32.370Z] Endpoint hit
+[2025-12-05T15:21:32.370Z] Generating for: E disse De... Voice: female
+[2025-12-05T15:21:32.370Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:21:32.984Z] Calling toStream
+[2025-12-05T15:21:32.985Z] Stream obtained. Setting up events.
+[2025-12-05T15:21:33.863Z] Stream ended
+[2025-12-05T15:21:33.863Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948093863.webm
+[2025-12-05T15:21:37.328Z] Endpoint hit
+[2025-12-05T15:21:37.328Z] Generating for: E fez Deus... Voice: female
+[2025-12-05T15:21:37.329Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:21:37.988Z] Calling toStream
+[2025-12-05T15:21:37.988Z] Stream obtained. Setting up events.
+[2025-12-05T15:21:38.995Z] Stream ended
+[2025-12-05T15:21:38.996Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948098996.webm
+[2025-12-05T15:21:43.860Z] Endpoint hit
+[2025-12-05T15:21:43.860Z] Generating for: E chamou D... Voice: female
+[2025-12-05T15:21:43.861Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:21:44.533Z] Calling toStream
+[2025-12-05T15:21:44.534Z] Stream obtained. Setting up events.
+[2025-12-05T15:21:45.471Z] Stream ended
+[2025-12-05T15:21:45.471Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948105471.webm
+[2025-12-05T15:21:50.250Z] Endpoint hit
+[2025-12-05T15:21:50.250Z] Generating for: E disse De... Voice: female
+[2025-12-05T15:21:50.251Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:21:50.905Z] Calling toStream
+[2025-12-05T15:21:50.906Z] Stream obtained. Setting up events.
+[2025-12-05T15:21:51.965Z] Stream ended
+[2025-12-05T15:21:51.965Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948111965.webm
+[2025-12-05T15:21:59.711Z] Endpoint hit
+[2025-12-05T15:21:59.711Z] Generating for: E chamou D... Voice: female
+[2025-12-05T15:21:59.711Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:22:00.339Z] Calling toStream
+[2025-12-05T15:22:00.339Z] Stream obtained. Setting up events.
+[2025-12-05T15:22:01.350Z] Stream ended
+[2025-12-05T15:22:01.351Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948121351.webm
+[2025-12-05T15:22:04.830Z] Endpoint hit
+[2025-12-05T15:22:04.830Z] Generating for: E disse De... Voice: female
+[2025-12-05T15:22:04.831Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:22:05.437Z] Calling toStream
+[2025-12-05T15:22:05.437Z] Stream obtained. Setting up events.
+[2025-12-05T15:22:06.889Z] Stream ended
+[2025-12-05T15:22:06.890Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948126890.webm
+[2025-12-05T15:22:12.295Z] Endpoint hit
+[2025-12-05T15:22:12.295Z] Generating for: E a terra ... Voice: female
+[2025-12-05T15:22:12.296Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:22:12.941Z] Calling toStream
+[2025-12-05T15:22:12.942Z] Stream obtained. Setting up events.
+[2025-12-05T15:22:16.024Z] Stream ended
+[2025-12-05T15:22:16.024Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948136024.webm
+[2025-12-05T15:23:15.167Z] Endpoint hit
+[2025-12-05T15:23:15.167Z] Generating for: **No princ... Voice: female
+[2025-12-05T15:23:15.167Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:23:15.474Z] Endpoint hit
+[2025-12-05T15:23:15.474Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:23:15.475Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:23:15.819Z] Calling toStream
+[2025-12-05T15:23:15.819Z] Stream obtained. Setting up events.
+[2025-12-05T15:23:16.088Z] Calling toStream
+[2025-12-05T15:23:16.089Z] Stream obtained. Setting up events.
+[2025-12-05T15:23:17.885Z] Stream ended
+[2025-12-05T15:23:17.886Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948197886.webm
+[2025-12-05T15:23:18.291Z] Endpoint hit
+[2025-12-05T15:23:18.291Z] Generating for: Então Deus... Voice: female
+[2025-12-05T15:23:18.291Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:23:18.960Z] Calling toStream
+[2025-12-05T15:23:18.960Z] Stream obtained. Setting up events.
+[2025-12-05T15:23:18.998Z] Stream ended
+[2025-12-05T15:23:18.998Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948198998.webm
+[2025-12-05T15:23:23.484Z] Stream ended
+[2025-12-05T15:23:23.485Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948203485.webm
+[2025-12-05T15:24:27.708Z] Endpoint hit
+[2025-12-05T15:24:27.709Z] Generating for: **No princ... Voice: female
+[2025-12-05T15:24:27.709Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:24:27.710Z] Endpoint hit
+[2025-12-05T15:24:27.710Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:24:27.710Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:24:28.356Z] Calling toStream
+[2025-12-05T15:24:28.356Z] Stream obtained. Setting up events.
+[2025-12-05T15:24:28.364Z] Calling toStream
+[2025-12-05T15:24:28.364Z] Stream obtained. Setting up events.
+[2025-12-05T15:24:30.422Z] Stream ended
+[2025-12-05T15:24:30.423Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948270423.webm
+[2025-12-05T15:24:31.091Z] Stream ended
+[2025-12-05T15:24:31.092Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948271092.webm
+[2025-12-05T15:24:31.214Z] Endpoint hit
+[2025-12-05T15:24:31.215Z] Generating for: Então Deus... Voice: female
+[2025-12-05T15:24:31.215Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:24:31.828Z] Calling toStream
+[2025-12-05T15:24:31.829Z] Stream obtained. Setting up events.
+[2025-12-05T15:24:35.199Z] Stream ended
+[2025-12-05T15:24:35.200Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948275200.webm
+[2025-12-05T15:24:45.244Z] Endpoint hit
+[2025-12-05T15:24:45.244Z] Generating for: Naquele te... Voice: female
+[2025-12-05T15:24:45.245Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:24:45.558Z] Endpoint hit
+[2025-12-05T15:24:45.558Z] Generating for: Eles disse... Voice: female
+[2025-12-05T15:24:45.558Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:24:45.908Z] Calling toStream
+[2025-12-05T15:24:45.908Z] Stream obtained. Setting up events.
+[2025-12-05T15:24:46.153Z] Calling toStream
+[2025-12-05T15:24:46.154Z] Stream obtained. Setting up events.
+[2025-12-05T15:24:47.417Z] Stream ended
+[2025-12-05T15:24:47.418Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948287418.webm
+[2025-12-05T15:24:47.753Z] Endpoint hit
+[2025-12-05T15:24:47.753Z] Generating for: Então o Se... Voice: female
+[2025-12-05T15:24:47.754Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:24:48.381Z] Calling toStream
+[2025-12-05T15:24:48.382Z] Stream obtained. Setting up events.
+[2025-12-05T15:24:48.942Z] Stream ended
+[2025-12-05T15:24:48.942Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948288942.webm
+[2025-12-05T15:24:50.805Z] Stream ended
+[2025-12-05T15:24:50.806Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948290806.webm
+[2025-12-05T15:25:00.046Z] Endpoint hit
+[2025-12-05T15:25:00.047Z] Generating for: Assim, o S... Voice: female
+[2025-12-05T15:25:00.047Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:25:00.662Z] Calling toStream
+[2025-12-05T15:25:00.663Z] Stream obtained. Setting up events.
+[2025-12-05T15:25:02.368Z] Stream ended
+[2025-12-05T15:25:02.369Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948302369.webm
+[2025-12-05T15:25:45.772Z] Endpoint hit
+[2025-12-05T15:25:45.772Z] Generating for: E era toda... Voice: female
+[2025-12-05T15:25:45.773Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:25:46.081Z] Endpoint hit
+[2025-12-05T15:25:46.082Z] Generating for: E acontece... Voice: female
+[2025-12-05T15:25:46.082Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:25:46.422Z] Calling toStream
+[2025-12-05T15:25:46.422Z] Stream obtained. Setting up events.
+[2025-12-05T15:25:46.701Z] Calling toStream
+[2025-12-05T15:25:46.702Z] Stream obtained. Setting up events.
+[2025-12-05T15:25:47.300Z] Stream ended
+[2025-12-05T15:25:47.300Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948347300.webm
+[2025-12-05T15:25:47.684Z] Endpoint hit
+[2025-12-05T15:25:47.684Z] Generating for: E disseram... Voice: female
+[2025-12-05T15:25:47.685Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:25:47.914Z] Stream ended
+[2025-12-05T15:25:47.914Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948347914.webm
+[2025-12-05T15:25:48.362Z] Calling toStream
+[2025-12-05T15:25:48.362Z] Stream obtained. Setting up events.
+[2025-12-05T15:25:49.148Z] Stream ended
+[2025-12-05T15:25:49.148Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948349148.webm
+[2025-12-05T15:25:51.854Z] Endpoint hit
+[2025-12-05T15:25:51.854Z] Generating for: E disseram... Voice: female
+[2025-12-05T15:25:51.854Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:25:52.470Z] Calling toStream
+[2025-12-05T15:25:52.470Z] Stream obtained. Setting up events.
+[2025-12-05T15:25:53.698Z] Stream ended
+[2025-12-05T15:25:53.698Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948353698.webm
+[2025-12-05T15:25:57.596Z] Endpoint hit
+[2025-12-05T15:25:57.596Z] Generating for: Então desc... Voice: female
+[2025-12-05T15:25:57.596Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:25:58.228Z] Calling toStream
+[2025-12-05T15:25:58.229Z] Stream obtained. Setting up events.
+[2025-12-05T15:25:58.983Z] Stream ended
+[2025-12-05T15:25:58.984Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948358984.webm
+[2025-12-05T15:26:48.796Z] Endpoint hit
+[2025-12-05T15:26:48.796Z] Generating for: Abrão part... Voice: female
+[2025-12-05T15:26:48.797Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:26:48.797Z] Endpoint hit
+[2025-12-05T15:26:48.797Z] Generating for: O Senhor h... Voice: female
+[2025-12-05T15:26:48.797Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:26:49.439Z] Calling toStream
+[2025-12-05T15:26:49.439Z] Stream obtained. Setting up events.
+[2025-12-05T15:26:49.468Z] Calling toStream
+[2025-12-05T15:26:49.469Z] Stream obtained. Setting up events.
+[2025-12-05T15:26:51.354Z] Stream ended
+[2025-12-05T15:26:51.354Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948411354.webm
+[2025-12-05T15:26:51.500Z] Endpoint hit
+[2025-12-05T15:26:51.501Z] Generating for: Abrão atra... Voice: female
+[2025-12-05T15:26:51.501Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:26:52.040Z] Stream ended
+[2025-12-05T15:26:52.041Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948412040.webm
+[2025-12-05T15:26:52.116Z] Calling toStream
+[2025-12-05T15:26:52.117Z] Stream obtained. Setting up events.
+[2025-12-05T15:26:55.924Z] Stream ended
+[2025-12-05T15:26:55.925Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948415925.webm
+[2025-12-05T15:27:17.298Z] Endpoint hit
+[2025-12-05T15:27:17.299Z] Generating for: Dali, ele ... Voice: female
+[2025-12-05T15:27:17.299Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:27:17.958Z] Calling toStream
+[2025-12-05T15:27:17.958Z] Stream obtained. Setting up events.
+[2025-12-05T15:27:19.530Z] Stream ended
+[2025-12-05T15:27:19.530Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948439530.webm
+[2025-12-05T15:28:10.898Z] Endpoint hit
+[2025-12-05T15:28:10.899Z] Generating for: No princíp... Voice: female
+[2025-12-05T15:28:10.899Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:28:10.900Z] Endpoint hit
+[2025-12-05T15:28:10.900Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:28:10.900Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:28:11.549Z] Calling toStream
+[2025-12-05T15:28:11.550Z] Stream obtained. Setting up events.
+[2025-12-05T15:28:11.602Z] Calling toStream
+[2025-12-05T15:28:11.603Z] Stream obtained. Setting up events.
+[2025-12-05T15:28:14.270Z] Stream ended
+[2025-12-05T15:28:14.271Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948494271.webm
+[2025-12-05T15:28:15.041Z] Stream ended
+[2025-12-05T15:28:15.042Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948495042.webm
+[2025-12-05T15:28:15.205Z] Endpoint hit
+[2025-12-05T15:28:15.206Z] Generating for: Então Deus... Voice: female
+[2025-12-05T15:28:15.206Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:28:15.835Z] Calling toStream
+[2025-12-05T15:28:15.835Z] Stream obtained. Setting up events.
+[2025-12-05T15:28:19.085Z] Stream ended
+[2025-12-05T15:28:19.085Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948499085.webm
+[2025-12-05T15:28:41.116Z] Endpoint hit
+[2025-12-05T15:28:41.116Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:28:41.117Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:28:41.737Z] Calling toStream
+[2025-12-05T15:28:41.737Z] Stream obtained. Setting up events.
+[2025-12-05T15:28:46.394Z] Stream ended
+[2025-12-05T15:28:46.395Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948526395.webm
+[2025-12-05T15:28:50.794Z] Endpoint hit
+[2025-12-05T15:28:50.794Z] Generating for: No princíp... Voice: male
+[2025-12-05T15:28:50.794Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:28:50.796Z] Endpoint hit
+[2025-12-05T15:28:50.796Z] Generating for: Em seguida... Voice: male
+[2025-12-05T15:28:50.796Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:28:51.428Z] Calling toStream
+[2025-12-05T15:28:51.428Z] Stream obtained. Setting up events.
+[2025-12-05T15:28:51.432Z] Calling toStream
+[2025-12-05T15:28:51.433Z] Stream obtained. Setting up events.
+[2025-12-05T15:28:53.327Z] Stream ended
+[2025-12-05T15:28:53.328Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948533328.webm
+[2025-12-05T15:28:53.668Z] Stream ended
+[2025-12-05T15:28:53.668Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948533668.webm
+[2025-12-05T15:28:53.898Z] Endpoint hit
+[2025-12-05T15:28:53.898Z] Generating for: Então Deus... Voice: male
+[2025-12-05T15:28:53.898Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:28:54.518Z] Calling toStream
+[2025-12-05T15:28:54.519Z] Stream obtained. Setting up events.
+[2025-12-05T15:28:57.631Z] Stream ended
+[2025-12-05T15:28:57.632Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948537632.webm
+[2025-12-05T15:31:21.631Z] Endpoint hit
+[2025-12-05T15:31:21.632Z] Generating for: No princíp... Voice: male
+[2025-12-05T15:31:21.632Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:31:21.632Z] Endpoint hit
+[2025-12-05T15:31:21.633Z] Generating for: Em seguida... Voice: male
+[2025-12-05T15:31:21.633Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:31:22.307Z] Calling toStream
+[2025-12-05T15:31:22.308Z] Stream obtained. Setting up events.
+[2025-12-05T15:31:24.421Z] Stream ended
+[2025-12-05T15:31:24.422Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948684422.webm
+[2025-12-05T15:31:26.244Z] Calling toStream
+[2025-12-05T15:31:26.244Z] Stream obtained. Setting up events.
+[2025-12-05T15:31:29.468Z] Stream ended
+[2025-12-05T15:31:29.468Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948689468.webm
+[2025-12-05T15:31:35.170Z] Endpoint hit
+[2025-12-05T15:31:35.170Z] Generating for: No princíp... Voice: male
+[2025-12-05T15:31:35.171Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:31:35.171Z] Endpoint hit
+[2025-12-05T15:31:35.172Z] Generating for: Em seguida... Voice: male
+[2025-12-05T15:31:35.172Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:31:35.821Z] Calling toStream
+[2025-12-05T15:31:35.822Z] Stream obtained. Setting up events.
+[2025-12-05T15:31:35.847Z] Calling toStream
+[2025-12-05T15:31:35.847Z] Stream obtained. Setting up events.
+[2025-12-05T15:31:36.693Z] Stream ended
+[2025-12-05T15:31:36.694Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948696694.webm
+[2025-12-05T15:31:38.503Z] Stream ended
+[2025-12-05T15:31:38.504Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948698504.webm
+[2025-12-05T15:31:38.618Z] Endpoint hit
+[2025-12-05T15:31:38.618Z] Generating for: Então Deus... Voice: male
+[2025-12-05T15:31:38.618Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:31:39.235Z] Calling toStream
+[2025-12-05T15:31:39.235Z] Stream obtained. Setting up events.
+[2025-12-05T15:31:43.514Z] Stream ended
+[2025-12-05T15:31:43.515Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948703515.webm
+[2025-12-05T15:32:08.875Z] Endpoint hit
+[2025-12-05T15:32:08.875Z] Generating for: No princíp... Voice: female
+[2025-12-05T15:32:08.876Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:32:08.876Z] Endpoint hit
+[2025-12-05T15:32:08.877Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:32:08.877Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:32:09.512Z] Calling toStream
+[2025-12-05T15:32:09.513Z] Stream obtained. Setting up events.
+[2025-12-05T15:32:09.515Z] Calling toStream
+[2025-12-05T15:32:09.515Z] Stream obtained. Setting up events.
+[2025-12-05T15:32:10.220Z] Stream ended
+[2025-12-05T15:32:10.221Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948730221.webm
+[2025-12-05T15:32:10.249Z] Stream ended
+[2025-12-05T15:32:10.250Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948730250.webm
+[2025-12-05T15:32:10.799Z] Endpoint hit
+[2025-12-05T15:32:10.799Z] Generating for: Então Deus... Voice: female
+[2025-12-05T15:32:10.799Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:32:11.414Z] Calling toStream
+[2025-12-05T15:32:11.414Z] Stream obtained. Setting up events.
+[2025-12-05T15:32:15.705Z] Stream ended
+[2025-12-05T15:32:15.706Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948735706.webm
+[2025-12-05T15:32:34.250Z] Endpoint hit
+[2025-12-05T15:32:34.251Z] Generating for: No princíp... Voice: female
+[2025-12-05T15:32:34.251Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:32:34.555Z] Endpoint hit
+[2025-12-05T15:32:34.555Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:32:34.556Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:32:34.973Z] Calling toStream
+[2025-12-05T15:32:34.973Z] Stream obtained. Setting up events.
+[2025-12-05T15:32:35.173Z] Calling toStream
+[2025-12-05T15:32:35.173Z] Stream obtained. Setting up events.
+[2025-12-05T15:32:35.642Z] Stream ended
+[2025-12-05T15:32:35.642Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948755642.webm
+[2025-12-05T15:32:36.097Z] Stream ended
+[2025-12-05T15:32:36.097Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948756097.webm
+[2025-12-05T15:32:36.170Z] Endpoint hit
+[2025-12-05T15:32:36.170Z] Generating for: Então Deus... Voice: female
+[2025-12-05T15:32:36.170Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:32:36.805Z] Calling toStream
+[2025-12-05T15:32:36.805Z] Stream obtained. Setting up events.
+[2025-12-05T15:32:37.814Z] Stream ended
+[2025-12-05T15:32:37.815Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948757815.webm
+[2025-12-05T15:33:01.767Z] Endpoint hit
+[2025-12-05T15:33:01.768Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:33:01.768Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:33:02.409Z] Calling toStream
+[2025-12-05T15:33:02.409Z] Stream obtained. Setting up events.
+[2025-12-05T15:33:06.461Z] Stream ended
+[2025-12-05T15:33:06.461Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948786461.webm
+[2025-12-05T15:34:41.350Z] Endpoint hit
+[2025-12-05T15:34:41.350Z] Generating for: Teste 123... Voice: male
+[2025-12-05T15:34:41.350Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:34:42.021Z] Calling toStream
+[2025-12-05T15:34:42.021Z] Stream obtained. Setting up events.
+[2025-12-05T15:34:42.726Z] Stream ended
+[2025-12-05T15:34:42.726Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948882726.webm
+[2025-12-05T15:35:36.825Z] Endpoint hit
+[2025-12-05T15:35:36.826Z] Generating for: No princíp... Voice: female
+[2025-12-05T15:35:36.826Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:35:36.828Z] Endpoint hit
+[2025-12-05T15:35:36.828Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:35:36.828Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:35:37.482Z] Calling toStream
+[2025-12-05T15:35:37.483Z] Stream obtained. Setting up events.
+[2025-12-05T15:35:37.514Z] Calling toStream
+[2025-12-05T15:35:37.515Z] Stream obtained. Setting up events.
+[2025-12-05T15:35:38.231Z] Stream ended
+[2025-12-05T15:35:38.231Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948938231.webm
+[2025-12-05T15:35:39.891Z] Stream ended
+[2025-12-05T15:35:39.892Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948939892.webm
+[2025-12-05T15:35:40.065Z] Endpoint hit
+[2025-12-05T15:35:40.066Z] Generating for: Então Deus... Voice: female
+[2025-12-05T15:35:40.066Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:35:40.690Z] Calling toStream
+[2025-12-05T15:35:40.690Z] Stream obtained. Setting up events.
+[2025-12-05T15:35:46.007Z] Stream ended
+[2025-12-05T15:35:46.008Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948946008.webm
+[2025-12-05T15:36:05.961Z] Endpoint hit
+[2025-12-05T15:36:05.961Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:36:05.962Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:36:06.590Z] Calling toStream
+[2025-12-05T15:36:06.590Z] Stream obtained. Setting up events.
+[2025-12-05T15:36:07.472Z] Stream ended
+[2025-12-05T15:36:07.472Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764948967472.webm
+[2025-12-05T15:38:11.339Z] Endpoint hit
+[2025-12-05T15:38:11.340Z] Generating for: No princíp... Voice: female
+[2025-12-05T15:38:11.340Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:38:11.341Z] Endpoint hit
+[2025-12-05T15:38:11.342Z] Generating for: Em seguida... Voice: female
+[2025-12-05T15:38:11.342Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:38:12.003Z] Calling toStream
+[2025-12-05T15:38:12.003Z] Stream obtained. Setting up events.
+[2025-12-05T15:38:12.027Z] Calling toStream
+[2025-12-05T15:38:12.027Z] Stream obtained. Setting up events.
+[2025-12-05T15:38:14.962Z] Stream ended
+[2025-12-05T15:38:14.963Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949094963.webm
+[2025-12-05T15:38:15.790Z] Stream ended
+[2025-12-05T15:38:15.791Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949095791.webm
+[2025-12-05T15:38:16.313Z] Endpoint hit
+[2025-12-05T15:38:16.313Z] Generating for: Então Deus... Voice: female
+[2025-12-05T15:38:16.313Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:38:16.965Z] Calling toStream
+[2025-12-05T15:38:16.966Z] Stream obtained. Setting up events.
+[2025-12-05T15:38:19.658Z] Stream ended
+[2025-12-05T15:38:19.658Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949099658.webm
+[2025-12-05T15:38:44.187Z] Endpoint hit
+[2025-12-05T15:38:44.188Z] Generating for: Assim os c... Voice: female
+[2025-12-05T15:38:44.188Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:38:44.493Z] Endpoint hit
+[2025-12-05T15:38:44.495Z] Generating for: E havendo ... Voice: female
+[2025-12-05T15:38:44.495Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:38:44.845Z] Calling toStream
+[2025-12-05T15:38:44.846Z] Stream obtained. Setting up events.
+[2025-12-05T15:38:45.110Z] Calling toStream
+[2025-12-05T15:38:45.110Z] Stream obtained. Setting up events.
+[2025-12-05T15:38:45.642Z] Stream ended
+[2025-12-05T15:38:45.642Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949125642.webm
+[2025-12-05T15:38:45.925Z] Stream ended
+[2025-12-05T15:38:45.926Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949125926.webm
+[2025-12-05T15:38:46.131Z] Endpoint hit
+[2025-12-05T15:38:46.132Z] Generating for: E abençoou... Voice: female
+[2025-12-05T15:38:46.132Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:38:46.773Z] Calling toStream
+[2025-12-05T15:38:46.774Z] Stream obtained. Setting up events.
+[2025-12-05T15:38:48.095Z] Stream ended
+[2025-12-05T15:38:48.096Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949128096.webm
+[2025-12-05T15:38:50.660Z] Endpoint hit
+[2025-12-05T15:38:50.661Z] Generating for: Estas são ... Voice: female
+[2025-12-05T15:38:50.662Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:38:51.270Z] Calling toStream
+[2025-12-05T15:38:51.271Z] Stream obtained. Setting up events.
+[2025-12-05T15:38:52.048Z] Stream ended
+[2025-12-05T15:38:52.049Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949132049.webm
+[2025-12-05T15:42:50.803Z] Endpoint hit
+[2025-12-05T15:42:50.803Z] Generating for: Assim os c... Voice: female
+[2025-12-05T15:42:50.804Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:42:50.805Z] Endpoint hit
+[2025-12-05T15:42:50.805Z] Generating for: E havendo ... Voice: female
+[2025-12-05T15:42:50.806Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:42:51.447Z] Calling toStream
+[2025-12-05T15:42:51.448Z] Stream obtained. Setting up events.
+[2025-12-05T15:42:51.465Z] Calling toStream
+[2025-12-05T15:42:51.465Z] Stream obtained. Setting up events.
+[2025-12-05T15:42:52.155Z] Stream ended
+[2025-12-05T15:42:52.156Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949372156.webm
+[2025-12-05T15:42:52.742Z] Stream ended
+[2025-12-05T15:42:52.742Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949372742.webm
+[2025-12-05T15:42:52.935Z] Endpoint hit
+[2025-12-05T15:42:52.935Z] Generating for: E abençoou... Voice: female
+[2025-12-05T15:42:52.936Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:42:53.549Z] Calling toStream
+[2025-12-05T15:42:53.549Z] Stream obtained. Setting up events.
+[2025-12-05T15:42:54.944Z] Stream ended
+[2025-12-05T15:42:54.944Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949374944.webm
+[2025-12-05T15:42:57.467Z] Endpoint hit
+[2025-12-05T15:42:57.468Z] Generating for: Estas são ... Voice: female
+[2025-12-05T15:42:57.468Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:42:58.083Z] Calling toStream
+[2025-12-05T15:42:58.083Z] Stream obtained. Setting up events.
+[2025-12-05T15:42:58.782Z] Stream ended
+[2025-12-05T15:42:58.783Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949378783.webm
+[2025-12-05T15:43:05.556Z] Endpoint hit
+[2025-12-05T15:43:05.556Z] Generating for: E toda a p... Voice: female
+[2025-12-05T15:43:05.556Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:43:06.176Z] Calling toStream
+[2025-12-05T15:43:06.177Z] Stream obtained. Setting up events.
+[2025-12-05T15:43:07.623Z] Stream ended
+[2025-12-05T15:43:07.624Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949387624.webm
+[2025-12-05T15:43:44.844Z] Endpoint hit
+[2025-12-05T15:43:44.845Z] Generating for: No princíp... Voice: female
+[2025-12-05T15:43:44.846Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:43:45.147Z] Endpoint hit
+[2025-12-05T15:43:45.147Z] Generating for: E a terra ... Voice: female
+[2025-12-05T15:43:45.148Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:43:45.512Z] Calling toStream
+[2025-12-05T15:43:45.512Z] Stream obtained. Setting up events.
+[2025-12-05T15:43:45.777Z] Calling toStream
+[2025-12-05T15:43:45.778Z] Stream obtained. Setting up events.
+[2025-12-05T15:43:46.308Z] Stream ended
+[2025-12-05T15:43:46.308Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949426308.webm
+[2025-12-05T15:43:46.783Z] Endpoint hit
+[2025-12-05T15:43:46.784Z] Generating for: E disse De... Voice: female
+[2025-12-05T15:43:46.784Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:43:47.040Z] Stream ended
+[2025-12-05T15:43:47.040Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949427040.webm
+[2025-12-05T15:43:47.406Z] Calling toStream
+[2025-12-05T15:43:47.406Z] Stream obtained. Setting up events.
+[2025-12-05T15:43:48.166Z] Stream ended
+[2025-12-05T15:43:48.167Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949428167.webm
+[2025-12-05T15:43:50.118Z] Endpoint hit
+[2025-12-05T15:43:50.118Z] Generating for: E viu Deus... Voice: female
+[2025-12-05T15:43:50.118Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:43:50.737Z] Calling toStream
+[2025-12-05T15:43:50.738Z] Stream obtained. Setting up events.
+[2025-12-05T15:43:51.540Z] Stream ended
+[2025-12-05T15:43:51.540Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949431540.webm
+[2025-12-05T15:43:58.067Z] Endpoint hit
+[2025-12-05T15:43:58.068Z] Generating for: E Deus cha... Voice: female
+[2025-12-05T15:43:58.068Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:43:58.687Z] Calling toStream
+[2025-12-05T15:43:58.687Z] Stream obtained. Setting up events.
+[2025-12-05T15:43:59.657Z] Stream ended
+[2025-12-05T15:43:59.657Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949439657.webm
+[2025-12-05T15:44:01.778Z] Endpoint hit
+[2025-12-05T15:44:01.779Z] Generating for: E disse De... Voice: female
+[2025-12-05T15:44:01.779Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T15:44:02.380Z] Calling toStream
+[2025-12-05T15:44:02.380Z] Stream obtained. Setting up events.
+[2025-12-05T15:44:04.092Z] Stream ended
+[2025-12-05T15:44:04.092Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949444092.webm
+[2025-12-05T15:44:15.758Z] Endpoint hit
+[2025-12-05T15:44:15.758Z] Generating for: No princíp... Voice: male
+[2025-12-05T15:44:15.759Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:44:16.063Z] Endpoint hit
+[2025-12-05T15:44:16.064Z] Generating for: Em seguida... Voice: male
+[2025-12-05T15:44:16.064Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:44:16.379Z] Calling toStream
+[2025-12-05T15:44:16.380Z] Stream obtained. Setting up events.
+[2025-12-05T15:44:16.705Z] Calling toStream
+[2025-12-05T15:44:16.705Z] Stream obtained. Setting up events.
+[2025-12-05T15:44:17.096Z] Stream ended
+[2025-12-05T15:44:17.097Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949457097.webm
+[2025-12-05T15:44:17.489Z] Endpoint hit
+[2025-12-05T15:44:17.490Z] Generating for: Então Deus... Voice: male
+[2025-12-05T15:44:17.490Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:44:18.129Z] Calling toStream
+[2025-12-05T15:44:18.129Z] Stream obtained. Setting up events.
+[2025-12-05T15:44:18.929Z] Stream ended
+[2025-12-05T15:44:18.929Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949458929.webm
+[2025-12-05T15:44:19.334Z] Stream ended
+[2025-12-05T15:44:19.335Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949459335.webm
+[2025-12-05T15:46:31.880Z] Endpoint hit
+[2025-12-05T15:46:31.880Z] Generating for: E abençoou... Voice: male
+[2025-12-05T15:46:31.880Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:46:31.882Z] Endpoint hit
+[2025-12-05T15:46:31.882Z] Generating for: E o temor ... Voice: male
+[2025-12-05T15:46:31.882Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:46:32.518Z] Calling toStream
+[2025-12-05T15:46:32.518Z] Stream obtained. Setting up events.
+[2025-12-05T15:46:32.561Z] Calling toStream
+[2025-12-05T15:46:32.561Z] Stream obtained. Setting up events.
+[2025-12-05T15:46:33.526Z] Stream ended
+[2025-12-05T15:46:33.527Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949593527.webm
+[2025-12-05T15:46:33.591Z] Endpoint hit
+[2025-12-05T15:46:33.592Z] Generating for: Tudo quant... Voice: male
+[2025-12-05T15:46:33.592Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:46:34.219Z] Calling toStream
+[2025-12-05T15:46:34.219Z] Stream obtained. Setting up events.
+[2025-12-05T15:46:34.280Z] Stream ended
+[2025-12-05T15:46:34.280Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949594280.webm
+[2025-12-05T15:46:35.420Z] Stream ended
+[2025-12-05T15:46:35.420Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949595420.webm
+[2025-12-05T15:46:40.746Z] Endpoint hit
+[2025-12-05T15:46:40.747Z] Generating for: A carne, p... Voice: male
+[2025-12-05T15:46:40.747Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:46:41.437Z] Calling toStream
+[2025-12-05T15:46:41.437Z] Stream obtained. Setting up events.
+[2025-12-05T15:46:42.325Z] Stream ended
+[2025-12-05T15:46:42.326Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949602326.webm
+[2025-12-05T15:46:52.129Z] Endpoint hit
+[2025-12-05T15:46:52.129Z] Generating for: Deus abenç... Voice: male
+[2025-12-05T15:46:52.130Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:46:52.439Z] Endpoint hit
+[2025-12-05T15:46:52.439Z] Generating for: Contudo, a... Voice: male
+[2025-12-05T15:46:52.439Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:46:52.774Z] Calling toStream
+[2025-12-05T15:46:52.775Z] Stream obtained. Setting up events.
+[2025-12-05T15:46:53.054Z] Calling toStream
+[2025-12-05T15:46:53.055Z] Stream obtained. Setting up events.
+[2025-12-05T15:46:54.542Z] Stream ended
+[2025-12-05T15:46:54.543Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949614543.webm
+[2025-12-05T15:46:55.064Z] Endpoint hit
+[2025-12-05T15:46:55.064Z] Generating for: Então Deus... Voice: male
+[2025-12-05T15:46:55.064Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:46:55.108Z] Stream ended
+[2025-12-05T15:46:55.109Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949615109.webm
+[2025-12-05T15:46:55.684Z] Calling toStream
+[2025-12-05T15:46:55.685Z] Stream obtained. Setting up events.
+[2025-12-05T15:46:57.663Z] Stream ended
+[2025-12-05T15:46:57.664Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949617664.webm
+[2025-12-05T15:47:22.492Z] Endpoint hit
+[2025-12-05T15:47:22.492Z] Generating for: Deus acres... Voice: male
+[2025-12-05T15:47:22.493Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T15:47:23.123Z] Calling toStream
+[2025-12-05T15:47:23.124Z] Stream obtained. Setting up events.
+[2025-12-05T15:47:27.741Z] Stream ended
+[2025-12-05T15:47:27.742Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764949647742.webm
+[2025-12-05T16:04:07.467Z] Endpoint hit
+[2025-12-05T16:04:07.467Z] Generating for: Assim os c... Voice: male
+[2025-12-05T16:04:07.468Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T16:04:07.468Z] Endpoint hit
+[2025-12-05T16:04:07.469Z] Generating for: E havendo ... Voice: male
+[2025-12-05T16:04:07.469Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T16:04:08.117Z] Calling toStream
+[2025-12-05T16:04:08.118Z] Stream obtained. Setting up events.
+[2025-12-05T16:04:08.124Z] Calling toStream
+[2025-12-05T16:04:08.125Z] Stream obtained. Setting up events.
+[2025-12-05T16:04:08.853Z] Stream ended
+[2025-12-05T16:04:08.853Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764950648853.webm
+[2025-12-05T16:04:08.981Z] Endpoint hit
+[2025-12-05T16:04:08.982Z] Generating for: E abençoou... Voice: male
+[2025-12-05T16:04:08.982Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T16:04:09.222Z] Stream ended
+[2025-12-05T16:04:09.223Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764950649223.webm
+[2025-12-05T16:04:09.594Z] Calling toStream
+[2025-12-05T16:04:09.594Z] Stream obtained. Setting up events.
+[2025-12-05T16:04:10.463Z] Stream ended
+[2025-12-05T16:04:10.464Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764950650464.webm
+[2025-12-05T16:04:13.652Z] Endpoint hit
+[2025-12-05T16:04:13.653Z] Generating for: Estas são ... Voice: male
+[2025-12-05T16:04:13.653Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T16:04:14.300Z] Calling toStream
+[2025-12-05T16:04:14.301Z] Stream obtained. Setting up events.
+[2025-12-05T16:04:15.778Z] Stream ended
+[2025-12-05T16:04:15.778Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764950655778.webm
+[2025-12-05T16:08:20.121Z] Endpoint hit
+[2025-12-05T16:08:20.121Z] Generating for: No princíp... Voice: male
+[2025-12-05T16:08:20.122Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T16:08:20.122Z] Endpoint hit
+[2025-12-05T16:08:20.123Z] Generating for: E a terra ... Voice: male
+[2025-12-05T16:08:20.123Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T16:08:20.775Z] Calling toStream
+[2025-12-05T16:08:20.775Z] Stream obtained. Setting up events.
+[2025-12-05T16:08:20.783Z] Calling toStream
+[2025-12-05T16:08:20.783Z] Stream obtained. Setting up events.
+[2025-12-05T16:08:21.465Z] Stream ended
+[2025-12-05T16:08:21.466Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764950901466.webm
+[2025-12-05T16:08:22.005Z] Stream ended
+[2025-12-05T16:08:22.005Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764950902005.webm
+[2025-12-05T16:08:22.150Z] Endpoint hit
+[2025-12-05T16:08:22.151Z] Generating for: E disse De... Voice: male
+[2025-12-05T16:08:22.151Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T16:08:22.765Z] Calling toStream
+[2025-12-05T16:08:22.766Z] Stream obtained. Setting up events.
+[2025-12-05T16:08:23.259Z] Stream ended
+[2025-12-05T16:08:23.260Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764950903260.webm
+[2025-12-05T16:08:25.505Z] Endpoint hit
+[2025-12-05T16:08:25.506Z] Generating for: E viu Deus... Voice: male
+[2025-12-05T16:08:25.506Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T16:08:26.133Z] Calling toStream
+[2025-12-05T16:08:26.133Z] Stream obtained. Setting up events.
+[2025-12-05T16:08:27.137Z] Stream ended
+[2025-12-05T16:08:27.138Z] Writing file to C:\Users\Dondon\Desktop\biblia\uploads\tts-1764950907138.webm
+[2025-12-05T19:21:10.667Z] Endpoint hit
+[2025-12-05T19:21:10.667Z] Generating for: Livro da g... Voice: male
+[2025-12-05T19:21:10.667Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:21:10.696Z] Endpoint hit
+[2025-12-05T19:21:10.697Z] Generating for: Abraão ger... Voice: male
+[2025-12-05T19:21:10.697Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:21:11.336Z] Calling toStream
+[2025-12-05T19:21:11.337Z] Stream obtained. Setting up events.
+[2025-12-05T19:21:11.352Z] Calling toStream
+[2025-12-05T19:21:11.352Z] Stream obtained. Setting up events.
+[2025-12-05T19:21:12.132Z] Stream ended
+[2025-12-05T19:21:12.509Z] Stream ended
+[2025-12-05T19:21:12.672Z] Endpoint hit
+[2025-12-05T19:21:12.673Z] Generating for: E Judá ger... Voice: male
+[2025-12-05T19:21:12.673Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:21:13.283Z] Calling toStream
+[2025-12-05T19:21:13.284Z] Stream obtained. Setting up events.
+[2025-12-05T19:21:15.327Z] Stream ended
+[2025-12-05T19:21:17.701Z] Endpoint hit
+[2025-12-05T19:21:17.702Z] Generating for: E Arão ger... Voice: male
+[2025-12-05T19:21:17.702Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:21:18.321Z] Calling toStream
+[2025-12-05T19:21:18.321Z] Stream obtained. Setting up events.
+[2025-12-05T19:21:19.331Z] Stream ended
+[2025-12-05T19:21:24.522Z] Endpoint hit
+[2025-12-05T19:21:24.523Z] Generating for: E Salmom g... Voice: male
+[2025-12-05T19:21:24.523Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:21:25.166Z] Calling toStream
+[2025-12-05T19:21:25.167Z] Stream obtained. Setting up events.
+[2025-12-05T19:21:26.101Z] Stream ended
+[2025-12-05T19:21:31.081Z] Endpoint hit
+[2025-12-05T19:21:31.081Z] Generating for: E Jessé ge... Voice: male
+[2025-12-05T19:21:31.081Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:21:31.751Z] Calling toStream
+[2025-12-05T19:21:31.751Z] Stream obtained. Setting up events.
+[2025-12-05T19:21:32.496Z] Stream ended
+[2025-12-05T19:21:37.504Z] Endpoint hit
+[2025-12-05T19:21:37.504Z] Generating for: E Salomão ... Voice: male
+[2025-12-05T19:21:37.504Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:21:38.164Z] Calling toStream
+[2025-12-05T19:21:38.165Z] Stream obtained. Setting up events.
+[2025-12-05T19:21:38.930Z] Stream ended
+[2025-12-05T19:21:44.571Z] Endpoint hit
+[2025-12-05T19:21:44.571Z] Generating for: E Asa gero... Voice: male
+[2025-12-05T19:21:44.571Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:21:45.213Z] Calling toStream
+[2025-12-05T19:21:45.214Z] Stream obtained. Setting up events.
+[2025-12-05T19:21:46.343Z] Stream ended
+[2025-12-05T19:27:51.290Z] Endpoint hit
+[2025-12-05T19:27:51.290Z] Generating for: E, tendo n... Voice: male
+[2025-12-05T19:27:51.291Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:27:51.291Z] Endpoint hit
+[2025-12-05T19:27:51.291Z] Generating for: Dizendo: O... Voice: male
+[2025-12-05T19:27:51.291Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:27:51.939Z] Calling toStream
+[2025-12-05T19:27:51.939Z] Stream obtained. Setting up events.
+[2025-12-05T19:27:51.941Z] Calling toStream
+[2025-12-05T19:27:51.941Z] Stream obtained. Setting up events.
+[2025-12-05T19:27:52.820Z] Stream ended
+[2025-12-05T19:27:53.248Z] Stream ended
+[2025-12-05T19:27:53.405Z] Endpoint hit
+[2025-12-05T19:27:53.405Z] Generating for: E o rei He... Voice: male
+[2025-12-05T19:27:53.405Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:27:54.026Z] Calling toStream
+[2025-12-05T19:27:54.026Z] Stream obtained. Setting up events.
+[2025-12-05T19:27:55.081Z] Stream ended
+[2025-12-05T19:28:01.245Z] Endpoint hit
+[2025-12-05T19:28:01.245Z] Generating for: E, tendo n... Voice: male
+[2025-12-05T19:28:01.246Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:28:01.246Z] Endpoint hit
+[2025-12-05T19:28:01.246Z] Generating for: Dizendo: O... Voice: male
+[2025-12-05T19:28:01.246Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:28:01.863Z] Calling toStream
+[2025-12-05T19:28:01.864Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:01.876Z] Calling toStream
+[2025-12-05T19:28:01.877Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:02.754Z] Stream ended
+[2025-12-05T19:28:03.606Z] Stream ended
+[2025-12-05T19:28:03.684Z] Endpoint hit
+[2025-12-05T19:28:03.685Z] Generating for: E o rei He... Voice: male
+[2025-12-05T19:28:03.685Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:28:04.294Z] Calling toStream
+[2025-12-05T19:28:04.295Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:05.393Z] Stream ended
+[2025-12-05T19:28:11.534Z] Endpoint hit
+[2025-12-05T19:28:11.535Z] Generating for: No princíp... Voice: male
+[2025-12-05T19:28:11.535Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:28:11.536Z] Endpoint hit
+[2025-12-05T19:28:11.536Z] Generating for: E a terra ... Voice: male
+[2025-12-05T19:28:11.536Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:28:12.166Z] Calling toStream
+[2025-12-05T19:28:12.166Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:12.178Z] Calling toStream
+[2025-12-05T19:28:12.179Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:12.874Z] Stream ended
+[2025-12-05T19:28:13.266Z] Endpoint hit
+[2025-12-05T19:28:13.267Z] Generating for: E disse De... Voice: male
+[2025-12-05T19:28:13.267Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:28:13.470Z] Stream ended
+[2025-12-05T19:28:13.884Z] Calling toStream
+[2025-12-05T19:28:13.884Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:14.458Z] Stream ended
+[2025-12-05T19:28:16.601Z] Endpoint hit
+[2025-12-05T19:28:16.601Z] Generating for: E viu Deus... Voice: male
+[2025-12-05T19:28:16.601Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:28:17.231Z] Calling toStream
+[2025-12-05T19:28:17.232Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:17.822Z] Stream ended
+[2025-12-05T19:28:24.759Z] Endpoint hit
+[2025-12-05T19:28:24.759Z] Generating for: E Deus cha... Voice: male
+[2025-12-05T19:28:24.760Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-05T19:28:25.382Z] Calling toStream
+[2025-12-05T19:28:25.382Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:26.425Z] Endpoint hit
+[2025-12-05T19:28:26.426Z] Generating for: No princíp... Voice: female
+[2025-12-05T19:28:26.426Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:26.427Z] Endpoint hit
+[2025-12-05T19:28:26.427Z] Generating for: E a terra ... Voice: female
+[2025-12-05T19:28:26.427Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:26.738Z] Stream ended
+[2025-12-05T19:28:27.037Z] Calling toStream
+[2025-12-05T19:28:27.037Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:27.047Z] Calling toStream
+[2025-12-05T19:28:27.048Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:27.758Z] Stream ended
+[2025-12-05T19:28:28.249Z] Endpoint hit
+[2025-12-05T19:28:28.249Z] Generating for: E disse De... Voice: female
+[2025-12-05T19:28:28.250Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:28.398Z] Stream ended
+[2025-12-05T19:28:28.858Z] Calling toStream
+[2025-12-05T19:28:28.858Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:29.567Z] Stream ended
+[2025-12-05T19:28:31.582Z] Endpoint hit
+[2025-12-05T19:28:31.583Z] Generating for: E viu Deus... Voice: female
+[2025-12-05T19:28:31.583Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:32.226Z] Calling toStream
+[2025-12-05T19:28:32.227Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:33.572Z] Stream ended
+[2025-12-05T19:28:34.908Z] Endpoint hit
+[2025-12-05T19:28:34.908Z] Generating for: E, tendo n... Voice: female
+[2025-12-05T19:28:34.909Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:35.218Z] Endpoint hit
+[2025-12-05T19:28:35.218Z] Generating for: Dizendo: O... Voice: female
+[2025-12-05T19:28:35.218Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:35.555Z] Calling toStream
+[2025-12-05T19:28:35.555Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:35.835Z] Calling toStream
+[2025-12-05T19:28:35.836Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:36.667Z] Stream ended
+[2025-12-05T19:28:37.179Z] Stream ended
+[2025-12-05T19:28:37.649Z] Endpoint hit
+[2025-12-05T19:28:37.650Z] Generating for: E o rei He... Voice: female
+[2025-12-05T19:28:37.650Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:38.278Z] Calling toStream
+[2025-12-05T19:28:38.279Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:39.038Z] Stream ended
+[2025-12-05T19:28:44.808Z] Endpoint hit
+[2025-12-05T19:28:44.808Z] Generating for: E, congreg... Voice: female
+[2025-12-05T19:28:44.809Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:45.427Z] Calling toStream
+[2025-12-05T19:28:45.428Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:46.946Z] Stream ended
+[2025-12-05T19:28:52.865Z] Endpoint hit
+[2025-12-05T19:28:52.865Z] Generating for: E eles lhe... Voice: female
+[2025-12-05T19:28:52.865Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:53.497Z] Calling toStream
+[2025-12-05T19:28:53.498Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:54.215Z] Stream ended
+[2025-12-05T19:28:57.599Z] Endpoint hit
+[2025-12-05T19:28:57.599Z] Generating for: E tu, Belé... Voice: female
+[2025-12-05T19:28:57.600Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:58.205Z] Calling toStream
+[2025-12-05T19:28:58.205Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:59.183Z] Stream ended
+[2025-12-05T19:28:59.231Z] Endpoint hit
+[2025-12-05T19:28:59.231Z] Generating for: Após o nas... Voice: female
+[2025-12-05T19:28:59.232Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:59.232Z] Endpoint hit
+[2025-12-05T19:28:59.233Z] Generating for: Ao ouvir i... Voice: female
+[2025-12-05T19:28:59.233Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:28:59.839Z] Calling toStream
+[2025-12-05T19:28:59.840Z] Stream obtained. Setting up events.
+[2025-12-05T19:28:59.919Z] Calling toStream
+[2025-12-05T19:28:59.919Z] Stream obtained. Setting up events.
+[2025-12-05T19:29:01.896Z] Stream ended
+[2025-12-05T19:29:02.293Z] Endpoint hit
+[2025-12-05T19:29:02.293Z] Generating for: Herodes, e... Voice: female
+[2025-12-05T19:29:02.293Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:29:02.940Z] Calling toStream
+[2025-12-05T19:29:02.941Z] Stream obtained. Setting up events.
+[2025-12-05T19:29:04.451Z] Stream ended
+[2025-12-05T19:29:06.683Z] Stream ended
+[2025-12-05T19:31:07.491Z] Endpoint hit
+[2025-12-05T19:31:07.492Z] Generating for: No princíp... Voice: female
+[2025-12-05T19:31:07.492Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:31:07.492Z] Endpoint hit
+[2025-12-05T19:31:07.493Z] Generating for: E a terra ... Voice: female
+[2025-12-05T19:31:07.493Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:31:08.186Z] Calling toStream
+[2025-12-05T19:31:08.186Z] Stream obtained. Setting up events.
+[2025-12-05T19:31:08.194Z] Calling toStream
+[2025-12-05T19:31:08.195Z] Stream obtained. Setting up events.
+[2025-12-05T19:31:09.462Z] Stream ended
+[2025-12-05T19:31:09.502Z] Stream ended
+[2025-12-05T19:31:09.618Z] Endpoint hit
+[2025-12-05T19:31:09.619Z] Generating for: E disse De... Voice: female
+[2025-12-05T19:31:09.619Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:31:10.247Z] Calling toStream
+[2025-12-05T19:31:10.247Z] Stream obtained. Setting up events.
+[2025-12-05T19:31:11.276Z] Stream ended
+[2025-12-05T19:31:12.960Z] Endpoint hit
+[2025-12-05T19:31:12.960Z] Generating for: E viu Deus... Voice: female
+[2025-12-05T19:31:12.960Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:31:13.605Z] Calling toStream
+[2025-12-05T19:31:13.606Z] Stream obtained. Setting up events.
+[2025-12-05T19:31:14.052Z] Stream ended
+[2025-12-05T19:31:21.520Z] Endpoint hit
+[2025-12-05T19:31:21.520Z] Generating for: E Deus cha... Voice: female
+[2025-12-05T19:31:21.520Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T19:31:22.196Z] Calling toStream
+[2025-12-05T19:31:22.197Z] Stream obtained. Setting up events.
+[2025-12-05T19:31:23.232Z] Stream ended

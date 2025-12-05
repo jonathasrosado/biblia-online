@@ -1,0 +1,32 @@
+[
+  {
+    "model": "gemini-2.0-flash-exp",
+    "status": "WORKS",
+    "response": "OK\n"
+  },
+  {
+    "model": "gemini-1.5-flash",
+    "status": "FAILED",
+    "error": "{\"error\":{\"code\":404,\"message\":\"models/gemini-1.5-"
+  },
+  {
+    "model": "gemini-1.5-flash-8b",
+    "status": "FAILED",
+    "error": "{\"error\":{\"code\":404,\"message\":\"models/gemini-1.5-"
+  },
+  {
+    "model": "gemini-1.5-pro",
+    "status": "FAILED",
+    "error": "{\"error\":{\"code\":404,\"message\":\"models/gemini-1.5-"
+  },
+  {
+    "model": "gemini-1.5-pro-002",
+    "status": "FAILED",
+    "error": "{\"error\":{\"code\":404,\"message\":\"models/gemini-1.5-"
+  },
+  {
+    "model": "gemini-pro",
+    "status": "FAILED",
+    "error": "{\"error\":{\"code\":404,\"message\":\"models/gemini-pro "
+  }
+]
