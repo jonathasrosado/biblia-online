@@ -390,6 +390,24 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
   }
 }
 
+// New Smart Search Summary
+export const getDetailedAnswer = async (query: string, language: string = 'pt'): Promise<string> => {
+  try {
+    const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+    const response = await ai.models.generateContent({
+      model: modelName,
+      contents: `You are a bible expert. The user is searching for: "${query}".
+      Provide a direct, helpful, and theologically sound summary answer to this query.
+      If it's a question, answer it. If it's a topic, summarize what the Bible says about it.
+      Keep it under 3 paragraphs. Use ${langName}.`,
+    });
+    return response.text ? response.text.trim() : "";
+  } catch (error) {
+    console.error("AI Summary Error:", error);
+    return "";
+  }
+};
+
 // Chat instance creator - DEPRECATED in favor of backend API
 export const createChat = (language: string = 'pt'): Chat => {
   const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
