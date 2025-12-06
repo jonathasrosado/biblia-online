@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createRequire } from "module";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
 import { aiManager } from './services/aiManager.js';
@@ -37,7 +38,7 @@ try {
     }
 } catch (e) { console.log("No forced key found."); }
 
-// --- HELPER: Direct Fetch for AI (Bypasses SDK issues) ---
+// --- HELPER: SDK-based Generation (Replaces Fetch) ---
 const generateViaFetch = async (prompt, modelName, apiKey, jsonMode = false) => {
     // Default to a working model if one isn't explicitly passed.
     const primaryModel = modelName || 'gemini-2.0-flash';
@@ -45,39 +46,31 @@ const generateViaFetch = async (prompt, modelName, apiKey, jsonMode = false) => 
 
     const tryModel = async (model) => {
         const maskedKey = apiKey ? apiKey.substring(0, 8) + '...' : 'NONE';
-        console.log(`[AI DEBUG] Generating with Model: ${model}, Key: ${maskedKey}`);
+        console.log(`[AI DEBUG] Generating (SDK) with Model: ${model}, Key: ${maskedKey}`);
 
-        // Gemma models don't support JSON mode via API config (returns 400)
-        // So we force jsonMode to false for them
-        const isGemma = model.includes('gemma');
-        const effectiveJsonMode = isGemma ? false : jsonMode;
-
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const body = {
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: effectiveJsonMode ? { responseMimeType: "application/json" } : {}
-        };
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const modelInstance = genAI.getGenerativeModel({
+            model: model,
+            generationConfig: {
+                // Gemma crashes with JSON mode, so disable it for Gemma
+                responseMimeType: (jsonMode && !model.includes('gemma')) ? "application/json" : "text/plain"
+            }
         });
-        if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`${response.status}: ${errText}`);
-        }
-        const data = await response.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+        const result = await modelInstance.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
     };
 
     try {
-        console.log(`[AI] Generating with ${primaryModel}...`);
+        console.log(`[AI] Generating with ${primaryModel} (SDK)...`);
         return await tryModel(primaryModel);
     } catch (e1) {
         console.warn(`[AI] ${primaryModel} failed: ${e1.message}. Trying ${fallbackModel}...`);
         try {
             return await tryModel(fallbackModel);
         } catch (e2) {
+            // Extract detailed error if possible
             throw new Error(`AI Generation Failed. Primary: ${e1.message}. Fallback: ${e2.message}`);
         }
     }
