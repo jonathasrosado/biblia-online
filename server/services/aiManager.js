@@ -124,8 +124,8 @@ export class AIManager {
         this.config = this.loadConfig(); // Force reload to ensure latest config
         const featureConfig = this.config.features[feature];
 
-        // Default to OpenRouter to bypass Railway region blocks for Gemini
-        const provider = featureConfig?.provider || 'openrouter';
+        // FORCE OPENROUTER TO BYPASS BLOCKS
+        const provider = 'openrouter';
         const model = modelOverride || featureConfig?.model || 'google/gemini-2.0-flash-exp:free';
 
         console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
