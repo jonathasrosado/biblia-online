@@ -1059,6 +1059,32 @@ app.post('/api/ai/detailed-answer', async (req, res) => {
 });
 
 // --- AI GENERATION ENDPOINT ---
+app.post('/api/ai/devotional', async (req, res) => {
+    try {
+        const { language } = req.body;
+        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
+
+        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
+
+        const { GoogleGenerativeAI } = require('@google/generative-ai');
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            generationConfig: { responseMimeType: "application/json" }
+        });
+
+        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+        const prompt = `Generate a short, inspiring daily Christian devotional in ${langName}. Return a JSON object with: title, verseReference, verseText, reflection (approx 150 words), and a short prayer.`;
+
+        const result = await model.generateContent(prompt);
+        res.json({ text: result.response.text() });
+    } catch (error) {
+        console.error("Devotional API Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// --- AI GENERATION ENDPOINT ---
 app.post('/api/ai/generate-image', async (req, res) => {
     console.log('[API] /api/ai/generate-image called');
     console.log('[API] Request body:', JSON.stringify(req.body));

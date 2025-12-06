@@ -251,6 +251,7 @@ export const getFluidChapterContent = async (book: string, chapter: number, lang
 };
 
 // Get a devotional
+// Get a devotional
 export const getDevotional = async (language: string = 'pt'): Promise<DevotionalContent | null> => {
   // Cache key includes date to ensure daily rotation
   const today = new Date().toISOString().split('T')[0];
@@ -260,31 +261,19 @@ export const getDevotional = async (language: string = 'pt'): Promise<Devotional
   if (cached) return cached;
 
   try {
-    const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: `Generate a short, inspiring daily Christian devotional in ${langName}. Return a JSON object with: title, verseReference, verseText, reflection (approx 150 words), and a short prayer.`,
-      config: {
-        temperature: 0.7,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            title: { type: Type.STRING },
-            verseReference: { type: Type.STRING },
-            verseText: { type: Type.STRING },
-            reflection: { type: Type.STRING },
-            prayer: { type: Type.STRING }
-          },
-          required: ["title", "verseReference", "verseText", "reflection", "prayer"]
-        }
-      }
+    const response = await fetch('/api/ai/devotional', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ language })
     });
 
-    if (response.text) {
-      const data = JSON.parse(response.text) as DevotionalContent;
-      saveToCache(cacheKey, data);
-      return data;
+    if (!response.ok) return null;
+    const data = await response.json();
+
+    if (data.text) {
+      const content = JSON.parse(data.text) as DevotionalContent;
+      saveToCache(cacheKey, content);
+      return content;
     }
     return null;
   } catch (error) {
