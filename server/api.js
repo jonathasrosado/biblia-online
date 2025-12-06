@@ -1354,6 +1354,44 @@ const keepAliveInterval = setInterval(() => {
     // This prevents the Node process from exiting
 }, 60000);
 
+app.get('/api/ai/debug-raw', async (req, res) => {
+    try {
+        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
+        const genAI = new GoogleGenerativeAI(apiKey);
+
+        const results = {};
+
+        // Test 1: Gemini 2.0 Flash Exp
+        try {
+            const model2 = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+            const result2 = await model2.generateContent("Test connection");
+            results.model_2_0 = { success: true, text: result2.response.text() };
+        } catch (e) {
+            results.model_2_0 = { success: false, error: e.message, details: JSON.stringify(e) };
+        }
+
+        // Test 2: Gemini 1.5 Flash
+        try {
+            const model15 = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const result15 = await model15.generateContent("Test connection");
+            results.model_1_5 = { success: true, text: result15.response.text() };
+        } catch (e) {
+            results.model_1_5 = { success: false, error: e.message, details: JSON.stringify(e) };
+        }
+
+        // Test 3: List Models (if possible to see what is blocked)
+        results.env = {
+            node: process.version,
+            hasFetch: typeof fetch !== 'undefined',
+            keyLength: apiKey ? apiKey.length : 0
+        };
+
+        res.json(results);
+    } catch (globalError) {
+        res.status(500).json({ error: globalError.message });
+    }
+});
+
 // Error handlers to prevent silent crashes
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
