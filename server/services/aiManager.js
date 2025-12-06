@@ -123,9 +123,9 @@ export class AIManager {
     async generateContent(feature, prompt, systemInstruction = '', responseFormat = null) {
         const featureConfig = this.config.features[feature];
 
-        // Default to Gemini if not configured
-        const provider = featureConfig?.provider || 'gemini';
-        const model = featureConfig?.model || 'gemini-1.5-flash';
+        // Default to OpenRouter to bypass Railway region blocks for Gemini
+        const provider = featureConfig?.provider || 'openrouter';
+        const model = featureConfig?.model || 'google/gemini-2.0-flash-exp:free';
 
         console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
 
