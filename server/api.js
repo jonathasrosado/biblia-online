@@ -21,6 +21,27 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+// SECURITY: Allow data: blobs for audio (iOS fix)
+app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; img-src 'self' https: data: blob:; media-src 'self' https: data: blob:; connect-src 'self' https:;");
+    next();
+});
+
+// EMERGENCY KEY FALLBACK
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+let FORCED_KEY = "";
+try {
+    const forced = require('./force_key.js');
+    if (forced && forced.GEMINI_KEY) {
+        FORCED_KEY = forced.GEMINI_KEY;
+        console.log("⚠️ EMERGENCY: Loaded Hardcoded API Key. This is a temporary production fix.");
+        if (!process.env.GEMINI_API_KEY) {
+            process.env.GEMINI_API_KEY = FORCED_KEY;
+        }
+    }
+} catch (e) { console.log("No forced key found."); }
+
 // Configure Multer for uploads
 const UPLOADS_DIR = path.resolve(__dirname, '../uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {
