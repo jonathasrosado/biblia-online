@@ -1142,19 +1142,36 @@ app.post('/api/ai/devotional', async (req, res) => {
 
             for (const line of lines) {
                 const lower = line.toLowerCase();
-                if (lower.match(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|===title)"))) {
-                    parts.title = line.replace(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|===title):?\\s*", "i"), '').replace(/\*+$/, '').trim();
+
+                // Matches: "* Title", "- **Title**", "1. Tema", "## Title", "### Title"
+
+                // TITLE
+                if (lower.match(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|assunto|===title)"))) {
+                    parts.title = line.replace(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|assunto|===title):?\\s*", "i"), '').replace(/\*+$/, '').trim();
                     continue;
                 }
-                if (lower.match(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|===verse)"))) {
-                    parts.verseText = line.replace(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|===verse):?\\s*", "i"), '').replace(/\*+$/, '').trim();
+
+                // VERSE - Expanded keywords
+                if (lower.match(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|leitura|texto|base|bíblica|biblica|escritura|===verse)"))) {
+                    parts.verseText = line.replace(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|leitura|texto|base|bíblica|biblica|escritura|===verse)(?:\\s+chave|\\s+bíblica|\\s+base)?\\s*:?\\s*", "i"), '').replace(/\*+$/, '').trim();
                     continue;
                 }
-                if (lower.match(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|===prayer)"))) {
+
+                // PRAYER - Expanded keywords
+                if (lower.match(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|clamor|reza|prece|===prayer)"))) {
                     currentSection = 'prayer';
-                    prayerParts.push(line.replace(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|===prayer):?\\s*", "i"), '').replace(/\*+$/, '').trim());
+                    parts.prayer = line.replace(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|clamor|reza|prece|===prayer):?\\s*", "i"), '').replace(/\*+$/, '').trim();
                     continue;
                 }
+
+                // REFLECTION (Body) - Explicit check
+                if (lower.match(new RegExp(headerRegex.source + "(?:reflexão|reflexao|reflection|mensagem|pensamento|===reflection)"))) {
+                    currentSection = 'reflection';
+                    const content = line.replace(new RegExp(headerRegex.source + "(?:reflexão|reflexao|reflection|mensagem|pensamento|===reflection):?\\s*", "i"), '').replace(/\*+$/, '').trim();
+                    if (content) reflectionParts.push(content);
+                    continue;
+                }
+
                 if (currentSection === 'reflection') reflectionParts.push(line);
                 else prayerParts.push(line);
             }
