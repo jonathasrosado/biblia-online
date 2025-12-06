@@ -1025,10 +1025,10 @@ app.post('/api/ai/search', async (req, res) => {
         // Use 'chat' feature config as it's proven to work with OpenRouter
         let rawText;
         try {
-            rawText = await aiManager.generateContent('chat', prompt, systemInstruction);
+            rawText = await aiManager.generateContent('chat', prompt, systemInstruction, 'json_object');
         } catch (e) {
             console.warn("Primary model failed, retrying...");
-            rawText = await aiManager.generateContent('chat', prompt, systemInstruction);
+            rawText = await aiManager.generateContent('chat', prompt, systemInstruction, 'json_object');
         }
 
         // Parse JSON output
@@ -1074,10 +1074,10 @@ app.post('/api/ai/devotional', async (req, res) => {
 
         let rawText;
         try {
-            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction);
+            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction, 'json_object');
         } catch (e) {
             console.warn("Devotional model failed, retrying...");
-            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction);
+            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction, 'json_object');
         }
 
         let json;
