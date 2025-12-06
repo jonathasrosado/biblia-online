@@ -1141,73 +1141,62 @@ app.post('/api/ai/devotional', async (req, res) => {
                 else if (!parts.prayer && content.toLowerCase().includes('amém')) parts.prayer = content;
             }
         }
-        // Try to split ref and text
-        const split = content.split(/[-–—] \s*(?=")/);
-        if (split.length > 1) {
-            parts.verseReference = split[0].trim();
-            parts.verseText = split[1].replace(/^"/, '').replace(/"$/, '').trim();
-        } else {
-            parts.verseText = content;
-        }
-    }
-            else if (section.includes('REFLECTION')) parts.reflection = content;
-    else if (section.includes('PRAYER')) parts.prayer = content;
-}
+
 
         // Fallback: If strict parsing failed (e.g. AI ignored separators), try the fuzzy line parser one last time
         if (!parts.reflection && !parts.prayer) {
-    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
-    let currentSection = 'reflection';
-    let reflectionParts = [];
-    let prayerParts = [];
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
+            let currentSection = 'reflection';
+            let reflectionParts = [];
+            let prayerParts = [];
 
-    const headerRegex = /^(?:[-*]|\d+\.)?\s*(?:\*\*|#+)?\s*/;
+            const headerRegex = /^(?:[-*]|\d+\.)?\s*(?:\*\*|#+)?\s*/;
 
-    for (const line of lines) {
-        const lower = line.toLowerCase();
+            for (const line of lines) {
+                const lower = line.toLowerCase();
 
-        // Matches: "* Title", "- **Title**", "1. Tema", "## Title", "### Title"
+                // Matches: "* Title", "- **Title**", "1. Tema", "## Title", "### Title"
 
-        // TITLE
-        if (lower.match(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|assunto|===title)"))) {
-            parts.title = line.replace(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|assunto|===title):?\\s*", "i"), '').replace(/\*+$/, '').trim();
-            continue;
+                // TITLE
+                if (lower.match(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|assunto|===title)"))) {
+                    parts.title = line.replace(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|assunto|===title):?\\s*", "i"), '').replace(/\*+$/, '').trim();
+                    continue;
+                }
+
+                // VERSE - Expanded keywords
+                if (lower.match(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|leitura|texto|base|bíblica|biblica|escritura|===verse)"))) {
+                    parts.verseText = line.replace(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|leitura|texto|base|bíblica|biblica|escritura|===verse)(?:\\s+chave|\\s+bíblica|\\s+base)?\\s*:?\\s*", "i"), '').replace(/\*+$/, '').trim();
+                    continue;
+                }
+
+                // PRAYER - Expanded keywords
+                if (lower.match(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|clamor|reza|prece|===prayer)"))) {
+                    currentSection = 'prayer';
+                    parts.prayer = line.replace(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|clamor|reza|prece|===prayer):?\\s*", "i"), '').replace(/\*+$/, '').trim();
+                    continue;
+                }
+
+                // REFLECTION (Body) - Explicit check
+                if (lower.match(new RegExp(headerRegex.source + "(?:reflexão|reflexao|reflection|mensagem|pensamento|===reflection)"))) {
+                    currentSection = 'reflection';
+                    const content = line.replace(new RegExp(headerRegex.source + "(?:reflexão|reflexao|reflection|mensagem|pensamento|===reflection):?\\s*", "i"), '').replace(/\*+$/, '').trim();
+                    if (content) reflectionParts.push(content);
+                    continue;
+                }
+
+                if (currentSection === 'reflection') reflectionParts.push(line);
+                else prayerParts.push(line);
+            }
+            parts.reflection = reflectionParts.join('\n\n');
+            parts.prayer = parts.prayer || prayerParts.join(' ');
         }
 
-        // VERSE - Expanded keywords
-        if (lower.match(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|leitura|texto|base|bíblica|biblica|escritura|===verse)"))) {
-            parts.verseText = line.replace(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|leitura|texto|base|bíblica|biblica|escritura|===verse)(?:\\s+chave|\\s+bíblica|\\s+base)?\\s*:?\\s*", "i"), '').replace(/\*+$/, '').trim();
-            continue;
-        }
-
-        // PRAYER - Expanded keywords
-        if (lower.match(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|clamor|reza|prece|===prayer)"))) {
-            currentSection = 'prayer';
-            parts.prayer = line.replace(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|clamor|reza|prece|===prayer):?\\s*", "i"), '').replace(/\*+$/, '').trim();
-            continue;
-        }
-
-        // REFLECTION (Body) - Explicit check
-        if (lower.match(new RegExp(headerRegex.source + "(?:reflexão|reflexao|reflection|mensagem|pensamento|===reflection)"))) {
-            currentSection = 'reflection';
-            const content = line.replace(new RegExp(headerRegex.source + "(?:reflexão|reflexao|reflection|mensagem|pensamento|===reflection):?\\s*", "i"), '').replace(/\*+$/, '').trim();
-            if (content) reflectionParts.push(content);
-            continue;
-        }
-
-        if (currentSection === 'reflection') reflectionParts.push(line);
-        else prayerParts.push(line);
-    }
-    parts.reflection = reflectionParts.join('\n\n');
-    parts.prayer = parts.prayer || prayerParts.join(' ');
-}
-
-const json = parts;
-res.json({ text: JSON.stringify(json) });
+        const json = parts;
+        res.json({ text: JSON.stringify(json) });
     } catch (error) {
-    console.error("Devotional API Error:", error);
-    res.status(500).json({ error: error.message });
-}
+        console.error("Devotional API Error:", error);
+        res.status(500).json({ error: error.message });
+    }
 });
 
 app.post('/api/ai/explain', async (req, res) => {
