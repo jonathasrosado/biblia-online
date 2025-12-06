@@ -994,6 +994,70 @@ app.get('/api/ai/status', (req, res) => {
     }
 });
 
+// --- SEARCH & ANSWER API (Server-Side) ---
+app.post('/api/ai/search', async (req, res) => {
+    try {
+        const { query, language } = req.body;
+        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
+
+        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
+
+        const { GoogleGenerativeAI } = require('@google/generative-ai');
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            generationConfig: { responseMimeType: "application/json" }
+        });
+
+        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+        const prompt = `Search the bible for verses related to: "${query}". 
+          If the query is a specific topic (e.g. "hope", "salvation"), find the most relevant verses.
+          If the query is a phrase, try to find where it appears.
+          Return the top 5 most relevant results in ${langName} as a JSON array of objects with keys: reference, text, context.`;
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        res.json({ text });
+    } catch (error) {
+        console.error("Search API Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/ai/detailed-answer', async (req, res) => {
+    try {
+        const { query, language } = req.body;
+        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
+
+        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
+
+        const { GoogleGenerativeAI } = require('@google/generative-ai');
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+        const prompt = `You are a wise and knowledgeable Bible assistant. 
+          Users are searching for: "${query}".
+          
+          Your goal is to provide a "smart answer" that:
+          1. Directly answers the question if it is a question (e.g. "Who is David?").
+          2. Summarizes the biblical perspective if it is a topic (e.g. "Faith").
+          3. provides context if it is a keyword.
+
+          Format:
+          - Use **Markdown** for emphasis.
+          - Be concise (max 3 short paragraphs).
+          - Include 2-3 key bible references (e.g. Joao 3:16) if applicable.
+          - Answer in ${langName}.`;
+
+        const result = await model.generateContent(prompt);
+        res.json({ text: result.response.text() });
+    } catch (error) {
+        console.error("Detailed Answer API Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // --- AI GENERATION ENDPOINT ---
 app.post('/api/ai/generate-image', async (req, res) => {
     console.log('[API] /api/ai/generate-image called');

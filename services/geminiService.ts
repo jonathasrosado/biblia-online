@@ -341,32 +341,33 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
     }
   }
 
-  // 2. AI Search (Semantic / Fallback)
+  // 2. AI Search (Semantic / Fallback) - via Server Backend
   try {
-    const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: `Search the bible for verses related to: "${query}". 
-      If the query is a specific topic (e.g. "hope", "salvation"), find the most relevant verses.
-      If the query is a phrase, try to find where it appears.
-      Return the top 5 most relevant results in ${langName}.`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              reference: { type: Type.STRING, description: "e.g. João 3:16" },
-              text: { type: Type.STRING },
-              context: { type: Type.STRING, description: "Brief context of why this matches" }
-            }
-          }
-        }
-      }
+    const response = await fetch('/api/ai/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, language })
     });
 
-    const json = JSON.parse(response.text || '[]');
+    if (!response.ok) throw new Error('Search API failed');
+    const data = await response.json();
+
+    // Parse the text which is expected to be JSON string
+    let json = [];
+    try {
+      json = JSON.parse(data.text || '[]');
+      // Clean up markdown code blocks if present
+      if (typeof json === 'string') {
+        // Occasionally it returns a string if prompt blocked json, try to parse substring
+        const match = json.match(/\[.*\]/s);
+        if (match) json = JSON.parse(match[0]);
+      }
+    } catch {
+      // Fallback: try to extract JSON array from string
+      const match = data.text.match(/\[.*\]/s);
+      if (match) json = JSON.parse(match[0]);
+    }
+
     const aiResults = Array.isArray(json) ? json : [];
 
     // Combine results: Local first, then AI (deduplicated by reference)
@@ -385,10 +386,10 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
     return results;
   } catch (error) {
     console.error("AI Search Error:", error);
-    // Return whatever local results we found if AI fails
     return results;
   }
 }
+
 // Search Blog Posts (Local Filter)
 
 
@@ -414,30 +415,22 @@ export const searchBlogPosts = async (query: string): Promise<BlogPost[]> => {
   }
 };
 
-// New Smart Search Summary
+// New Smart Search Summary (Server Proxy)
 export const getDetailedAnswer = async (query: string, language: string = 'pt'): Promise<string> => {
   try {
-    const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: `You are a wise and knowledgeable Bible assistant. 
-      Users are searching for: "${query}".
-      
-      Your goal is to provide a "smart answer" that:
-      1. Directly answers the question if it is a question (e.g. "Who is David?").
-      2. Summarizes the biblical perspective if it is a topic (e.g. "Faith").
-      3. provides context if it is a keyword.
-
-      Format:
-      - Use **Markdown** for emphasis.
-      - Be concise (max 3 short paragraphs).
-      - Include 2-3 key bible references (e.g. Joao 3:16) if applicable.
-      - Answer in ${langName}.`,
+    const response = await fetch('/api/ai/detailed-answer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, language })
     });
-    return response.text ? response.text.trim() : "";
+
+    if (!response.ok) return "";
+    const data = await response.json();
+    return data.text ? data.text.trim() : "";
   } catch (error) {
     console.error("AI Summary Error:", error);
     return "";
+
   }
 };
 
