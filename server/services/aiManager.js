@@ -133,13 +133,14 @@ export class AIManager {
 
         console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
 
+        if (provider === 'openrouter') {
+            // Pass system instruction separately to OpenRouter for correct role handling
+            return this._generateOpenRouterText(prompt, model, systemInstruction, responseFormat);
+        }
+
         const fullPrompt = systemInstruction
             ? `${systemInstruction}\n\n${prompt}`
             : prompt;
-
-        if (provider === 'openrouter') {
-            return this._generateOpenRouterText(fullPrompt, model, responseFormat);
-        }
 
         // Gemini Generation
         const apiKey = this.config.apiKeys.gemini || process.env.GEMINI_API_KEY;
