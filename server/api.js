@@ -41,8 +41,9 @@ try {
 // --- HELPER: SDK-based Generation (Replaces Fetch) ---
 const generateViaFetch = async (prompt, modelName, apiKey, jsonMode = false) => {
     // Default to a working model if one isn't explicitly passed.
-    const primaryModel = modelName || 'gemini-2.0-flash';
-    const fallbackModel = 'gemma-3-27b-it';
+    // Use 'exp' version as it is confirmed working for Chat on Railway.
+    const primaryModel = modelName || 'gemini-2.0-flash-exp';
+    const fallbackModel = 'gemini-1.5-flash'; // 1.5 Flash is most reliable fallback
 
     const tryModel = async (model) => {
         const maskedKey = apiKey ? apiKey.substring(0, 8) + '...' : 'NONE';
