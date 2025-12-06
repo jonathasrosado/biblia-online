@@ -1126,17 +1126,21 @@ app.post('/api/ai/devotional', async (req, res) => {
             for (const line of lines) {
                 const lower = line.toLowerCase();
 
+                // Regex to match start of line with optional bullet/number and markdown
+                // Matches: "* Title", "- **Title**", "1. Tema"
+                const headerRegex = /^(?:[-*]|\d+\.)?\s*(?:\*\*|#)?\s*/;
+
                 // Detect Section Headers (fuzzy match)
-                if (lower.match(/^(?:\*\*|#)?\s*(?:tema|título|title)/)) {
+                if (lower.match(new RegExp(headerRegex.source + "(?:tema|título|title)"))) {
                     // Extract title from this line
-                    const clean = line.replace(/^(?:\*\*|#)?\s*(?:tema|título|title):?\s*/i, '').replace(/\*+$/, '').trim();
+                    const clean = line.replace(new RegExp(headerRegex.source + "(?:tema|título|title):?\\s*", "i"), '').replace(/\*+$/, '').trim();
                     if (clean) json.title = clean;
                     continue;
                 }
 
-                if (lower.match(/^(?:\*\*|#)?\s*(?:versículo|leitura|verse|texto base)/)) {
+                if (lower.match(new RegExp(headerRegex.source + "(?:versículo|leitura|verse|texto base)"))) {
                     // Extract verse from this line
-                    const clean = line.replace(/^(?:\*\*|#)?\s*(?:versículo|leitura|verse|texto base):?\s*/i, '').replace(/\*+$/, '').trim();
+                    const clean = line.replace(new RegExp(headerRegex.source + "(?:versículo|leitura|verse|texto base):?\\s*", "i"), '').replace(/\*+$/, '').trim();
                     if (clean) {
                         // Split ref and text if possible (e.g. "John 3:16 - For God...")
                         const parts = clean.split(/[-–—] \s*(?=")/); // Look for dash before quote
@@ -1150,10 +1154,10 @@ app.post('/api/ai/devotional', async (req, res) => {
                     continue;
                 }
 
-                if (lower.match(/^(?:\*\*|#)?\s*(?:oração|prayer)/)) {
+                if (lower.match(new RegExp(headerRegex.source + "(?:oração|prayer)"))) {
                     currentSection = 'prayer';
                     // Extract prayer part if on same line
-                    const clean = line.replace(/^(?:\*\*|#)?\s*(?:oração|prayer):?\s*/i, '').replace(/\*+$/, '').trim();
+                    const clean = line.replace(new RegExp(headerRegex.source + "(?:oração|prayer):?\\s*", "i"), '').replace(/\*+$/, '').trim();
                     if (clean) prayerParts.push(clean);
                     continue;
                 }
