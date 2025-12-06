@@ -1053,11 +1053,41 @@ app.post('/api/ai/devotional', async (req, res) => {
         const { language } = req.body;
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
 
-        const prompt = `Generate a short, inspiring daily Christian devotional in ${langName}. 
-        Return formatted text with: Title, Verse Reference, Verse Text, Reflection (approx 150 words), and a Short Prayer.`;
+        const systemInstruction = `You are a spiritual mentor. Return ONLY valid JSON.
+        Structure:
+        {
+          "title": "Inspiring Title",
+          "verseReference": "Book Chapter:Verse",
+          "verseText": "Full verse text...",
+          "content": "Deep reflection (~150 words)",
+          "prayer": "Short prayer"
+        }`;
 
-        const text = await aiManager.generateContent('devotional', prompt, '');
-        res.json({ text });
+        const prompt = `Generate a daily devotional in ${langName} focusing on hope and faith.`;
+
+        let rawText;
+        try {
+            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction);
+        } catch (e) {
+            console.warn("Devotional model failed, retrying...");
+            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction);
+        }
+
+        let json;
+        try {
+            const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+            json = JSON.parse(cleanText);
+        } catch (e) {
+            json = {
+                title: "Devocional Diário",
+                content: rawText,
+                verseReference: "",
+                verseText: "",
+                prayer: ""
+            };
+        }
+
+        res.json(json);
     } catch (error) {
         console.error("Devotional API Error:", error);
         res.status(500).json({ error: error.message });
