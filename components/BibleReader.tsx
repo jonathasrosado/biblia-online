@@ -282,6 +282,12 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                 });
               });
           }
+        } else {
+          // Fallback to Web Speech if server generation fails (e.g. 500 error)
+          console.warn("Server audio failed, falling back to local TTS");
+          await speakWithWebSpeech(chunks[index]);
+          index++;
+          playNext();
         }
       } catch (err) {
         console.error("Audio generation failed", err);

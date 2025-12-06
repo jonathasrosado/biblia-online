@@ -1049,7 +1049,7 @@ app.post('/api/ai/detailed-answer', async (req, res) => {
 
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
         const prompt = `You are a wise and knowledgeable Bible assistant. 
@@ -1085,7 +1085,7 @@ app.post('/api/ai/devotional', async (req, res) => {
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-1.5-flash-latest',
             generationConfig: { responseMimeType: "application/json" }
         });
 
@@ -1109,7 +1109,7 @@ app.post('/api/ai/explain', async (req, res) => {
 
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
         const prompt = `Act as a bible scholar. Explain the theological meaning, historical context, and practical application of ${book} ${chapter}:${verse} - "${text}". Keep it concise (under 200 words) and accessible. Answer in ${langName}.`;
@@ -1132,7 +1132,7 @@ app.post('/api/ai/fluid-gen', async (req, res) => {
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-1.5-flash-latest',
             generationConfig: { temperature: 0.7 }
         });
 
