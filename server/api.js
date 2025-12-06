@@ -1340,71 +1340,58 @@ if (fs.existsSync(DIST_DIR)) {
     app.get(/.*/, (req, res) => {
         if (!req.path.startsWith('/api')) {
             res.sendFile(path.join(DIST_DIR, 'index.html'));
-        }
-    });
-}
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Storage directory: ${DATA_DIR}`);
-});
+            app.get('/api/ai/debug-raw', async (req, res) => {
+                try {
+                    const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
+                    const genAI = new GoogleGenerativeAI(apiKey);
 
-// Keep the server alive
-const keepAliveInterval = setInterval(() => {
-    // This prevents the Node process from exiting
-}, 60000);
+                    const results = {};
 
-app.get('/api/ai/debug-raw', async (req, res) => {
-    try {
-        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-        const genAI = new GoogleGenerativeAI(apiKey);
+                    // Test 1: Gemini 2.0 Flash Exp
+                    try {
+                        const model2 = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+                        const result2 = await model2.generateContent("Test connection");
+                        results.model_2_0 = { success: true, text: result2.response.text() };
+                    } catch (e) {
+                        results.model_2_0 = { success: false, error: e.message, details: JSON.stringify(e) };
+                    }
 
-        const results = {};
+                    // Test 2: Gemini 1.5 Flash
+                    try {
+                        const model15 = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                        const result15 = await model15.generateContent("Test connection");
+                        results.model_1_5 = { success: true, text: result15.response.text() };
+                    } catch (e) {
+                        results.model_1_5 = { success: false, error: e.message, details: JSON.stringify(e) };
+                    }
 
-        // Test 1: Gemini 2.0 Flash Exp
-        try {
-            const model2 = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-            const result2 = await model2.generateContent("Test connection");
-            results.model_2_0 = { success: true, text: result2.response.text() };
-        } catch (e) {
-            results.model_2_0 = { success: false, error: e.message, details: JSON.stringify(e) };
-        }
+                    // Test 3: List Models (if possible to see what is blocked)
+                    results.env = {
+                        node: process.version,
+                        hasFetch: typeof fetch !== 'undefined',
+                        keyLength: apiKey ? apiKey.length : 0
+                    };
 
-        // Test 2: Gemini 1.5 Flash
-        try {
-            const model15 = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            const result15 = await model15.generateContent("Test connection");
-            results.model_1_5 = { success: true, text: result15.response.text() };
-        } catch (e) {
-            results.model_1_5 = { success: false, error: e.message, details: JSON.stringify(e) };
-        }
+                    res.json(results);
+                } catch (globalError) {
+                    res.status(500).json({ error: globalError.message });
+                }
+            });
 
-        // Test 3: List Models (if possible to see what is blocked)
-        results.env = {
-            node: process.version,
-            hasFetch: typeof fetch !== 'undefined',
-            keyLength: apiKey ? apiKey.length : 0
-        };
+            // Error handlers to prevent silent crashes
+            process.on('unhandledRejection', (reason, promise) => {
+                console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+            });
 
-        res.json(results);
-    } catch (globalError) {
-        res.status(500).json({ error: globalError.message });
-    }
-});
+            process.on('uncaughtException', (error) => {
+                console.error('Uncaught Exception:', error);
+            });
 
-// Error handlers to prevent silent crashes
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-    console.log('\nShutting down gracefully...');
-    clearInterval(keepAliveInterval);
-    process.exit(0);
-});
+            // Graceful shutdown
+            process.on('SIGINT', () => {
+                console.log('\nShutting down gracefully...');
+                clearInterval(keepAliveInterval);
+                process.exit(0);
+            });
 
