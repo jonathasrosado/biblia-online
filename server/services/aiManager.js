@@ -221,6 +221,17 @@ export class AIManager {
             text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
 
             return text;
+
+        } catch (error) {
+            console.error("[AIManager] OpenRouter Request Failed:", error);
+            throw error;
+        }
+    }
+
+    async processImagePrompts(text, feature) {
+        if (feature === 'blog_post' && text.includes('[[IMAGE_PROMPT:')) {
+            console.log('[AIManager] Detecting image prompts in content...');
+            const regex = /\[\[IMAGE_PROMPT:\s*(.*?)\]\]/g;
             const matches = [...text.matchAll(regex)];
 
             for (const match of matches) {
@@ -245,7 +256,7 @@ export class AIManager {
                 }
             }
         }
-    return text;
+        return text;
     }
 
     getPollinationsUrl(prompt, options = {}, model = 'flux-realism') {
