@@ -32,52 +32,8 @@ try {
     if (forced && forced.GEMINI_KEY) {
         FORCED_KEY = forced.GEMINI_KEY;
         console.log("⚠️ EMERGENCY: Loaded Hardcoded API Key.");
-        if (!process.env.GEMINI_API_KEY) {
-            process.env.GEMINI_API_KEY = FORCED_KEY;
-        }
     }
 } catch (e) { console.log("No forced key found."); }
-
-// --- HELPER: SDK-based Generation (Replaces Fetch) ---
-const generateViaFetch = async (prompt, modelName, apiKey, jsonMode = false) => {
-    // Default to a working model if one isn't explicitly passed.
-    // Use 'exp' version as it is confirmed working for Chat on Railway.
-    const primaryModel = modelName || 'gemini-2.0-flash-exp';
-    const fallbackModel = 'gemini-1.5-flash'; // 1.5 Flash is most reliable fallback
-
-    const tryModel = async (model) => {
-        const maskedKey = apiKey ? apiKey.substring(0, 8) + '...' : 'NONE';
-        console.log(`[AI DEBUG] Generating (SDK) with Model: ${model}, Key: ${maskedKey}`);
-
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const modelInstance = genAI.getGenerativeModel({
-            model: model,
-            generationConfig: {
-                // Gemma crashes with JSON mode, so disable it for Gemma
-                // Railway production also seems to reject JSON mode for Gemini 2.0 Check? 
-                // Disabling it globally to rely on prompt.
-                // responseMimeType: (jsonMode && !model.includes('gemma')) ? "application/json" : "text/plain"
-            }
-        });
-
-        const result = await modelInstance.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
-    };
-
-    try {
-        console.log(`[AI] Generating with ${primaryModel} (SDK)...`);
-        return await tryModel(primaryModel);
-    } catch (e1) {
-        console.warn(`[AI] ${primaryModel} failed: ${e1.message}. Trying ${fallbackModel}...`);
-        try {
-            return await tryModel(fallbackModel);
-        } catch (e2) {
-            // Extract detailed error if possible
-            throw new Error(`AI Generation Failed. Primary: ${e1.message}. Fallback: ${e2.message}`);
-        }
-    }
-};
 
 // Configure Multer for uploads
 const UPLOADS_DIR = path.resolve(__dirname, '../uploads');
@@ -1047,22 +1003,24 @@ app.get('/api/ai/status', (req, res) => {
     }
 });
 
-// --- RESTORED AI ENDPOINTS (Using generateViaFetch) ---
+// --- AI ENDPOINTS (Unified via aiManager) ---
 
 app.post('/api/ai/search', async (req, res) => {
     try {
         const { query, language } = req.body;
-        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
-
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+
+        const systemInstruction = `You are a biblical search assistant. 
+          Return results in ${langName}.
+          Return a JSON array of objects with keys: reference, text, context.`;
+
         const prompt = `Search the bible for verses related to: "${query}". 
           If the query is a specific topic (e.g. "hope", "salvation"), find the most relevant verses.
           If the query is a phrase, try to find where it appears.
-          Return the top 5 most relevant results in ${langName} as a JSON array of objects with keys: reference, text, context.`;
+          Return the top 5 most relevant results.`;
 
-        // Use default model (Gemma 3) logic
-        const text = await generateViaFetch(prompt, null, apiKey, true);
+        // Use 'search' feature (defaults to Gemini Exp) - NO JSON MODE enforced to avoid errors
+        const text = await aiManager.generateContent('search', prompt, systemInstruction);
         res.json({ text });
     } catch (error) {
         console.error("Search API Error:", error);
@@ -1073,13 +1031,12 @@ app.post('/api/ai/search', async (req, res) => {
 app.post('/api/ai/devotional', async (req, res) => {
     try {
         const { language } = req.body;
-        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
-
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
-        const prompt = `Generate a short, inspiring daily Christian devotional in ${langName}. Return a JSON object with: title, verseReference, verseText, reflection (approx 150 words), and a short prayer.`;
 
-        const text = await generateViaFetch(prompt, 'gemini-2.0-flash', apiKey, true);
+        const prompt = `Generate a short, inspiring daily Christian devotional in ${langName}. 
+        Return a JSON object with: title, verseReference, verseText, reflection (approx 150 words), and a short prayer.`;
+
+        const text = await aiManager.generateContent('devotional', prompt, '');
         res.json({ text });
     } catch (error) {
         console.error("Devotional API Error:", error);
@@ -1090,13 +1047,11 @@ app.post('/api/ai/devotional', async (req, res) => {
 app.post('/api/ai/explain', async (req, res) => {
     try {
         const { book, chapter, verse, text, language } = req.body;
-        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
-
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+
         const prompt = `Act as a bible scholar. Explain the theological meaning, historical context, and practical application of ${book} ${chapter}:${verse} - "${text}". Keep it concise (under 200 words) and accessible. Answer in ${langName}.`;
 
-        const responseText = await generateViaFetch(prompt, 'gemini-2.0-flash', apiKey, false);
+        const responseText = await aiManager.generateContent('explain', prompt, '');
         res.json({ text: responseText });
     } catch (error) {
         console.error("Explain API Error:", error);
@@ -1107,17 +1062,15 @@ app.post('/api/ai/explain', async (req, res) => {
 app.post('/api/ai/detailed-answer', async (req, res) => {
     try {
         const { query, language } = req.body;
-        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
-
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+
         const prompt = `You are a wise and knowledgeable Bible assistant. 
           Users are searching for: "${query}".
           Goal: Provide a "smart answer" that answers questions, summarizes topics, or provides context.
           Format: Markdown, concise (max 3 short paragraphs), include 2-3 key bible references.
           Answer in ${langName}.`;
 
-        const text = await generateViaFetch(prompt, 'gemini-2.0-flash', apiKey, false);
+        const text = await aiManager.generateContent('detailed_answer', prompt, '');
         res.json({ text });
     } catch (error) {
         console.error("Detailed Answer API Error:", error);
@@ -1128,9 +1081,6 @@ app.post('/api/ai/detailed-answer', async (req, res) => {
 app.post('/api/ai/fluid-gen', async (req, res) => {
     try {
         const { book, chapter, language, originalText } = req.body;
-        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
-
         const prompt = `
           Atue como um especialista em teologia e linguística.
           Reescreva o capítulo ${chapter} de ${book} em linguagem moderna e fluida (${language}).
@@ -1139,7 +1089,7 @@ app.post('/api/ai/fluid-gen', async (req, res) => {
           Retorne JSON: { "title": "...", "paragraphs": ["..."] }
         `;
 
-        const text = await generateViaFetch(prompt, 'gemini-2.0-flash', apiKey, true);
+        const text = await aiManager.generateContent('fluid_gen', prompt, '');
         res.json({ text });
     } catch (error) {
         console.error("Fluid Gen API Error:", error);
