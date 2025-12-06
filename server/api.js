@@ -1034,9 +1034,16 @@ app.post('/api/ai/search', async (req, res) => {
         // Parse JSON output
         let json;
         try {
-            const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-            json = JSON.parse(cleanText);
+            const firstBrace = rawText.indexOf('{');
+            const lastBrace = rawText.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1) {
+                const cleanText = rawText.substring(firstBrace, lastBrace + 1);
+                json = JSON.parse(cleanText);
+            } else {
+                throw new Error("No JSON found");
+            }
         } catch (e) {
+            console.warn("Search JSON parse failed:", e, "Raw:", rawText.substring(0, 100));
             // Fallback if AI returns plain text
             json = { explanation: rawText, verses: [] };
         }
@@ -1075,9 +1082,16 @@ app.post('/api/ai/devotional', async (req, res) => {
 
         let json;
         try {
-            const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-            json = JSON.parse(cleanText);
+            const firstBrace = rawText.indexOf('{');
+            const lastBrace = rawText.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1) {
+                const cleanText = rawText.substring(firstBrace, lastBrace + 1);
+                json = JSON.parse(cleanText);
+            } else {
+                throw new Error("No JSON found");
+            }
         } catch (e) {
+            console.warn("Devotional JSON parse failed:", e, "Raw:", rawText.substring(0, 100));
             json = {
                 title: "Devocional Diário",
                 content: rawText,
