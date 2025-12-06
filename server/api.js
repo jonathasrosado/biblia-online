@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 import multer from 'multer';
