@@ -1048,7 +1048,7 @@ app.post('/api/ai/search', async (req, res) => {
             json = { explanation: rawText, verses: [] };
         }
 
-        res.json(json);
+        res.json({ text: JSON.stringify(json) });
     } catch (error) {
         console.error("Search API Error:", error);
         res.status(500).json({ error: error.message });
@@ -1092,16 +1092,23 @@ app.post('/api/ai/devotional', async (req, res) => {
             }
         } catch (e) {
             console.warn("Devotional JSON parse failed:", e, "Raw:", rawText.substring(0, 100));
+
+            // Manual Regex Extraction (Fallback)
+            const titleMatch = rawText.match(/\*\*Title:?\*\* (.*)/i) || rawText.match(/\*\*Título:?\*\* (.*)/i) || rawText.match(/Title: (.*)/i);
+            const verseMatch = rawText.match(/\*\*Verse:?\*\* (.*)/i) || rawText.match(/\*\*Versículo:?\*\* (.*)/i);
+            const reflectionMatch = rawText.match(/\*\*Reflection:?\*\* ([\s\S]*?)\*\*Prayer/i) || rawText.match(/\*\*Reflexão:?\*\* ([\s\S]*?)\*\*Oração/i);
+            const prayerMatch = rawText.match(/\*\*Prayer:?\*\* ([\s\S]*)/i) || rawText.match(/\*\*Oração:?\*\* ([\s\S]*)/i);
+
             json = {
-                title: "Devocional Diário",
-                content: rawText,
-                verseReference: "",
-                verseText: "",
-                prayer: ""
+                title: titleMatch ? titleMatch[1].trim() : "Devocional Diário",
+                reflection: reflectionMatch ? reflectionMatch[1].trim() : (rawText || "Sem conteúdo."),
+                verseReference: "Hoje",
+                verseText: verseMatch ? verseMatch[1].trim() : "",
+                prayer: prayerMatch ? prayerMatch[1].trim() : ""
             };
         }
 
-        res.json(json);
+        res.json({ text: JSON.stringify(json) });
     } catch (error) {
         console.error("Devotional API Error:", error);
         res.status(500).json({ error: error.message });
