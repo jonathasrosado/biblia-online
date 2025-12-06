@@ -121,6 +121,7 @@ export class AIManager {
     }
 
     async generateContent(feature, prompt, systemInstruction = '', responseFormat = null, modelOverride = null) {
+        this.config = this.loadConfig(); // Force reload to ensure latest config
         const featureConfig = this.config.features[feature];
 
         // Default to OpenRouter to bypass Railway region blocks for Gemini
@@ -158,7 +159,7 @@ export class AIManager {
     }
 
     async _generateOpenRouterText(prompt, model, responseFormat = null) {
-        const apiKey = this.config.apiKeys.openrouter;
+        const apiKey = this.config.apiKeys.openrouter || process.env.OPENROUTER_API_KEY;
         if (!apiKey) throw new Error("OpenRouter API Key missing");
 
         console.log(`[AIManager] Generating text via OpenRouter (${model})...`);
