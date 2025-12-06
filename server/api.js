@@ -1077,19 +1077,19 @@ app.post('/api/ai/devotional', async (req, res) => {
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
 
         const systemInstruction = `You are a spiritual mentor.
-        CRITICAL: You MUST use the exact separators below.
-        FORMAT:
-        ===TITLE===
-        (Inspiring Title Here)
-        ===VERSE===
-        (Book Chapter:Verse - Full Verse Text)
-        ===REFLECTION===
-        (Deep reflection ~150 words)
-        ===PRAYER===
-        (Short prayer)
-        `;
+        const systemInstruction = `You are a spiritual mentor.
+            CRITICAL: Follow this format STRICTLY.
+        === TITLE ===
+                (Title)
+                === VERSE ===
+                (Reference - Text)
+                === REFLECTION ===
+                (Body)
+                === PRAYER ===
+                (Prayer)
+                    `;
 
-        const prompt = `Generate a daily devotional in ${langName} focusing on hope and faith. Use the ===SEPARATOR=== format strictly.`;
+        const prompt = `Generate a daily devotional in ${ langName } focusing on hope and faith.Use exactly these headers: === TITLE ===, === VERSE ===, === REFLECTION ===, === PRAYER ===.`;
 
         let rawText;
         try {
@@ -1101,6 +1101,11 @@ app.post('/api/ai/devotional', async (req, res) => {
         }
 
         console.log("Devotional Raw Output:", rawText.substring(0, 100).replace(/\n/g, ' '));
+        
+        // Normalize generic separators if AI fails to use specific ones
+        if (rawText.includes('===SEPARATOR===')) {
+             rawText = rawText.replace(/===SEPARATOR===/g, '\n===SECTION===\n');
+        }
 
         // Strict Text Parser
         const parts = {
@@ -1114,10 +1119,29 @@ app.post('/api/ai/devotional', async (req, res) => {
         const sections = rawText.split('===');
         for (let i = 0; i < sections.length; i++) {
             const section = sections[i].trim().toUpperCase();
-            const content = sections[i + 1] ? sections[i + 1].trim() : "";
-
+            const content = sections[i+1] ? sections[i+1].trim() : "";
+            
+            // Handle specific keys
             if (section.includes('TITLE')) parts.title = content;
             else if (section.includes('VERSE')) {
+                 const split = content.split(/[-–—] \s*(?=")/);
+                 if (split.length > 1) {
+                     parts.verseReference = split[0].trim();
+                     parts.verseText = split[1].replace(/^"/, '').replace(/"$/, '').trim();
+                 } else {
+                     parts.verseText = content;
+                 }
+            }
+            else if (section.includes('REFLECTION')) parts.reflection = content;
+            else if (section.includes('PRAYER')) parts.prayer = content;
+            
+            // Handle generic sectioning (fallback if keys are missing but structure exists)
+            else if (section.includes('SECTION')) {
+                // Heuristic: Assign based on order or content
+                if (!parts.reflection && content.length > 50) parts.reflection = content;
+                else if (!parts.prayer && content.toLowerCase().includes('amém')) parts.prayer = content;
+            }
+        }
                 // Try to split ref and text
                 const split = content.split(/[-–—] \s*(?=")/);
                 if (split.length > 1) {
@@ -1192,7 +1216,7 @@ app.post('/api/ai/explain', async (req, res) => {
         const { book, chapter, verse, text, language } = req.body;
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
 
-        const prompt = `Act as a bible scholar. Explain the theological meaning, historical context, and practical application of ${book} ${chapter}:${verse} - "${text}". Keep it concise (under 200 words) and accessible. Answer in ${langName}.`;
+        const prompt = `Act as a bible scholar.Explain the theological meaning, historical context, and practical application of ${ book } ${ chapter }:${ verse } - "${text}".Keep it concise(under 200 words) and accessible.Answer in ${ langName }.`;
 
         const responseText = await aiManager.generateContent('explain', prompt, '');
         res.json({ text: responseText });
@@ -1209,9 +1233,9 @@ app.post('/api/ai/detailed-answer', async (req, res) => {
 
         const prompt = `You are a wise and knowledgeable Bible assistant. 
           Users are searching for: "${query}".
-          Goal: Provide a "smart answer" that answers questions, summarizes topics, or provides context.
-          Format: Markdown, concise (max 3 short paragraphs), include 2-3 key bible references.
-          Answer in ${langName}.`;
+            Goal: Provide a "smart answer" that answers questions, summarizes topics, or provides context.
+                Format: Markdown, concise(max 3 short paragraphs), include 2 - 3 key bible references.
+        Answer in ${ langName }.`;
 
         const text = await aiManager.generateContent('detailed_answer', prompt, '');
         res.json({ text });
@@ -1226,9 +1250,9 @@ app.post('/api/ai/fluid-gen', async (req, res) => {
         const { book, chapter, language, originalText } = req.body;
         const prompt = `
           Atue como um especialista em teologia e linguística.
-          Reescreva o capítulo ${chapter} de ${book} em linguagem moderna e fluida (${language}).
-          Texto Base: ${originalText}
-          Regras: Fidelidade teológica, linguagem moderna, narrativa fluida.
+          Reescreva o capítulo ${ chapter } de ${ book } em linguagem moderna e fluida(${ language }).
+          Texto Base: ${ originalText }
+        Regras: Fidelidade teológica, linguagem moderna, narrativa fluida.
           Retorne JSON: { "title": "...", "paragraphs": ["..."] }
         `;
 
@@ -1474,7 +1498,7 @@ app.post('/api/ai/rewrite', async (req, res) => {
 // --- SERVE STATIC FRONTEND (Production) ---
 const DIST_DIR = path.resolve(__dirname, '../dist');
 if (fs.existsSync(DIST_DIR)) {
-    console.log(`Serving static files from ${DIST_DIR}`);
+    console.log(`Serving static files from ${ DIST_DIR }`);
     app.use(express.static(DIST_DIR));
 
     // Handle SPA routing: return index.html for any unknown route
@@ -1522,10 +1546,10 @@ app.get('/api/ai/debug-raw', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${ PORT }`);
     console.log("VERSION: OPENROUTER_HARD_FIX - FORCE PROVIDER ACTIVE");
-    console.log(`Environment: ${process.env.NODE_ENV}`);
-    console.log(`Storage directory: ${DATA_DIR}`);
+    console.log(`Environment: ${ process.env.NODE_ENV }`);
+    console.log(`Storage directory: ${ DATA_DIR }`);
 });
 
 // Keep the server alive
