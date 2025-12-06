@@ -1076,108 +1076,93 @@ app.post('/api/ai/devotional', async (req, res) => {
         const { language } = req.body;
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
 
-        const systemInstruction = `You are a spiritual mentor. Return ONLY valid JSON.
-        Structure:
-        {
-          "title": "Inspiring Title",
-          "verseReference": "Book Chapter:Verse",
-          "verseText": "Full verse text...",
-          "reflection": "Deep reflection (~150 words)",
-          "prayer": "Short prayer"
-        }`;
+        const systemInstruction = `You are a spiritual mentor.
+        CRITICAL: You MUST use the exact separators below.
+        FORMAT:
+        ===TITLE===
+        (Inspiring Title Here)
+        ===VERSE===
+        (Book Chapter:Verse - Full Verse Text)
+        ===REFLECTION===
+        (Deep reflection ~150 words)
+        ===PRAYER===
+        (Short prayer)
+        `;
 
-        const prompt = `Generate a daily devotional in ${langName} focusing on hope and faith.`;
+        const prompt = `Generate a daily devotional in ${langName} focusing on hope and faith. Use the ===SEPARATOR=== format strictly.`;
 
         let rawText;
         try {
-            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction, 'json_object');
+            // Using 'chat' config as it is more permissive with text formats
+            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction);
         } catch (e) {
             console.warn("Devotional model failed, retrying...");
-            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction, 'json_object');
+            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction);
         }
 
-        let json;
-        try {
-            const firstBrace = rawText.indexOf('{');
-            const lastBrace = rawText.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1) {
-                const cleanText = rawText.substring(firstBrace, lastBrace + 1);
-                json = JSON.parse(cleanText);
-            } else {
-                throw new Error("No JSON found");
+        console.log("Devotional Raw Output:", rawText.substring(0, 100).replace(/\n/g, ' '));
+
+        // Strict Text Parser
+        const parts = {
+            title: "Devocional Diário",
+            verseReference: "Hoje",
+            verseText: "",
+            reflection: "",
+            prayer: ""
+        };
+
+        const sections = rawText.split('===');
+        for (let i = 0; i < sections.length; i++) {
+            const section = sections[i].trim().toUpperCase();
+            const content = sections[i + 1] ? sections[i + 1].trim() : "";
+
+            if (section.includes('TITLE')) parts.title = content;
+            else if (section.includes('VERSE')) {
+                // Try to split ref and text
+                const split = content.split(/[-–—] \s*(?=")/);
+                if (split.length > 1) {
+                    parts.verseReference = split[0].trim();
+                    parts.verseText = split[1].replace(/^"/, '').replace(/"$/, '').trim();
+                } else {
+                    parts.verseText = content;
+                }
             }
-        } catch (e) {
-            console.warn("Devotional JSON parse failed:", e, "Raw:", rawText.substring(0, 100));
+            else if (section.includes('REFLECTION')) parts.reflection = content;
+            else if (section.includes('PRAYER')) parts.prayer = content;
+        }
 
-            // Manual Line-by-Line Extraction (Robust Fallback)
+        // Fallback: If strict parsing failed (e.g. AI ignored separators), try the fuzzy line parser one last time
+        if (!parts.reflection && !parts.prayer) {
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
-            json = {
-                title: "Devocional Diário",
-                reflection: "",
-                verseReference: "Hoje",
-                verseText: "",
-                prayer: ""
-            };
-
-            let currentSection = 'reflection'; // Default to reflection body
+            let currentSection = 'reflection';
             let reflectionParts = [];
             let prayerParts = [];
 
+            const headerRegex = /^(?:[-*]|\d+\.)?\s*(?:\*\*|#+)?\s*/;
+
             for (const line of lines) {
                 const lower = line.toLowerCase();
-
-                // Regex to match start of line with optional bullet/number and markdown
-                // Regex to match start of line with optional bullet/number and markdown
-                // Matches: "* Title", "- **Title**", "1. Tema", "## Title"
-                const headerRegex = /^(?:[-*]|\d+\.)?\s*(?:\*\*|#+)?\s*/;
-
-                // Detect Section Headers (fuzzy match - ACCENT INSENSITIVE)
-                if (lower.match(new RegExp(headerRegex.source + "(?:tema|título|titulo|title)"))) {
-                    // Extract title from this line
-                    const clean = line.replace(new RegExp(headerRegex.source + "(?:tema|título|titulo|title):?\\s*", "i"), '').replace(/\*+$/, '').trim();
-                    if (clean) json.title = clean;
+                if (lower.match(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|===title)"))) {
+                    parts.title = line.replace(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|===title):?\\s*", "i"), '').replace(/\*+$/, '').trim();
                     continue;
                 }
-
-                if (lower.match(new RegExp(headerRegex.source + "(?:versículo|versiculo|leitura|verse|texto base)"))) {
-                    // Extract verse from this line
-                    const clean = line.replace(new RegExp(headerRegex.source + "(?:versículo|versiculo|leitura|verse|texto base):?\\s*", "i"), '').replace(/\*+$/, '').trim();
-                    if (clean) {
-                        // Split ref and text if possible (e.g. "John 3:16 - For God...")
-                        const parts = clean.split(/[-–—] \s*(?=")/); // Look for dash before quote
-                        if (parts.length > 1) {
-                            json.verseReference = parts[0].trim();
-                            json.verseText = parts[1].replace(/^"/, '').replace(/"$/, '').trim();
-                        } else {
-                            json.verseText = clean;
-                        }
-                    }
+                if (lower.match(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|===verse)"))) {
+                    parts.verseText = line.replace(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|===verse):?\\s*", "i"), '').replace(/\*+$/, '').trim();
                     continue;
                 }
-
-                if (lower.match(new RegExp(headerRegex.source + "(?:oração|oracao|prayer)"))) {
+                if (lower.match(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|===prayer)"))) {
                     currentSection = 'prayer';
-                    // Extract prayer part if on same line
-                    const clean = line.replace(new RegExp(headerRegex.source + "(?:oração|oracao|prayer):?\\s*", "i"), '').replace(/\*+$/, '').trim();
-                    if (clean) prayerParts.push(clean);
+                    prayerParts.push(line.replace(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|===prayer):?\\s*", "i"), '').replace(/\*+$/, '').trim());
                     continue;
                 }
-
-                // If no header detected, append to current section
-                if (currentSection === 'reflection') {
-                    // Ignore greeting or logic artifacts
-                    if (!line.match(/^(querido|olá|bem-vindo)/i)) {
-                        reflectionParts.push(line);
-                    }
-                } else if (currentSection === 'prayer') {
-                    prayerParts.push(line);
-                }
+                if (currentSection === 'reflection') reflectionParts.push(line);
+                else prayerParts.push(line);
             }
-
-            json.reflection = reflectionParts.join('\n\n').trim() || (rawText || "Sem conteúdo.");
-            json.prayer = prayerParts.join(' ').trim();
+            parts.reflection = reflectionParts.join('\n\n');
+            parts.prayer = parts.prayer || prayerParts.join(' ');
         }
 
+        const json = parts;
         res.json({ text: JSON.stringify(json) });
     } catch (error) {
         console.error("Devotional API Error:", error);
