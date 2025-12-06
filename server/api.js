@@ -3,13 +3,11 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path';
-import https from 'https';
-import { fileURLToPath } from 'url';
-import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
-import { Readable } from "stream";
-import { GoogleGenAI } from "@google/genai";
-import { aiManager } from './services/aiManager.js';
 import multer from 'multer';
+import { fileURLToPath } from 'url';
+import { createRequire } from "module";
+import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
+import { aiManager } from './services/aiManager.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,20 +25,63 @@ app.use((req, res, next) => {
     next();
 });
 
-// EMERGENCY KEY FALLBACK
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
 let FORCED_KEY = "";
 try {
     const forced = require('./force_key.js');
     if (forced && forced.GEMINI_KEY) {
         FORCED_KEY = forced.GEMINI_KEY;
-        console.log("⚠️ EMERGENCY: Loaded Hardcoded API Key. This is a temporary production fix.");
+        console.log("⚠️ EMERGENCY: Loaded Hardcoded API Key.");
         if (!process.env.GEMINI_API_KEY) {
             process.env.GEMINI_API_KEY = FORCED_KEY;
         }
     }
 } catch (e) { console.log("No forced key found."); }
+
+// --- HELPER: Direct Fetch for AI (Bypasses SDK issues) ---
+const generateViaFetch = async (prompt, modelName, apiKey, jsonMode = false) => {
+    // Default to a working model if one isn't explicitly passed.
+    const primaryModel = modelName || 'gemini-2.0-flash';
+    const fallbackModel = 'gemma-3-27b-it';
+
+    const tryModel = async (model) => {
+        const maskedKey = apiKey ? apiKey.substring(0, 8) + '...' : 'NONE';
+        console.log(`[AI DEBUG] Generating with Model: ${model}, Key: ${maskedKey}`);
+
+        // Gemma models don't support JSON mode via API config (returns 400)
+        // So we force jsonMode to false for them
+        const isGemma = model.includes('gemma');
+        const effectiveJsonMode = isGemma ? false : jsonMode;
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const body = {
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: effectiveJsonMode ? { responseMimeType: "application/json" } : {}
+        };
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`${response.status}: ${errText}`);
+        }
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    };
+
+    try {
+        console.log(`[AI] Generating with ${primaryModel}...`);
+        return await tryModel(primaryModel);
+    } catch (e1) {
+        console.warn(`[AI] ${primaryModel} failed: ${e1.message}. Trying ${fallbackModel}...`);
+        try {
+            return await tryModel(fallbackModel);
+        } catch (e2) {
+            throw new Error(`AI Generation Failed. Primary: ${e1.message}. Fallback: ${e2.message}`);
+        }
+    }
+};
 
 // Configure Multer for uploads
 const UPLOADS_DIR = path.resolve(__dirname, '../uploads');
@@ -1006,24 +1047,17 @@ app.get('/api/ai/status', (req, res) => {
         const status = aiManager.getStatus();
         res.json(status);
     } catch (e) {
-        res.status(500).json({ error: 'Failed to fetch status' });
+        res.status(500).json({ error: 'Failed to get status' });
     }
 });
 
-// --- SEARCH & ANSWER API (Server-Side) ---
+// --- RESTORED AI ENDPOINTS (Using generateViaFetch) ---
+
 app.post('/api/ai/search', async (req, res) => {
     try {
         const { query, language } = req.body;
         const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-
         if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
-
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
-            generationConfig: { responseMimeType: "application/json" }
-        });
 
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
         const prompt = `Search the bible for verses related to: "${query}". 
@@ -1031,11 +1065,45 @@ app.post('/api/ai/search', async (req, res) => {
           If the query is a phrase, try to find where it appears.
           Return the top 5 most relevant results in ${langName} as a JSON array of objects with keys: reference, text, context.`;
 
-        const result = await model.generateContent(prompt);
-        const text = result.response.text();
+        // Use default model (Gemma 3) logic
+        const text = await generateViaFetch(prompt, null, apiKey, true);
         res.json({ text });
     } catch (error) {
         console.error("Search API Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/ai/devotional', async (req, res) => {
+    try {
+        const { language } = req.body;
+        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
+        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
+
+        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+        const prompt = `Generate a short, inspiring daily Christian devotional in ${langName}. Return a JSON object with: title, verseReference, verseText, reflection (approx 150 words), and a short prayer.`;
+
+        const text = await generateViaFetch(prompt, 'gemini-2.0-flash', apiKey, true);
+        res.json({ text });
+    } catch (error) {
+        console.error("Devotional API Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/ai/explain', async (req, res) => {
+    try {
+        const { book, chapter, verse, text, language } = req.body;
+        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
+        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
+
+        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+        const prompt = `Act as a bible scholar. Explain the theological meaning, historical context, and practical application of ${book} ${chapter}:${verse} - "${text}". Keep it concise (under 200 words) and accessible. Answer in ${langName}.`;
+
+        const responseText = await generateViaFetch(prompt, 'gemini-2.0-flash', apiKey, false);
+        res.json({ text: responseText });
+    } catch (error) {
+        console.error("Explain API Error:", error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -1044,130 +1112,48 @@ app.post('/api/ai/detailed-answer', async (req, res) => {
     try {
         const { query, language } = req.body;
         const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-
         if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
-
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-001' });
 
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
         const prompt = `You are a wise and knowledgeable Bible assistant. 
           Users are searching for: "${query}".
-          
-          Your goal is to provide a "smart answer" that:
-          1. Directly answers the question if it is a question (e.g. "Who is David?").
-          2. Summarizes the biblical perspective if it is a topic (e.g. "Faith").
-          3. provides context if it is a keyword.
+          Goal: Provide a "smart answer" that answers questions, summarizes topics, or provides context.
+          Format: Markdown, concise (max 3 short paragraphs), include 2-3 key bible references.
+          Answer in ${langName}.`;
 
-          Format:
-          - Use **Markdown** for emphasis.
-          - Be concise (max 3 short paragraphs).
-          - Include 2-3 key bible references (e.g. Joao 3:16) if applicable.
-          - Answer in ${langName}.`;
-
-        const result = await model.generateContent(prompt);
-        res.json({ text: result.response.text() });
+        const text = await generateViaFetch(prompt, 'gemini-2.0-flash', apiKey, false);
+        res.json({ text });
     } catch (error) {
         console.error("Detailed Answer API Error:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// --- AI GENERATION ENDPOINT ---
-app.post('/api/ai/devotional', async (req, res) => {
-    try {
-        const { language } = req.body;
-        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
-
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash-001',
-            generationConfig: { responseMimeType: "application/json" }
-        });
-
-        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
-        const prompt = `Generate a short, inspiring daily Christian devotional in ${langName}. Return a JSON object with: title, verseReference, verseText, reflection (approx 150 words), and a short prayer.`;
-
-        const result = await model.generateContent(prompt);
-        res.json({ text: result.response.text() });
-    } catch (error) {
-        console.error("Devotional API Error:", error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// --- AI EXPLAIN ENDPOINT ---
-app.post('/api/ai/explain', async (req, res) => {
-    try {
-        const { book, chapter, verse, text, language } = req.body;
-        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
-
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-001' });
-
-        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
-        const prompt = `Act as a bible scholar. Explain the theological meaning, historical context, and practical application of ${book} ${chapter}:${verse} - "${text}". Keep it concise (under 200 words) and accessible. Answer in ${langName}.`;
-
-        const result = await model.generateContent(prompt);
-        res.json({ text: result.response.text() });
-    } catch (error) {
-        console.error("Explain API Error:", error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// --- AI FLUID GEN ENDPOINT ---
 app.post('/api/ai/fluid-gen', async (req, res) => {
     try {
         const { book, chapter, language, originalText } = req.body;
         const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
         if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
 
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash-001',
-            generationConfig: { temperature: 0.7 }
-        });
-
         const prompt = `
           Atue como um especialista em teologia e linguística.
-          Seu objetivo é reescrever o capítulo ${chapter} do livro de ${book} da Bíblia para uma linguagem moderna e fluida, em ${language === 'pt' ? 'Português do Brasil' : language}.
-          
-          USE O SEGUINTE TEXTO ORIGINAL COMO BASE:
-          ---
-          ${originalText}
-          ---
-    
-          Regras:
-          1. Mantenha a fidelidade teológica absoluta ao texto fornecido acima.
-          2. Substitua termos arcaicos por equivalentes modernos.
-          3. Organize o texto em parágrafos lógicos e fluidos (narrativa), NÃO em versículos isolados.
-          4. Destaque em **negrito** (Markdown) as frases teologicamente mais importantes.
-          5. O texto deve ser envolvente, como um livro de literatura.
-          6. Retorne APENAS um JSON válido com a seguinte estrutura:
-          {
-            "title": "Título do Capítulo (ex: A Criação do Mundo)",
-            "paragraphs": ["parágrafo 1...", "parágrafo 2..."]
-          }
+          Reescreva o capítulo ${chapter} de ${book} em linguagem moderna e fluida (${language}).
+          Texto Base: ${originalText}
+          Regras: Fidelidade teológica, linguagem moderna, narrativa fluida.
+          Retorne JSON: { "title": "...", "paragraphs": ["..."] }
         `;
 
-        const result = await model.generateContent(prompt);
-        res.json({ text: result.response.text() });
+        const text = await generateViaFetch(prompt, 'gemini-2.0-flash', apiKey, true);
+        res.json({ text });
     } catch (error) {
         console.error("Fluid Gen API Error:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// --- AI GENERATION ENDPOINT ---
+// --- GENERATION ENDPOINTS ---
+
 app.post('/api/ai/generate-image', async (req, res) => {
-    console.log('[API] /api/ai/generate-image called');
     console.log('[API] Request body:', JSON.stringify(req.body));
     try {
         const { prompt, width, height, customFilename } = req.body;
