@@ -637,80 +637,75 @@ app.post('/api/settings', (req, res) => {
     }
 });
 
-// --- AUDIO GENERATION (TTS) ---
+// DEBUG LOG ENDPOINT
+app.get('/api/debug/log', (req, res) => {
+    const debugFile = path.join(__dirname, 'server_debug.txt');
+    if (fs.existsSync(debugFile)) {
+        res.sendFile(debugFile);
+    } else {
+        res.type('text/plain').send("Log file is empty or missing.");
+    }
+});
 
 app.post('/api/audio/edge', async (req, res) => {
     const debugFile = path.join(__dirname, 'server_debug.txt');
     const log = (msg) => {
         try {
-            fs.appendFileSync(debugFile, `[${new Date().toISOString()}] ${msg}\n`);
+            const time = new Date().toLocaleTimeString();
+            fs.appendFileSync(debugFile, `[${time}] ${msg}\n`);
+            console.log(`[AudioDebug] ${msg}`);
         } catch (e) { console.error("Log failed", e); }
     };
 
     try {
-        log("Endpoint hit");
+        log("--- New Audio Request ---");
         const { text, voice } = req.body;
-        if (!text) {
-            log("No text provided");
-            return res.status(400).json({ error: 'Text is required' });
-        }
+        if (!text) return res.status(400).json({ error: 'Text is required' });
 
-        log(`Generating for: ${text.substring(0, 10)}... Voice: ${voice}`);
+        log(`Voice: ${voice}, Text Length: ${text.length}`);
+
+        // 1. Setup TTS
         const tts = new MsEdgeTTS();
-
-        let voiceId = "pt-BR-AntonioNeural";
-        if (voice === 'female') {
-            voiceId = "pt-BR-FranciscaNeural";
-        }
-
-        log(`Setting metadata for ${voiceId}`);
+        const voiceId = voice === 'female' ? "pt-BR-FranciscaNeural" : "pt-BR-AntonioNeural";
         await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
 
-        log("Calling toStream");
+        // 2. Generate
+        log("Generating stream...");
         const result = await tts.toStream(text);
-
-        // Fix based on test finding: correct property is result.audioStream
         const stream = result ? result.audioStream : null;
 
         if (!stream) {
-            const keys = result ? Object.keys(result) : 'null_result';
-            log(`Stream is null. Result keys: ${keys}`);
-            return res.status(500).json({ error: 'Stream is null', keys, step: 'toStream result analysis' });
+            throw new Error(`Stream is null. Result keys: ${result ? Object.keys(result).join(',') : 'null'}`);
         }
 
-        log("Stream obtained. Setting up events.");
-
+        // 3. Collect Data
         const chunks = [];
-
-        stream.on('data', (chunk) => chunks.push(chunk));
+        stream.on('data', (c) => chunks.push(c));
 
         stream.on('end', () => {
-            log("Stream ended");
-            const buffer = Buffer.concat(chunks);
-            // Don't write to file, just send base64
-            // const filename = `tts-${Date.now()}.webm`;
-            // const filePath = path.join(UPLOADS_DIR, filename);
-            // fs.writeFileSync(filePath, buffer);
-
-            res.json({
-                success: true,
-                // url: `/uploads/${filename}`, 
-                base64: buffer.toString('base64')
-            });
+            try {
+                const buffer = Buffer.concat(chunks);
+                log(`Success! Buffer size: ${buffer.length} bytes`);
+                const base64 = buffer.toString('base64');
+                res.json({ base64 });
+            } catch (err) {
+                log(`Buffer error: ${err.message}`);
+                res.status(500).json({ error: 'Buffer conversion failed' });
+            }
         });
 
         stream.on('error', (err) => {
-            log(`Stream Error: ${err}`);
-            console.error("Stream Error:", err);
-            res.status(500).json({ error: 'Stream failure' });
+            log(`Stream error: ${err.message}`);
+            res.status(500).json({ error: 'Stream error', details: err.message });
         });
 
-    } catch (error) {
-        log(`Catch Error: ${error}\nStack: ${error.stack}`);
-        console.error("Edge TTS Error:", error);
-        res.status(500).json({ error: 'Failed to generate audio' });
+    } catch (e) {
+        log(`CRITICAL ERROR: ${e.message}`);
+        log(`Stack: ${e.stack}`);
+        res.status(500).json({ error: e.message, stack: e.stack });
     }
 });
+
 // Deprecated in favor of Pollinations.ai
 export const generateSVGImage = async (prompt) => {
     return null;
