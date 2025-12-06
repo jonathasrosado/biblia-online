@@ -1084,6 +1084,72 @@ app.post('/api/ai/devotional', async (req, res) => {
     }
 });
 
+// --- AI EXPLAIN ENDPOINT ---
+app.post('/api/ai/explain', async (req, res) => {
+    try {
+        const { book, chapter, verse, text, language } = req.body;
+        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
+        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
+
+        const { GoogleGenerativeAI } = require('@google/generative-ai');
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+        const prompt = `Act as a bible scholar. Explain the theological meaning, historical context, and practical application of ${book} ${chapter}:${verse} - "${text}". Keep it concise (under 200 words) and accessible. Answer in ${langName}.`;
+
+        const result = await model.generateContent(prompt);
+        res.json({ text: result.response.text() });
+    } catch (error) {
+        console.error("Explain API Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// --- AI FLUID GEN ENDPOINT ---
+app.post('/api/ai/fluid-gen', async (req, res) => {
+    try {
+        const { book, chapter, language, originalText } = req.body;
+        const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
+        if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
+
+        const { GoogleGenerativeAI } = require('@google/generative-ai');
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            generationConfig: { temperature: 0.7 }
+        });
+
+        const prompt = `
+          Atue como um especialista em teologia e linguística.
+          Seu objetivo é reescrever o capítulo ${chapter} do livro de ${book} da Bíblia para uma linguagem moderna e fluida, em ${language === 'pt' ? 'Português do Brasil' : language}.
+          
+          USE O SEGUINTE TEXTO ORIGINAL COMO BASE:
+          ---
+          ${originalText}
+          ---
+    
+          Regras:
+          1. Mantenha a fidelidade teológica absoluta ao texto fornecido acima.
+          2. Substitua termos arcaicos por equivalentes modernos.
+          3. Organize o texto em parágrafos lógicos e fluidos (narrativa), NÃO em versículos isolados.
+          4. Destaque em **negrito** (Markdown) as frases teologicamente mais importantes.
+          5. O texto deve ser envolvente, como um livro de literatura.
+          6. Retorne APENAS um JSON válido com a seguinte estrutura:
+          {
+            "title": "Título do Capítulo (ex: A Criação do Mundo)",
+            "paragraphs": ["parágrafo 1...", "parágrafo 2..."]
+          }
+        `;
+
+        const result = await model.generateContent(prompt);
+        res.json({ text: result.response.text() });
+    } catch (error) {
+        console.error("Fluid Gen API Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // --- AI GENERATION ENDPOINT ---
 app.post('/api/ai/generate-image', async (req, res) => {
     console.log('[API] /api/ai/generate-image called');

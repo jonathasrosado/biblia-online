@@ -129,65 +129,27 @@ type FluidChapterContent = { title: string; paragraphs: string[] };
 
 // Direct AI Generation (Bypasses cache/local API)
 export const generateFluidContent = async (book: string, chapter: number, language: string = 'pt'): Promise<FluidChapterContent | { error: string }> => {
-  if (!apiKey) {
-    return { error: "Chave de API não configurada." };
-  }
-
   try {
     // 1. Fetch Original Verses (Grounded Generation)
     const verses = await getChapterContent(book, chapter, language);
     const originalText = verses.map(v => `${v.number}. ${v.text}`).join('\n');
 
-    const prompt = `
-      Atue como um especialista em teologia e linguística.
-      Seu objetivo é reescrever o capítulo ${chapter} do livro de ${book} da Bíblia para uma linguagem moderna e fluida, em ${language === 'pt' ? 'Português do Brasil' : language}.
-      
-      USE O SEGUINTE TEXTO ORIGINAL COMO BASE:
-      ---
-      ${originalText}
-      ---
-
-      Regras:
-      1. Mantenha a fidelidade teológica absoluta ao texto fornecido acima.
-      2. Substitua termos arcaicos por equivalentes modernos.
-      3. Organize o texto em parágrafos lógicos e fluidos (narrativa), NÃO em versículos isolados.
-      4. Destaque em **negrito** (Markdown) as frases teologicamente mais importantes.
-      5. O texto deve ser envolvente, como um livro de literatura.
-      6. Retorne APENAS um JSON válido com a seguinte estrutura:
-      {
-        "title": "Título do Capítulo (ex: A Criação do Mundo)",
-        "paragraphs": ["parágrafo 1...", "parágrafo 2..."]
-      }
-    `;
-
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: prompt,
-      config: {
-        temperature: 0.7
-      }
+    const response = await fetch('/api/ai/fluid-gen', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ book, chapter, language, originalText })
     });
 
-    console.log("DEBUG: Full Response Object:", JSON.stringify(response, null, 2));
+    if (!response.ok) throw new Error(`Fluid Gen Error: ${response.status}`);
+    const data = await response.json();
 
-    let text = '';
-    if (typeof response.text === 'function') {
-      text = (response.text as Function)();
-    } else if (typeof response.text === 'string') {
-      text = response.text;
-    } else if (response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts && response.candidates[0].content.parts[0].text) {
-      text = response.candidates[0].content.parts[0].text;
-    } else {
-      console.error("DEBUG: Could not extract text from response");
-      throw new Error("Could not extract text from response");
-    }
-
-    // Clean JSON (remove markdown code blocks if present)
+    // Parse text inside response
+    let text = data.text || '';
     const jsonString = text.replace(/```json\n?|\n?```/g, '').trim();
 
     try {
-      const data = JSON.parse(jsonString) as FluidChapterContent;
-      return data;
+      const parsed = JSON.parse(jsonString) as FluidChapterContent;
+      return parsed;
     } catch (parseError) {
       console.error("JSON Parse Error:", parseError, "Raw text:", text);
       return { error: "Estrutura inválida da IA. Tente novamente." };
@@ -289,13 +251,16 @@ export const explainVerse = async (book: string, chapter: number, verse: number,
   if (cached) return cached;
 
   try {
-    const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: `Act as a bible scholar. Explain the theological meaning, historical context, and practical application of ${book} ${chapter}:${verse} - "${text}". Keep it concise (under 200 words) and accessible. Answer in ${langName}.`,
+    const response = await fetch('/api/ai/explain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ book, chapter, verse, text, language })
     });
 
-    const explanation = response.text || "";
+    if (!response.ok) return "Explicação indisponível (Server Error).";
+    const data = await response.json();
+
+    const explanation = data.text || "";
     if (explanation) {
       saveToCache(cacheKey, explanation);
     }
