@@ -126,7 +126,8 @@ export class AIManager {
 
         // FORCE OPENROUTER TO BYPASS BLOCKS
         const provider = 'openrouter';
-        const model = modelOverride || featureConfig?.model || 'google/gemini-2.0-flash-exp:free';
+        // FORCE MODEL TO FREE VERSION (Ignore config file which might be stale/1.5)
+        const model = 'google/gemini-2.0-flash-exp:free';
 
         console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
 
