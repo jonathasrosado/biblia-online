@@ -1066,7 +1066,7 @@ app.post('/api/ai/devotional', async (req, res) => {
           "title": "Inspiring Title",
           "verseReference": "Book Chapter:Verse",
           "verseText": "Full verse text...",
-          "content": "Deep reflection (~150 words)",
+          "reflection": "Deep reflection (~150 words)",
           "prayer": "Short prayer"
         }`;
 
