@@ -1109,32 +1109,68 @@ app.post('/api/ai/devotional', async (req, res) => {
         } catch (e) {
             console.warn("Devotional JSON parse failed:", e, "Raw:", rawText.substring(0, 100));
 
-            // Manual Regex Extraction (Fallback)
-            const titleMatch = rawText.match(/\*\*(?:Tema|Título|Title):?\*\* (.*)/i) || rawText.match(/^#+ (.*)/m);
-            const verseMatch = rawText.match(/\*\*(?:Versículo|Leitura|Verse|Texto Base):?\*\* (.*)/i);
-            const prayerMatch = rawText.match(/\*\*(?:Oração|Prayer):?\*\* ([\s\S]*)/i);
+            // Manual Line-by-Line Extraction (Robust Fallback)
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
+            json = {
+                title: "Devocional Diário",
+                reflection: "",
+                verseReference: "Hoje",
+                verseText: "",
+                prayer: ""
+            };
 
-            // Reflection: Try to capture text between Verse and Prayer
-            let reflectionText = "";
-            const contentMatch = rawText.match(/(?:\*\*Vers.*?|Texto Base.*?\*\*)([\s\S]*?)(?=\*\*Ora)/i);
-            if (contentMatch) {
-                reflectionText = contentMatch[1].trim();
-            } else {
-                // Clean up known headers to leave body
-                reflectionText = rawText
-                    .replace(/\*\*(?:Tema|Título|Title):?\*\* .*/i, '')
-                    .replace(/\*\*(?:Versículo|Leitura|Verse|Texto Base):?\*\* .*/i, '')
-                    .replace(/\*\*(?:Oração|Prayer):?\*\* [\s\S]*/i, '')
-                    .trim();
+            let currentSection = 'reflection'; // Default to reflection body
+            let reflectionParts = [];
+            let prayerParts = [];
+
+            for (const line of lines) {
+                const lower = line.toLowerCase();
+
+                // Detect Section Headers (fuzzy match)
+                if (lower.match(/^(?:\*\*|#)?\s*(?:tema|título|title)/)) {
+                    // Extract title from this line
+                    const clean = line.replace(/^(?:\*\*|#)?\s*(?:tema|título|title):?\s*/i, '').replace(/\*+$/, '').trim();
+                    if (clean) json.title = clean;
+                    continue;
+                }
+
+                if (lower.match(/^(?:\*\*|#)?\s*(?:versículo|leitura|verse|texto base)/)) {
+                    // Extract verse from this line
+                    const clean = line.replace(/^(?:\*\*|#)?\s*(?:versículo|leitura|verse|texto base):?\s*/i, '').replace(/\*+$/, '').trim();
+                    if (clean) {
+                        // Split ref and text if possible (e.g. "John 3:16 - For God...")
+                        const parts = clean.split(/[-–—] \s*(?=")/); // Look for dash before quote
+                        if (parts.length > 1) {
+                            json.verseReference = parts[0].trim();
+                            json.verseText = parts[1].replace(/^"/, '').replace(/"$/, '').trim();
+                        } else {
+                            json.verseText = clean;
+                        }
+                    }
+                    continue;
+                }
+
+                if (lower.match(/^(?:\*\*|#)?\s*(?:oração|prayer)/)) {
+                    currentSection = 'prayer';
+                    // Extract prayer part if on same line
+                    const clean = line.replace(/^(?:\*\*|#)?\s*(?:oração|prayer):?\s*/i, '').replace(/\*+$/, '').trim();
+                    if (clean) prayerParts.push(clean);
+                    continue;
+                }
+
+                // If no header detected, append to current section
+                if (currentSection === 'reflection') {
+                    // Ignore greeting or logic artifacts
+                    if (!line.match(/^(querido|olá|bem-vindo)/i)) {
+                        reflectionParts.push(line);
+                    }
+                } else if (currentSection === 'prayer') {
+                    prayerParts.push(line);
+                }
             }
 
-            json = {
-                title: titleMatch ? titleMatch[1].trim() : "Devocional Diário",
-                reflection: reflectionText || (rawText || "Sem conteúdo."),
-                verseReference: "Hoje",
-                verseText: verseMatch ? verseMatch[1].trim() : "",
-                prayer: prayerMatch ? prayerMatch[1].trim() : ""
-            };
+            json.reflection = reflectionParts.join('\n\n').trim() || (rawText || "Sem conteúdo.");
+            json.prayer = prayerParts.join(' ').trim();
         }
 
         res.json({ text: JSON.stringify(json) });
