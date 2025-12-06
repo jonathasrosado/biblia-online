@@ -125,7 +125,7 @@ export class AIManager {
 
         // Default to Gemini if not configured
         const provider = featureConfig?.provider || 'gemini';
-        const model = featureConfig?.model || 'gemini-2.0-flash-exp';
+        const model = featureConfig?.model || 'gemini-1.5-flash';
 
         console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
 
