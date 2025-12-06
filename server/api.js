@@ -15,6 +15,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3002;
+console.log("----------------------------------------");
+console.log("SERVER VERSION: 1.0.5 - STRICT STRING PARSING");
+console.log("----------------------------------------");
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -1091,10 +1094,10 @@ app.post('/api/ai/devotional', async (req, res) => {
 
         console.log("Devotional Raw Output:", rawText.substring(0, 100).replace(/\n/g, ' '));
 
-        // Normalize generic separators if AI fails to use specific ones
-        if (rawText.includes('===SEPARATOR===')) {
-            rawText = rawText.replace(/===SEPARATOR===/g, '\n===SECTION===\n');
-        }
+        // Normalize generic separators (Robust Regex)
+        // Matches ===SEPARATOR===, === SEPARATOR ===, etc.
+        rawText = rawText.replace(/={3,}\s*SEPARATOR\s*={3,}/gi, '\n===SECTION===\n');
+
 
         // Strict Text Parser
         const parts = {
