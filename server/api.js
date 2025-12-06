@@ -1049,7 +1049,7 @@ app.post('/api/ai/detailed-answer', async (req, res) => {
 
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-001' });
 
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
         const prompt = `You are a wise and knowledgeable Bible assistant. 
@@ -1079,13 +1079,12 @@ app.post('/api/ai/devotional', async (req, res) => {
     try {
         const { language } = req.body;
         const apiKey = process.env.GEMINI_API_KEY || aiManager.config.apiKeys.gemini;
-
         if (!apiKey) return res.status(500).json({ error: 'API Key missing' });
 
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash-latest',
+            model: 'gemini-1.5-flash-001',
             generationConfig: { responseMimeType: "application/json" }
         });
 
@@ -1109,7 +1108,7 @@ app.post('/api/ai/explain', async (req, res) => {
 
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-001' });
 
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
         const prompt = `Act as a bible scholar. Explain the theological meaning, historical context, and practical application of ${book} ${chapter}:${verse} - "${text}". Keep it concise (under 200 words) and accessible. Answer in ${langName}.`;
@@ -1132,7 +1131,7 @@ app.post('/api/ai/fluid-gen', async (req, res) => {
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash-latest',
+            model: 'gemini-1.5-flash-001',
             generationConfig: { temperature: 0.7 }
         });
 
