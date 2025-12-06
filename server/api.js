@@ -1010,61 +1010,51 @@ app.post('/api/ai/search', async (req, res) => {
         const { query, language } = req.body;
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
 
-        // RESTORED RICH PROMPT (Now safe with OpenRouter)
-        const systemInstruction = `You are a Bible search assistant. Return ONLY valid JSON.
-        Structure:
-        {
-          "explanation": "Detailed theological answer in ${langName}",
-          "verses": [
-            { "reference": "Book Chapter:Verse", "text": "Verse text" }
-          ]
-        }`;
+        // RESTORED RICH PROMPT (Text Layout for Robustness)
+        const systemInstruction = `You are a Bible search assistant. 
+        CRITICAL: Follow this format STRICTLY.
+        ===EXPLANATION===
+        (Detailed theological answer in ${langName})
+        ===VERSES===
+        Book Chapter:Verse - "Verse text"
+        Book Chapter:Verse - "Verse text"
+        `;
 
-        const prompt = `Search query: "${query}". Provide a comprehensive answer and 3-5 relevant verses.`;
+        const prompt = `Search query: "${query}". Provide a comprehensive answer and 3-5 relevant verses. Use exactly these headers: ===EXPLANATION===, ===VERSES===.`;
 
-        // Use 'chat' feature config as it's proven to work with OpenRouter
         let rawText;
         try {
-            rawText = await aiManager.generateContent('chat', prompt, systemInstruction, 'json_object');
+            rawText = await aiManager.generateContent('chat', prompt, systemInstruction);
         } catch (e) {
             console.warn("Primary model failed, retrying...");
-            rawText = await aiManager.generateContent('chat', prompt, systemInstruction, 'json_object');
+            rawText = await aiManager.generateContent('chat', prompt, systemInstruction);
         }
 
-        // Parse JSON output
-        let json;
-        try {
-            const firstBrace = rawText.indexOf('{');
-            const lastBrace = rawText.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1) {
-                const cleanText = rawText.substring(firstBrace, lastBrace + 1);
-                json = JSON.parse(cleanText);
-            } else {
-                throw new Error("No JSON found");
-            }
-        } catch (e) {
-            console.warn("Search JSON parse failed:", e, "Raw:", rawText.substring(0, 100));
+        const parts = { explanation: "", verses: [] };
 
-            // Fallback: Extract verses from text using Regex
-            const verseRegex = /\b([1-9]?[A-Za-zÀ-ÿ]+)\s+(\d+:\d+(?:-\d+)?)/g;
-            let extractedVerses = [];
-            let match;
-            while ((match = verseRegex.exec(rawText)) !== null) {
-                // Ensure it's not part of a timestamp logic or irrelevant number
-                extractedVerses.push({
-                    reference: `${match[1]} ${match[2]}`,
-                    text: "Ver no contexto..." // We can't easily extract the text without complex parsing, but at least the ref shows up
-                });
-            }
+        // Robust Parsing
+        const sections = rawText.split('===');
+        for (let i = 0; i < sections.length; i++) {
+            const section = sections[i].trim().toUpperCase();
+            const content = sections[i + 1] ? sections[i + 1].trim() : "";
 
-            // Fallback object
-            json = {
-                explanation: rawText.replace(verseRegex, "**$1 $2**"), // Highlight refs
-                verses: extractedVerses.slice(0, 5) // Limit to 5
-            };
+            if (section.includes('EXPLANATION')) {
+                parts.explanation = content;
+            } else if (section.includes('VERSES')) {
+                const lines = content.split('\n');
+                for (const line of lines) {
+                    const match = line.match(/^([-0-9A-Za-zÀ-ÿ\s]+:\d+(?:-\d+)?)\s*-\s*["']?(.*?)["']?$/);
+                    if (match) {
+                        parts.verses.push({ reference: match[1].trim(), text: match[2].trim() });
+                    }
+                }
+            }
         }
 
-        res.json({ text: JSON.stringify(json) });
+        // Fallback if parsing failed
+        if (!parts.explanation) parts.explanation = rawText;
+
+        res.json({ text: JSON.stringify(parts) });
     } catch (error) {
         console.error("Search API Error:", error);
         res.status(500).json({ error: error.message });
@@ -1236,16 +1226,43 @@ app.post('/api/ai/detailed-answer', async (req, res) => {
 app.post('/api/ai/fluid-gen', async (req, res) => {
     try {
         const { book, chapter, language, originalText } = req.body;
-        const prompt = `
-          Atue como um especialista em teologia e linguística.
-          Reescreva o capítulo ${chapter} de ${book} em linguagem moderna e fluida(${language}).
-          Texto Base: ${originalText}
-        Regras: Fidelidade teológica, linguagem moderna, narrativa fluida.
-          Retorne JSON: { "title": "...", "paragraphs": ["..."] }
+
+        const systemInstruction = `Atue como um especialista em teologia.
+        CRITICAL: Follow this format STRICTLY.
+        ===TITLE===
+        (Write the chapter title here)
+        ===PARAGRAPHS===
+        (Write the modernized text here, paragraph by paragraph)
         `;
 
-        const text = await aiManager.generateContent('fluid_gen', prompt, '');
-        res.json({ text });
+        const prompt = `
+          Reescreva o capítulo ${chapter} de ${book} em linguagem moderna e fluida (${language}).
+          Texto Base: ${originalText}
+          Use exactly these headers: ===TITLE===, ===PARAGRAPHS===.
+        `;
+
+        const rawText = await aiManager.generateContent('fluid_gen', prompt, systemInstruction);
+
+        const parts = { title: `Capítulo ${chapter}`, paragraphs: [] };
+
+        const sections = rawText.split('===');
+        for (let i = 0; i < sections.length; i++) {
+            const section = sections[i].trim().toUpperCase();
+            const content = sections[i + 1] ? sections[i + 1].trim() : "";
+
+            if (section.includes('TITLE')) {
+                parts.title = content;
+            } else if (section.includes('PARAGRAPHS')) {
+                parts.paragraphs = content.split('\n').map(p => p.trim()).filter(p => p.length > 0);
+            }
+        }
+
+        // Fallback
+        if (parts.paragraphs.length === 0) {
+            parts.paragraphs = rawText.split('\n').filter(p => p.length > 20);
+        }
+
+        res.json({ text: JSON.stringify(parts) });
     } catch (error) {
         console.error("Fluid Gen API Error:", error);
         res.status(500).json({ error: error.message });
