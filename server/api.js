@@ -1012,12 +1012,12 @@ app.post('/api/ai/search', async (req, res) => {
 
         const systemInstruction = `You are a biblical search assistant. 
           Return results in ${langName}.
-          Return a JSON array of objects with keys: reference, text, context.`;
+          Return a simple numbered list of the top results.`;
 
         const prompt = `Search the bible for verses related to: "${query}". 
           If the query is a specific topic (e.g. "hope", "salvation"), find the most relevant verses.
           If the query is a phrase, try to find where it appears.
-          Return the top 5 most relevant results.`;
+          Return the top 5 most relevant results as a numbered list. Format: Reference - Text.`;
 
         // Use 'search' feature (defaults to Gemini Exp) - NO JSON MODE enforced to avoid errors
         const text = await aiManager.generateContent('search', prompt, systemInstruction);
@@ -1034,7 +1034,7 @@ app.post('/api/ai/devotional', async (req, res) => {
         const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
 
         const prompt = `Generate a short, inspiring daily Christian devotional in ${langName}. 
-        Return a JSON object with: title, verseReference, verseText, reflection (approx 150 words), and a short prayer.`;
+        Return formatted text with: Title, Verse Reference, Verse Text, Reflection (approx 150 words), and a Short Prayer.`;
 
         const text = await aiManager.generateContent('devotional', prompt, '');
         res.json({ text });
