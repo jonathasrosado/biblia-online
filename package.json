@@ -9,6 +9,9 @@
     "start": "node server/api.js",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@google/genai": "^1.30.0",
     "@google/generative-ai": "^0.24.1",
@@ -22,6 +25,7 @@
     "lucide-react": "^0.555.0",
     "msedge-tts": "^2.0.2",
     "multer": "^2.0.2",
+    "node-fetch": "^3.3.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-helmet-async": "^2.0.5",
