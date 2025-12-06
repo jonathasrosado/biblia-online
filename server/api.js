@@ -1094,14 +1094,27 @@ app.post('/api/ai/devotional', async (req, res) => {
             console.warn("Devotional JSON parse failed:", e, "Raw:", rawText.substring(0, 100));
 
             // Manual Regex Extraction (Fallback)
-            const titleMatch = rawText.match(/\*\*Title:?\*\* (.*)/i) || rawText.match(/\*\*Título:?\*\* (.*)/i) || rawText.match(/Title: (.*)/i);
-            const verseMatch = rawText.match(/\*\*Verse:?\*\* (.*)/i) || rawText.match(/\*\*Versículo:?\*\* (.*)/i);
-            const reflectionMatch = rawText.match(/\*\*Reflection:?\*\* ([\s\S]*?)\*\*Prayer/i) || rawText.match(/\*\*Reflexão:?\*\* ([\s\S]*?)\*\*Oração/i);
-            const prayerMatch = rawText.match(/\*\*Prayer:?\*\* ([\s\S]*)/i) || rawText.match(/\*\*Oração:?\*\* ([\s\S]*)/i);
+            const titleMatch = rawText.match(/\*\*(?:Tema|Título|Title):?\*\* (.*)/i) || rawText.match(/^#+ (.*)/m);
+            const verseMatch = rawText.match(/\*\*(?:Versículo|Leitura|Verse|Texto Base):?\*\* (.*)/i);
+            const prayerMatch = rawText.match(/\*\*(?:Oração|Prayer):?\*\* ([\s\S]*)/i);
+
+            // Reflection: Try to capture text between Verse and Prayer
+            let reflectionText = "";
+            const contentMatch = rawText.match(/(?:\*\*Vers.*?|Texto Base.*?\*\*)([\s\S]*?)(?=\*\*Ora)/i);
+            if (contentMatch) {
+                reflectionText = contentMatch[1].trim();
+            } else {
+                // Clean up known headers to leave body
+                reflectionText = rawText
+                    .replace(/\*\*(?:Tema|Título|Title):?\*\* .*/i, '')
+                    .replace(/\*\*(?:Versículo|Leitura|Verse|Texto Base):?\*\* .*/i, '')
+                    .replace(/\*\*(?:Oração|Prayer):?\*\* [\s\S]*/i, '')
+                    .trim();
+            }
 
             json = {
                 title: titleMatch ? titleMatch[1].trim() : "Devocional Diário",
-                reflection: reflectionMatch ? reflectionMatch[1].trim() : (rawText || "Sem conteúdo."),
+                reflection: reflectionText || (rawText || "Sem conteúdo."),
                 verseReference: "Hoje",
                 verseText: verseMatch ? verseMatch[1].trim() : "",
                 prayer: prayerMatch ? prayerMatch[1].trim() : ""
