@@ -120,12 +120,12 @@ export class AIManager {
         };
     }
 
-    async generateContent(feature, prompt, systemInstruction = '', responseFormat = null) {
+    async generateContent(feature, prompt, systemInstruction = '', responseFormat = null, modelOverride = null) {
         const featureConfig = this.config.features[feature];
 
         // Default to OpenRouter to bypass Railway region blocks for Gemini
         const provider = featureConfig?.provider || 'openrouter';
-        const model = featureConfig?.model || 'google/gemini-2.0-flash-exp:free';
+        const model = modelOverride || featureConfig?.model || 'google/gemini-2.0-flash-exp:free';
 
         console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
 

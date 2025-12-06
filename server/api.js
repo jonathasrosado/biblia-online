@@ -1014,7 +1014,15 @@ app.post('/api/ai/search', async (req, res) => {
         const prompt = `User request: Find bible verses about "${query}". List reference and text.`;
 
         // MASQUERADE AS CHAT to bypass production block on 'Search' intent
-        const text = await aiManager.generateContent('chat', prompt, "");
+        let text;
+        try {
+            // Try Primary (Gemini 2.0 Flash Exp from Chat config)
+            text = await aiManager.generateContent('chat', prompt, "");
+        } catch (e) {
+            console.warn("Primary Search model failed. Trying Fallback (Gemini 1.5 Flash)...");
+            // Fallback to Stable 1.5 Flash
+            text = await aiManager.generateContent('chat', prompt, "", null, 'gemini-1.5-flash');
+        }
         res.json({ text });
     } catch (error) {
         console.error("Search API Error:", error);
