@@ -242,10 +242,19 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
           const blob = new Blob([byteArray], { type: 'audio/mpeg' });
           const blobUrl = URL.createObjectURL(blob);
 
-          audioRef.current.src = blobUrl;
-          audioRef.current.playbackRate = 1.0;
+          // Reuse existing audio object
+          const audio = audioRef.current;
 
-          audioRef.current.onended = () => {
+          // Vital for iOS: Verify audio is unlocked/ready
+          // (We already primed it in playAudio, but sometimes we need to be careful)
+
+          audio.src = blobUrl;
+          audio.playbackRate = 1.0;
+
+          // iOS Safari requires explicit load() sometimes when changing src
+          audio.load();
+
+          audio.onended = () => {
             URL.revokeObjectURL(blobUrl);
             index++;
             playNext();
