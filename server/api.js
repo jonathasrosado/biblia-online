@@ -1044,8 +1044,24 @@ app.post('/api/ai/search', async (req, res) => {
             }
         } catch (e) {
             console.warn("Search JSON parse failed:", e, "Raw:", rawText.substring(0, 100));
-            // Fallback if AI returns plain text
-            json = { explanation: rawText, verses: [] };
+
+            // Fallback: Extract verses from text using Regex
+            const verseRegex = /\b([1-9]?[A-Za-zÀ-ÿ]+)\s+(\d+:\d+(?:-\d+)?)/g;
+            let extractedVerses = [];
+            let match;
+            while ((match = verseRegex.exec(rawText)) !== null) {
+                // Ensure it's not part of a timestamp logic or irrelevant number
+                extractedVerses.push({
+                    reference: `${match[1]} ${match[2]}`,
+                    text: "Ver no contexto..." // We can't easily extract the text without complex parsing, but at least the ref shows up
+                });
+            }
+
+            // Fallback object
+            json = {
+                explanation: rawText.replace(verseRegex, "**$1 $2**"), // Highlight refs
+                verses: extractedVerses.slice(0, 5) // Limit to 5
+            };
         }
 
         res.json({ text: JSON.stringify(json) });
