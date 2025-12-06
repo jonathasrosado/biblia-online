@@ -1127,8 +1127,9 @@ app.post('/api/ai/devotional', async (req, res) => {
                 const lower = line.toLowerCase();
 
                 // Regex to match start of line with optional bullet/number and markdown
-                // Matches: "* Title", "- **Title**", "1. Tema"
-                const headerRegex = /^(?:[-*]|\d+\.)?\s*(?:\*\*|#)?\s*/;
+                // Regex to match start of line with optional bullet/number and markdown
+                // Matches: "* Title", "- **Title**", "1. Tema", "## Title"
+                const headerRegex = /^(?:[-*]|\d+\.)?\s*(?:\*\*|#+)?\s*/;
 
                 // Detect Section Headers (fuzzy match - ACCENT INSENSITIVE)
                 if (lower.match(new RegExp(headerRegex.source + "(?:tema|título|titulo|title)"))) {
