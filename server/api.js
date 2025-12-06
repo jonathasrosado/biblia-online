@@ -1088,7 +1088,7 @@ app.post('/api/ai/devotional', async (req, res) => {
                 (Prayer)
                     `;
 
-        const prompt = `Generate a daily devotional in ${langName} focusing on hope and faith.Use exactly these headers: === TITLE ===, === VERSE ===, === REFLECTION ===, === PRAYER ===.`;
+        const prompt = `Generate a daily devotional in ${langName} focusing on hope and faith. Use exactly these headers: ===TITLE===, ===VERSE===, ===REFLECTION===, ===PRAYER===. Do NOT use ===SEPARATOR=== or any variation.`;
 
         let rawText;
         try {
