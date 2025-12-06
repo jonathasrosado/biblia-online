@@ -54,7 +54,9 @@ const generateViaFetch = async (prompt, modelName, apiKey, jsonMode = false) => 
             model: model,
             generationConfig: {
                 // Gemma crashes with JSON mode, so disable it for Gemma
-                responseMimeType: (jsonMode && !model.includes('gemma')) ? "application/json" : "text/plain"
+                // Railway production also seems to reject JSON mode for Gemini 2.0 Check? 
+                // Disabling it globally to rely on prompt.
+                // responseMimeType: (jsonMode && !model.includes('gemma')) ? "application/json" : "text/plain"
             }
         });
 
