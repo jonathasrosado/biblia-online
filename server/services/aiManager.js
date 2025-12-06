@@ -159,8 +159,8 @@ export class AIManager {
     }
 
     async _generateOpenRouterText(prompt, model, responseFormat = null) {
-        // PRIORITIZE ENV VAR (to fix stuck config issues)
-        const apiKey = process.env.OPENROUTER_API_KEY || this.config.apiKeys.openrouter;
+        const rawKey = process.env.OPENROUTER_API_KEY || this.config.apiKeys.openrouter;
+        const apiKey = rawKey ? rawKey.trim() : null;
 
         if (!apiKey) throw new Error("OpenRouter API Key missing");
         console.log(`[AIManager] Auth Key: ${apiKey.substring(0, 15)}... (Source: ${process.env.OPENROUTER_API_KEY ? 'ENV' : 'CONFIG'})`);
