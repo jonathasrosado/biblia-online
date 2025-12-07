@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type, Chat, Modality } from "@google/genai";
 import { Verse, SearchResult, DevotionalContent, BlogPost } from '../types';
 import { getChapterContentLocal } from './localBibleService';
+import { bibleBooks, normalizeBookName } from '../constants';
 
 // IMPORTANT: Handle both Vite (browser) and Node (server) environments
 const getApiKey = () => {
@@ -280,6 +281,34 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
   if (cached) return cached;
 
   let results: SearchResult[] = [];
+
+  // 0. CHECK FOR DIRECT REFERENCES (e.g. "Salmos 91")
+  // This ensures the search page behaves consistently with the reading page
+  const directMatch = query.trim().match(/^([a-zA-Z\u00C0-\u00FF\s]+)\s+(\d+)$/);
+  if (directMatch) {
+    const bookName = directMatch[1].trim();
+    const chapter = parseInt(directMatch[2]);
+    const foundBook = bibleBooks.find(b =>
+      normalizeBookName(b.name) === normalizeBookName(bookName) ||
+      b.name.toLowerCase() === bookName.toLowerCase()
+    );
+
+    if (foundBook && chapter >= 1 && chapter <= foundBook.chapters) {
+      console.log(`Direct reference detected: ${foundBook.name} ${chapter}`);
+      try {
+        const verses = await getChapterContent(foundBook.name, chapter, language);
+        const refResults: SearchResult[] = verses.map(v => ({
+          text: v.text,
+          reference: `${foundBook.name} ${chapter}:${v.number}`,
+          context: "Capítulo Completo"
+        }));
+        saveToCache(cacheKey, refResults);
+        return refResults;
+      } catch (e) {
+        console.error("Failed to fetch direct reference content", e);
+      }
+    }
+  }
 
   // 1. Try Local Search first (Fast & Deterministic)
   if (language === 'pt') {

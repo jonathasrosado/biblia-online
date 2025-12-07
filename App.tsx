@@ -15,6 +15,7 @@ import LoginButton from './components/LoginButton';
 // Pages
 import HomePage from './components/HomePage'; // We'll use the component as the home page
 import ReadingPage from './pages/ReadingPage';
+import BookIntroPage from './pages/BookIntroPage';
 import SearchPage from './pages/SearchPage';
 import DevotionalPage from './pages/DevotionalPage';
 import ChatPage from './pages/ChatPage';
@@ -298,21 +299,12 @@ function AppContent() {
             <span className="font-serif font-bold text-xl text-bible-accent dark:text-bible-gold">{t.appTitle}</span>
           </div>
           <div className="flex items-center gap-2">
+            {/* User Login Button Removed per request */}
             <button
-              onClick={() => setIsLoginModalOpen(true)}
+              onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
             >
-              {user ? (
-                user.picture ? <img src={user.picture} alt={user.name} className="w-5 h-5 rounded-full" /> : <UserIcon size={20} />
-              ) : (
-                <UserIcon size={20} />
-              )}
-            </button>
-            <button
-              onClick={() => setSettingsModalOpen(true)}
-              className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-            >
-              <Settings size={20} />
+              {preferences.theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2">
               {sidebarOpen ? <X /> : <Menu />}
@@ -322,9 +314,17 @@ function AppContent() {
       )}
 
       {/* Sidebar Navigation */}
+      {/* Mobile Backdrop */}
+      {sidebarOpen && !desktopSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden animate-fadeIn"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {!isFullScreen && (
         <aside className={`
-          fixed inset-y-0 left-0 z-20 border-r transform transition-all duration-300 ease-in-out flex flex-col
+          fixed inset-y-0 left-0 z-50 border-r transform transition-all duration-300 ease-in-out flex flex-col
           ${preferences.theme === 'sepia'
             ? 'bg-[#efebd6] border-[#e6dcc6]'
             : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
@@ -422,17 +422,7 @@ function AppContent() {
             {/* Removed direct LoginButton, now handled by Modal/Top Button. 
                  But we can keep a "Minha Conta" button here too if we want. 
                  Let's put a banner or something. */}
-            {!user && (
-              <div className="bg-bible-gold/10 p-4 rounded-xl text-center">
-                <p className="text-sm font-bold text-bible-accent dark:text-bible-gold mb-2">Salve seu progresso</p>
-                <button
-                  onClick={() => setIsLoginModalOpen(true)}
-                  className="w-full py-2 bg-bible-gold text-white rounded-lg text-sm font-bold hover:bg-yellow-600 transition-colors"
-                >
-                  Entrar / Criar Conta
-                </button>
-              </div>
-            )}
+            {/* Login Banner Removed per request */}
             <AdUnit className="mt-2 scale-90 origin-bottom" label="Publicidade" />
           </div>
         </aside>
@@ -486,6 +476,12 @@ function AppContent() {
           <Route path="/" element={
             <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
               <HomePage language={language} t={t} isDark={preferences.theme === 'dark'} history={history} />
+            </ViewWrapper>
+          } />
+
+          <Route path="/leitura/:bookAbbrev" element={
+            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+              <BookIntroPage language={language} t={t} />
             </ViewWrapper>
           } />
 

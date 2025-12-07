@@ -323,6 +323,19 @@ app.post('/api/ai/blog-title', async (req, res) => {
     }
 });
 
+// --- BOOK SUMMARY ENDPOINT ---
+app.get('/api/books/:book/summary', async (req, res) => {
+    try {
+        const { book } = req.params;
+        const { lang } = req.query; // 'pt', 'en', etc.
+        const summary = await aiManager.generateBookSummary(book, lang || 'pt');
+        res.json(summary);
+    } catch (error) {
+        console.error("Book Summary Error:", error);
+        res.status(500).json({ error: 'Failed to get book summary' });
+    }
+});
+
 // --- FLUID READING GENERATION ENDPOINT ---
 app.post('/api/ai/fluid-gen', async (req, res) => {
     try {

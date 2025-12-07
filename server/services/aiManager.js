@@ -493,6 +493,62 @@ export class AIManager {
 
 
 
+    async generateBookSummary(book, language = 'pt') {
+        const safeBook = book.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const summaryDir = path.join(process.cwd(), 'data', 'summaries');
+        const summaryFile = path.join(summaryDir, `${language}_${safeBook}.json`);
+
+        // Ensure directory exists
+        if (!fs.existsSync(summaryDir)) {
+            fs.mkdirSync(summaryDir, { recursive: true });
+        }
+
+        // 1. Check Cache
+        if (fs.existsSync(summaryFile)) {
+            try {
+                console.log(`[AIManager] Serving cached summary for ${book}`);
+                const cachedContent = fs.readFileSync(summaryFile, 'utf-8');
+                return JSON.parse(cachedContent);
+            } catch (e) {
+                console.error("[AIManager] Cache read error, regenerating:", e);
+            }
+        }
+
+        // 2. Generate with AI
+        console.log(`[AIManager] Generating NEW summary for ${book}...`);
+        const prompt = `
+            Crie uma introdução rica e teologicamente precisa para o livro bíblico de ${book}.
+            Idioma de Saída: ${language === 'pt' ? 'Português Brasileiro' : 'English'}.
+            
+            Retorne APENAS um objeto JSON com esta estrutura exata:
+            {
+                "title": "Nome do Livro",
+                "testament": "Antigo ou Novo Testamento",
+                "author": "Autor provável",
+                "date": "Data aproximada da escrita",
+                "theme": "Tema principal em uma frase",
+                "keyVerse": "Um versículo chave representativo (texto e referência)",
+                "summary": "Um resumo envolvente de 2 ou 3 parágrafos sobre o conteúdo e propósito do livro."
+            }
+        `;
+
+        const systemInstruction = "You are a biblical scholar assistant. Provide accurate, orthodox Christian summaries of Bible books. Return strict JSON.";
+
+        try {
+            const jsonText = await this.generateContent('book_summary', prompt, systemInstruction, 'json_object');
+            const data = JSON.parse(jsonText);
+
+            // 3. Save to Cache
+            fs.writeFileSync(summaryFile, JSON.stringify(data, null, 2), 'utf-8');
+            console.log(`[AIManager] Summary saved to ${summaryFile}`);
+
+            return data;
+        } catch (error) {
+            console.error("[AIManager] Summary generation failed:", error);
+            throw new Error("Falha ao gerar resumo do livro.");
+        }
+    }
+
     async testConnection(provider, apiKey) {
         console.log(`[AIManager] Testing connection for ${provider}...`);
 

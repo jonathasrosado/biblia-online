@@ -178,7 +178,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                             .map((book) => (
                                 <button
                                     key={book.name}
-                                    onClick={() => navigate(`/leitura/${normalizeBookName(book.name)}/1`)}
+                                    onClick={() => navigate(`/leitura/${normalizeBookName(book.name)}`)}
                                     className={`p-4 rounded-2xl text-center transition-all border hover:-translate-y-1
                                     ${isDark
                                             ? 'bg-stone-900 border-stone-800 text-stone-400 hover:text-bible-gold hover:border-bible-gold/30'

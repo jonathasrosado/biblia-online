@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ChevronRight, Minimize, Maximize, List, AlignLeft, Type, Volume2, Square, Loader2, Play, Pause } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Volume2, Pause, Play, Share2, BookOpen, Mic, X, ChevronDown, Minimize, Maximize, List, AlignLeft, Type, Square, Loader2 } from 'lucide-react';
 import { bibleBooks, normalizeBookName, findBookByNormalizedName } from '../constants';
 import { chapterTitles } from '../data/chapterTitles';
-import { getChapterContent, getFluidChapterContent, generateAudioFromText } from '../services/geminiService';
+import { getChapterContent, getFluidChapterContent, getDetailedAnswer, generateAudioFromText } from '../services/geminiService';
 import { Verse, FluidChapterContent, ReadingPreferences } from '../types';
 import BibleReader, { BibleReaderRef } from '../components/BibleReader';
 import { AdUnit } from '../components/AdUnit';
@@ -209,6 +210,9 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     const bibleReaderRef = React.useRef<BibleReaderRef>(null);
     const [isVerseAudioPlaying, setIsVerseAudioPlaying] = useState(false);
     const [isVerseAudioLoading, setIsVerseAudioLoading] = useState(false);
+
+    // UI State
+    const [isChapterGridOpen, setIsChapterGridOpen] = useState(false);
 
     // --- Audio Functions Defined Before Use ---
 
@@ -468,14 +472,46 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                         </button>
                     ) : <div className="w-10" />}
 
-                    <div className="text-center">
-                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-bible-accent dark:text-bible-gold">
-                            {currentBook.name} {currentChapter}
-                        </h1>
+                    <div className="text-center relative">
+                        <button
+                            onClick={() => setIsChapterGridOpen(!isChapterGridOpen)}
+                            className="group flex flex-col items-center mx-auto"
+                        >
+                            <h1 className="flex items-center gap-3 text-2xl md:text-3xl font-serif font-bold text-bible-accent dark:text-bible-gold transition-colors hover:text-bible-gold">
+                                {currentBook.name} {currentChapter}
+                                <ChevronDown size={24} className={`transition-transform duration-300 ${isChapterGridOpen ? 'rotate-180' : ''}`} />
+                            </h1>
+                        </button>
+
                         {staticTitle && (
                             <p className="text-sm text-stone-500 dark:text-stone-400 font-medium italic mt-1">
                                 {staticTitle}
                             </p>
+                        )}
+
+                        {/* Expandable Chapter Grid */}
+                        {isChapterGridOpen && (
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[90vw] max-w-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-xl z-50 p-6 animate-slideUp">
+                                <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+                                    {Array.from({ length: currentBook.chapters }, (_, i) => i + 1).map((chap) => (
+                                        <button
+                                            key={chap}
+                                            onClick={() => {
+                                                navigateTo(currentBook.name, chap);
+                                                setIsChapterGridOpen(false);
+                                            }}
+                                            className={`
+                                                h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all
+                                                ${currentChapter === chap
+                                                    ? 'bg-bible-gold text-white shadow-md'
+                                                    : 'bg-stone-50 dark:bg-stone-800 border border-transparent hover:border-bible-gold hover:text-bible-gold'}
+                                            `}
+                                        >
+                                            {chap}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         )}
                     </div>
 
@@ -711,6 +747,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             </button>
                         )}
                     </div>
+
+
 
                     <AdUnit className="mt-12" />
                 </>

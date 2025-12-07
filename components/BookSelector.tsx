@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Bookmark, Clock, Trash2, History, Search, BookOpen, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { BibleBook, ReadingHistoryItem } from '../types';
 import { bibleBooks, normalizeBookName } from '../constants';
 
@@ -13,6 +14,7 @@ interface BookSelectorProps {
 }
 
 const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter, history, onSelect, onClearHistory, t }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedBook, setExpandedBook] = useState<string | null>(null);
@@ -77,6 +79,12 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
     }
   };
 
+  // NEW: Navigate to Book Intro Page
+  const handleBookClick = (book: BibleBook) => {
+    navigate(`/leitura/${normalizeBookName(book.name)}`);
+    setIsOpen(false);
+  };
+
   const getRelativeTime = (timestamp: number) => {
     const diff = Date.now() - timestamp;
     const minutes = Math.floor(diff / 60000);
@@ -119,19 +127,6 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
         <div
           ref={dropdownRef}
           className="fixed left-0 md:left-auto md:w-80 w-full z-50 mt-2 bg-white dark:bg-stone-900 rounded-xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden flex flex-col max-h-[70vh] animate-fadeIn"
-          style={{
-            // Attempt to align with the sidebar if possible, or just float
-            // Since we are in a fixed sidebar, fixed positioning works well.
-            // We'll use a simple strategy: if mobile, bottom sheet or full width. If desktop, popover.
-            // For now, let's just use fixed positioning relative to the trigger if we could, 
-            // but simpler is to just be a fixed overlay in the sidebar area.
-            // Actually, let's make it absolute relative to the sidebar container if we can, 
-            // but the sidebar has overflow-hidden.
-            // So fixed is best. We need to calculate position or just center it/put it near the mouse.
-            // Let's try a simple "absolute" but assuming the parent has visible overflow? No.
-            // Let's use fixed and center it for mobile, or align to sidebar for desktop.
-            // Hardcoding left position for now as a safe bet for the sidebar width.
-          }}
         >
           {/* Search Header */}
           <div className="p-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/95 backdrop-blur-sm sticky top-0 z-10">
@@ -208,16 +203,17 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
               <div className="space-y-1">
                 {filteredBooks.map((book) => (
                   <div key={book.name} className="flex flex-col">
-                    <button
-                      onClick={() => toggleBook(book.name)}
-                      className={`
-                        flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm transition-colors group
-                        ${currentBook.name === book.name
-                          ? 'bg-bible-gold/10 text-bible-gold font-bold'
-                          : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'}
-                      `}
-                    >
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center w-full group">
+                      {/* Main Main Click - Navigates to Book Page */}
+                      <button
+                        onClick={() => handleBookClick(book)}
+                        className={`
+                          flex-1 flex items-center gap-3 px-3 py-2.5 rounded-l-lg text-sm transition-colors
+                          ${currentBook.name === book.name
+                            ? 'bg-bible-gold/10 text-bible-gold font-bold'
+                            : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'}
+                        `}
+                      >
                         <span className={`
                           w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold
                           ${book.testament === 'Old' ? 'bg-stone-100 text-stone-500 dark:bg-stone-800' : 'bg-blue-50 text-blue-500 dark:bg-blue-900/20'}
@@ -225,12 +221,25 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
                           {book.testament === 'Old' ? 'AT' : 'NT'}
                         </span>
                         <span>{book.name}</span>
-                      </div>
-                      {expandedBook === book.name
-                        ? <ChevronDown size={14} className="text-bible-gold" />
-                        : <ChevronRight size={14} className="opacity-30 group-hover:opacity-100" />
-                      }
-                    </button>
+                      </button>
+
+                      {/* Toggle Button - Opens Chapters */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleBook(book.name);
+                        }}
+                        className={`
+                          px-2 py-2.5 rounded-r-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
+                          ${currentBook.name === book.name ? 'bg-bible-gold/10' : ''}
+                        `}
+                      >
+                        {expandedBook === book.name
+                          ? <ChevronDown size={14} className="text-bible-gold" />
+                          : <ChevronRight size={14} className="opacity-30 group-hover:opacity-100" />
+                        }
+                      </button>
+                    </div>
 
                     {expandedBook === book.name && (
                       <div className="grid grid-cols-5 gap-1.5 p-2 pl-11 animate-fadeIn">
