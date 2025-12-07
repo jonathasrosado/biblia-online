@@ -1588,8 +1588,8 @@ if (fs.existsSync(distPath)) {
 
 // Start Server
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT} (0.0.0.0)`);
     console.log(`Environment: ${process.env.NODE_ENV}`);
     console.log(`Storage directory: ${DATA_DIR}`);
 });
