@@ -65,8 +65,7 @@ const ICONS = [
 
 const FORMATS = [
     { id: 'square', label: 'Post (1:1)', aspect: 'aspect-square', icon: Square },
-    { id: 'story', label: 'Story (9:16)', aspect: 'aspect-[9/16]', icon: Smartphone },
-    { id: 'landscape', label: 'Paisagem (16:9)', aspect: 'aspect-video', icon: RectangleHorizontal }
+    { id: 'story', label: 'Story (9:16)', aspect: 'aspect-[9/16]', icon: Smartphone }
 ];
 
 const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, verseReference, onClose }) => {
@@ -115,61 +114,57 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
         setLoading(true);
 
         try {
-            // Reset scale for capture to ensure high quality
-            const currentScale = scale;
-            // We need to capture it at scale 1, but it might be visually scaled down.
-            // html-to-image captures the DOM element. If we use transform: scale, it captures it scaled.
-            // Strategy: Clone it or temporarily reset scale? 
-            // Actually, toPng has a style option. We can force scale 1.
-            // But if we use CSS transform, we might need to handle it.
-            // Let's try capturing as is, but with high pixelRatio.
-            // If the element is visually small, the output might be small? 
-            // No, pixelRatio handles resolution. But if transform is applied, it might be an issue.
-            // Better approach: Wrap the card in a scaler div, but capture the card itself.
-            // If we capture 'cardRef.current', and it has transform: scale(0.5), the image will be small.
-
-            // Workaround: Temporarily remove scale
             const originalTransform = cardRef.current.style.transform;
             cardRef.current.style.transform = 'scale(1)';
 
-            // Wait a tick for layout (though usually not needed for style changes if synchronous)
-            // But we need to make sure it doesn't jump visually too much or use a hidden clone.
-            // For now, let's just try capturing. If it fails, we'll use a hidden clone.
-
-            // Actually, let's use a wrapper for the scale, and capture the inner card?
-            // If the wrapper scales, the inner card is still full size in layout flow? No.
-            // CSS transform scale affects the visual size.
-
-            // Let's use the style property of toPng to override transform
+            // Use pixelRatio 2 for better performance/stability than 3
             const dataUrl = await toPng(cardRef.current, {
                 cacheBust: true,
-                pixelRatio: 3,
-                style: { transform: 'scale(1)', transformOrigin: 'top left' } // Force scale 1 during capture
+                pixelRatio: 2,
+                style: { transform: 'scale(1)', transformOrigin: 'top left' }
             });
 
-            // Restore scale (react render will likely do this, but just in case)
             cardRef.current.style.transform = originalTransform;
 
-            // Convert dataUrl to Blob for sharing
+            // Convert to Blob
             const blob = await (await fetch(dataUrl)).blob();
             const file = new File([blob], 'versiculo.png', { type: 'image/png' });
 
-            if (navigator.share) {
-                await navigator.share({
-                    files: [file],
-                    title: 'Versículo do Dia',
-                    text: `${verseText} - ${verseReference}`
-                });
-            } else {
-                // Fallback to download
-                const link = document.createElement('a');
-                link.download = `versiculo-${verseReference.replace(/\s/g, '-')}.png`;
-                link.href = dataUrl;
-                link.click();
+            // Robust Share Logic
+            let shared = false;
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Versículo do Dia',
+                        text: `${verseText} - ${verseReference}`
+                    });
+                    shared = true;
+                } catch (shareError) {
+                    // User might have cancelled share, or it failed. 
+                    // If it was a real error (not AbortError), we might want to download.
+                    console.warn("Share failed, attempting download fallback...", shareError);
+                    if (shareError.name !== 'AbortError') {
+                        shared = false; // Trigger download
+                    } else {
+                        shared = true; // User cancelled, so treat as "handled" (don't force download)
+                    }
+                }
             }
+
+            // Fallback to Download if share wasn't successful (and wasn't just cancelled)
+            if (!shared) {
+                const link = document.createElement('a');
+                link.download = `versiculo-${verseReference.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.png`;
+                link.href = dataUrl;
+                document.body.appendChild(link); // Required for Firefox sometimes
+                link.click();
+                document.body.removeChild(link);
+            }
+
         } catch (err) {
             console.error('Error generating image:', err);
-            alert('Erro ao gerar imagem. Tente novamente.');
+            alert('Não foi possível gerar a imagem. Tente novamente.');
         } finally {
             setLoading(false);
         }
