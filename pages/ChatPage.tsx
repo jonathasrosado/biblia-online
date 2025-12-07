@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import ChatBot from '../components/ChatBot';
 
 interface ChatPageProps {
@@ -8,6 +9,9 @@ interface ChatPageProps {
 }
 
 const ChatPage: React.FC<ChatPageProps> = ({ language, t }) => {
+    const [searchParams] = useSearchParams();
+    const initialQuery = searchParams.get('p') || undefined;
+
     return (
         <div className="h-full flex flex-col">
             <Helmet>
@@ -16,7 +20,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ language, t }) => {
             </Helmet>
 
             <div className="flex-1 overflow-y-auto">
-                <ChatBot language={language} t={t} />
+                <ChatBot
+                    language={language}
+                    t={t}
+                    initialMessage={initialQuery}
+                />
             </div>
         </div>
     );

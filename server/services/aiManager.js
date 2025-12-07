@@ -135,7 +135,8 @@ export class AIManager {
 
         if (provider === 'openrouter') {
             // Pass system instruction separately to OpenRouter for correct role handling
-            return this._generateOpenRouterText(prompt, model, systemInstruction, responseFormat);
+            const text = await this._generateOpenRouterText(prompt, model, systemInstruction, responseFormat);
+            return responseFormat === 'json_object' ? this.cleanJsonOutput(text) : text;
         }
 
         const fullPrompt = systemInstruction
@@ -157,7 +158,26 @@ export class AIManager {
         const result = await modelInstance.generateContent(fullPrompt);
 
         let text = result.response.text();
+
+        // Clean JSON if requested
+        if (responseFormat === 'json_object') {
+            text = this.cleanJsonOutput(text);
+        }
+
         return this.processImagePrompts(text, feature);
+    }
+
+    cleanJsonOutput(text) {
+        if (!text) return "{}";
+        // Remove markdown code blocks if present
+        let clean = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
+        // Remove potential leading/trailing non-json characters (heuristics)
+        const braceStart = clean.indexOf('{');
+        const braceEnd = clean.lastIndexOf('}');
+        if (braceStart !== -1 && braceEnd !== -1) {
+            clean = clean.substring(braceStart, braceEnd + 1);
+        }
+        return clean;
     }
 
     async _generateOpenRouterText(prompt, model, systemInstruction = '', responseFormat = null) {
@@ -493,7 +513,7 @@ export class AIManager {
 
 
 
-    async generateBookSummary(book, language = 'pt') {
+    async generateBookSummary(book, language = 'pt', force = false) {
         const safeBook = book.toLowerCase().replace(/[^a-z0-9]/g, '');
         const summaryDir = path.join(process.cwd(), 'data', 'summaries');
         const summaryFile = path.join(summaryDir, `${language}_${safeBook}.json`);
@@ -503,8 +523,8 @@ export class AIManager {
             fs.mkdirSync(summaryDir, { recursive: true });
         }
 
-        // 1. Check Cache
-        if (fs.existsSync(summaryFile)) {
+        // 1. Check Cache (Skip if force is true)
+        if (!force && fs.existsSync(summaryFile)) {
             try {
                 console.log(`[AIManager] Serving cached summary for ${book}`);
                 const cachedContent = fs.readFileSync(summaryFile, 'utf-8');
@@ -534,19 +554,43 @@ export class AIManager {
 
         const systemInstruction = "You are a biblical scholar assistant. Provide accurate, orthodox Christian summaries of Bible books. Return strict JSON.";
 
-        try {
-            const jsonText = await this.generateContent('book_summary', prompt, systemInstruction, 'json_object');
-            const data = JSON.parse(jsonText);
+        let lastError = null;
+        for (let attempt = 1; attempt <= 2; attempt++) {
+            try {
+                if (attempt > 1) console.log(`[AIManager] Retrying summary generation (Attempt ${attempt})...`);
 
-            // 3. Save to Cache
-            fs.writeFileSync(summaryFile, JSON.stringify(data, null, 2), 'utf-8');
-            console.log(`[AIManager] Summary saved to ${summaryFile}`);
+                const jsonText = await this.generateContent('book_summary', prompt, systemInstruction, 'json_object');
 
-            return data;
-        } catch (error) {
-            console.error("[AIManager] Summary generation failed:", error);
-            throw new Error("Falha ao gerar resumo do livro.");
+                // Validate JSON before parsing
+                if (!jsonText || jsonText.length < 10) throw new Error("Empty response from AI");
+
+                const data = JSON.parse(jsonText);
+
+                // Simple validation
+                if (!data.summary || !data.title) throw new Error("Invalid JSON structure");
+
+                // 3. Save to Cache
+                fs.writeFileSync(summaryFile, JSON.stringify(data, null, 2), 'utf-8');
+                console.log(`[AIManager] Summary saved to ${summaryFile}`);
+
+                return data;
+            } catch (error) {
+                console.error(`[AIManager] Summary generation failed (Attempt ${attempt}):`, error.message);
+                lastError = error;
+                // Log the raw text if available for debugging
+                if (error instanceof SyntaxError) {
+                    fs.appendFileSync(path.join(process.cwd(), 'server-debug.log'), `[JSON Error] Book: ${book}\n${error}\n`);
+                }
+            }
         }
+
+        // If all retries fail, check if we have *any* cached version to fallback to (even if force was true)
+        if (force && fs.existsSync(summaryFile)) {
+            console.log("[AIManager] Force refresh failed, falling back to old cache.");
+            return JSON.parse(fs.readFileSync(summaryFile, 'utf-8'));
+        }
+
+        throw new Error(`Falha ao gerar resumo após tentativas: ${lastError?.message}`);
     }
 
     async testConnection(provider, apiKey) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Book, Calendar, User, AlignLeft, ChevronRight, Hash, Quote, Loader2, BookOpen } from 'lucide-react';
+import { Book, Calendar, User, AlignLeft, ChevronRight, Hash, Quote, Loader2, BookOpen, RefreshCw } from 'lucide-react';
 import { bibleBooks, normalizeBookName, findBookByNormalizedName } from '../constants';
 import { AdUnit } from '../components/AdUnit';
 
@@ -30,39 +30,48 @@ const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t }) => {
     // Find book data
     const currentBook = findBookByNormalizedName(bookAbbrev || '');
 
-    useEffect(() => {
+    const fetchSummary = async (force = false) => {
         if (!currentBook) return;
 
-        const fetchSummary = async () => {
-            setLoading(true);
-            setError(null);
+        setLoading(true);
+        setError(null);
 
-            // Create a timeout promise to prevent infinite loading
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Tempo limite excedido')), 20000)
-            );
+        // Create a timeout promise to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Tempo limite excedido')), 90000)
+        );
 
-            try {
-                const response = await Promise.race([
-                    fetch(`/api/books/${currentBook.name}/summary?lang=${language}`),
-                    timeoutPromise
-                ]) as Response;
+        try {
+            const url = `/api/books/${currentBook.name}/summary?lang=${language}&t=${Date.now()}${force ? '&force=true' : ''}`;
+            console.log("Fetching summary from:", url);
 
-                if (!response.ok) throw new Error('Falha ao carregar resumo');
-                const data = await response.json();
-                console.log("Summary Data:", data); // Debug log
-                setSummary(data);
-            } catch (err) {
-                console.error(err);
-                setError(err instanceof Error && err.message === 'Tempo limite excedido'
-                    ? "A geração do resumo está demorando muito. Tente novamente."
-                    : "Não foi possível carregar a introdução deste livro no momento.");
-            } finally {
-                setLoading(false);
-            }
-        };
+            const response = await Promise.race([
+                fetch(url),
+                timeoutPromise
+            ]) as Response;
 
-        fetchSummary();
+            if (!response.ok) throw new Error('Falha ao carregar resumo');
+            const data = await response.json();
+            console.log("Summary Data:", data); // Debug log
+            setSummary(data);
+        } catch (err) {
+            console.error(err);
+            setError(err instanceof Error && err.message === 'Tempo limite excedido'
+                ? "A geração do resumo está demorando muito. Tente novamente."
+                : "Não foi possível carregar a introdução deste livro no momento.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (currentBook) {
+            // Check session storage first to avoid re-fetching on simple nav
+            const cacheKey = `book_summary_${currentBook.name}_${language}`;
+
+            // Note: We bypass session cache on load if we suspect issues, but for now standard check
+            fetchSummary();
+        }
     }, [currentBook, language]);
 
     if (!currentBook) {
@@ -154,12 +163,13 @@ const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t }) => {
                     </div>
                 ) : error ? (
                     <div className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-8 border border-red-100 dark:border-red-900/30 text-center">
-                        <p className="text-red-600 dark:text-red-400">{error}</p>
+                        <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
                         <button
-                            onClick={() => window.location.reload()}
-                            className="mt-4 text-sm font-bold underline hover:no-underline"
+                            onClick={() => fetchSummary(true)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 transition-colors font-bold text-sm"
                         >
-                            Tentar Novamente
+                            <RefreshCw size={16} />
+                            Tentar Novamente (Forçar)
                         </button>
                     </div>
                 ) : summary ? (

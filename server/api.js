@@ -327,8 +327,8 @@ app.post('/api/ai/blog-title', async (req, res) => {
 app.get('/api/books/:book/summary', async (req, res) => {
     try {
         const { book } = req.params;
-        const { lang } = req.query; // 'pt', 'en', etc.
-        const summary = await aiManager.generateBookSummary(book, lang || 'pt');
+        const { lang, force } = req.query; // 'pt', 'en', etc.
+        const summary = await aiManager.generateBookSummary(book, lang || 'pt', force === 'true');
         res.json(summary);
     } catch (error) {
         console.error("Book Summary Error:", error);
@@ -1557,6 +1557,16 @@ app.post('/api/ai/chat', async (req, res) => {
             "You are a warm, wise, and knowledgeable Bible study assistant.\n" +
             "You help users understand scripture, theology, and history.\n" +
             "You are respectful of different Christian traditions but lean towards orthodox, historical Christianity.\n\n" +
+            "**STYLE GUIDELINES (CRITICAL):**\n" +
+            "- **CHAT LIKE A FRIEND:** Be natural, warm, and simple. Avoid robotic language.\n" +
+            "- **ADAPTIVE LENGTH:** Adjust your depth based on the question. Simple question? Short answer (2-3 sentences). Complex theological question? Deeper answer (max 2 paragraphs).\n" +
+            "- **ENGAGEMENT (CRITICAL):** If your answer is short, YOU MUST end with a follow-up question to keep the conversation going (e.g., 'Would you like to know more about X?' or 'Have you ever felt like that?').\n" +
+            "- **NO FLUFF:** Start answering immediately. Don't say 'That is a great question'.\n\n" +
+            "**CITATION RULE (CRITICAL):**\n" +
+            "When citing Bible verses, YOU MUST use Markdown links to the reading page.\n" +
+            "- For Chapters: `[Book Chapter](/leitura/normalized-book/chapter)` (e.g., `[Gênesis 1](/leitura/genesis/1)`)\n" +
+            "- For Verses: `[Book Chapter:Verse](/leitura/normalized-book/chapter?verses=start-end)` (e.g., `[João 3:16](/leitura/joao/3?verses=16-16)`)\n" +
+            "- Use lowercase, no accents, and hyphens for spaces in book names.\n\n" +
             "Language: " + (language || 'pt') + ".\n\n" +
             "Previous Conversation:\n" +
             context;

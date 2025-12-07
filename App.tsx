@@ -206,7 +206,37 @@ function AppContent() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-    navigate(`/busca?q=${encodeURIComponent(searchQuery)}`);
+
+    const query = searchQuery.trim();
+
+    // 1. Check for Question (Smart Chat Redirect) - REMOVED (Unified Search Strategy)
+    // const isQuestion = /^(quem|como|qual|quando|onde|por que|o que|\?)/i.test(query) || query.includes('?');
+    // if (isQuestion) {
+    //  navigate(`/chat?p=${encodeURIComponent(query)}`);
+    //  setSidebarOpen(false);
+    //  return;
+    // }
+
+    // 2. Check for "Book Chapter" pattern (e.g., "Salmos 91", "João 3")
+    // Regex matches: Name (chars/spaces) + number
+    const match = query.match(/^([a-zA-Z\u00C0-\u00FF\s]+)\s+(\d+)$/);
+    if (match) {
+      const bookName = match[1].trim();
+      const chapter = parseInt(match[2]);
+      const foundBook = bibleBooks.find(b =>
+        normalizeBookName(b.name) === normalizeBookName(bookName) ||
+        b.name.toLowerCase() === bookName.toLowerCase()
+      );
+
+      if (foundBook && chapter >= 1 && chapter <= foundBook.chapters) {
+        navigate(`/leitura/${normalizeBookName(foundBook.name)}/${chapter}`);
+        setSidebarOpen(false);
+        return;
+      }
+    }
+
+    // 3. Default Search
+    navigate(`/busca?q=${encodeURIComponent(query)}`);
     setSidebarOpen(false);
   };
 
@@ -246,17 +276,26 @@ function AppContent() {
   // We can just pass defaults or try to parse location, but defaults are fine for the selector.
   // Determine current book/chapter for BookSelector based on URL
   const match = location.pathname.match(/\/leitura\/([^\/]+)\/(\d+)/);
+  const introMatch = location.pathname.match(/\/leitura\/([^\/]+)$/); // Match /leitura/book-name
+
   let currentBook = bibleBooks[0];
   let currentChapter = 1;
 
   if (match) {
     const bookName = decodeURIComponent(match[1]);
     const chapter = parseInt(match[2], 10);
-    // Use normalized lookup to handle 'genesis' vs 'Gênesis'
     const foundBook = findBookByNormalizedName(bookName);
     if (foundBook) {
       currentBook = foundBook;
       currentChapter = chapter;
+    }
+  } else if (introMatch) {
+    // Case: Book Intro Page (no chapter)
+    const bookName = decodeURIComponent(introMatch[1]);
+    const foundBook = findBookByNormalizedName(bookName);
+    if (foundBook) {
+      currentBook = foundBook;
+      currentChapter = 0; // 0 indicates "Intro" or "No specific chapter"
     }
   }
 
