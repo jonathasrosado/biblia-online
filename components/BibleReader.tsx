@@ -207,32 +207,32 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     // PRIME THE AUDIO ELEMENT (CRITICAL FOR IOS)
     // We create the audio element synchronously during the click event.
 
-    // iOS UNLOCK HACK: Play silent HTML5 audio to force "Playback" category
-    // This makes the iPhone treat this as "Music" (plays even with Silent Switch ON)
-    const unlockAudio = new Audio();
-    unlockAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAgZGF0YQQAAAAAAA==";
-    try {
-      await unlockAudio.play();
-      console.log("[📱] iOS Audio Session Unlocked");
-    } catch (e) {
-      console.warn("[⚠️] iOS Unlock failed:", e);
-    }
-
-    // Initialize Audio Context (must be done on user gesture)
+    // 1. INITIALIZE AUDIO CONTEXT (IMMEDIATELY - SYNCHRONOUSLY)
     if (!audioContextRef.current) {
       console.log("[🎵] Initializing AudioContext...");
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       audioContextRef.current = new AudioContextClass();
     }
 
-    // Resume if suspended (common in browsers)
+    // 2. RESUME IF SUSPENDED (Triggered by UI event)
     if (audioContextRef.current.state === 'suspended') {
       try {
-        await audioContextRef.current.resume();
-        console.log("[✅] AudioContext resumed");
+        // We do this BEFORE the await unlockAudio
+        audioContextRef.current.resume();
+        console.log("[✅] AudioContext resume triggered");
       } catch (e) {
         console.error("[⚠️] Failed to resume AudioContext:", e);
       }
+    }
+
+    // 3. iOS UNLOCK HACK: Play silent HTML5 audio
+    try {
+      const unlockAudio = new Audio();
+      unlockAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAgZGF0YQQAAAAAAA==";
+      await unlockAudio.play();
+      console.log("[📱] iOS Audio Session Unlocked");
+    } catch (e) {
+      console.warn("[⚠️] iOS Unlock failed:", e);
     }
 
     const chunks = verses.map(v => v.text.replace(/[*#_`\[\]]/g, ''));
