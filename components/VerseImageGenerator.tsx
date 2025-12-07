@@ -114,57 +114,80 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
         setLoading(true);
 
         try {
-            const originalTransform = cardRef.current.style.transform;
-            cardRef.current.style.transform = 'scale(1)';
+            // STRATEGY: Create a clean clone in the DOM to avoid scaling/transform issues
+            // 1. Clone the node
+            const node = cardRef.current;
+            const clone = node.cloneNode(true) as HTMLElement;
 
-            // Use pixelRatio 2 for better performance/stability than 3
-            const dataUrl = await toPng(cardRef.current, {
-                cacheBust: true,
-                pixelRatio: 2,
-                style: { transform: 'scale(1)', transformOrigin: 'top left' }
-            });
+            // 2. Style the clone to be fixed size, invisible but rendered
+            clone.style.position = 'fixed';
+            clone.style.top = '-9999px';
+            clone.style.left = '-9999px';
+            clone.style.transform = 'none'; // Ensure no scale
+            clone.style.zIndex = '-1';
 
-            cardRef.current.style.transform = originalTransform;
+            // Explicitly set width/height matching the original UN-SCALED size
+            // The originals have classes like w-[320px] or w-[400px]
+            // We'll let the classes dictate, but ensure no parent constraints
+            document.body.appendChild(clone);
 
-            // Convert to Blob
-            const blob = await (await fetch(dataUrl)).blob();
-            const file = new File([blob], 'versiculo.png', { type: 'image/png' });
+            // 3. Wait a moment for images/fonts in clone to be ready (optional but safer)
+            await new Promise(resolve => setTimeout(resolve, 100));
 
-            // Robust Share Logic
-            let shared = false;
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Versículo do Dia',
-                        text: `${verseText} - ${verseReference}`
-                    });
-                    shared = true;
-                } catch (shareError) {
-                    // User might have cancelled share, or it failed. 
-                    // If it was a real error (not AbortError), we might want to download.
-                    console.warn("Share failed, attempting download fallback...", shareError);
-                    if (shareError.name !== 'AbortError') {
-                        shared = false; // Trigger download
-                    } else {
-                        shared = true; // User cancelled, so treat as "handled" (don't force download)
+            try {
+                // 4. Capture the CLONE
+                const dataUrl = await toPng(clone, {
+                    cacheBust: true,
+                    pixelRatio: 2, // Retain 2x quality
+                    skipAutoScale: true
+                });
+
+                // 5. Cleanup Clone
+                document.body.removeChild(clone);
+
+                // 6. Convert to Blob
+                const blob = await (await fetch(dataUrl)).blob();
+                const file = new File([blob], 'versiculo.png', { type: 'image/png' });
+
+                // 7. Share or Download
+                let shared = false;
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Versículo do Dia',
+                            text: `${verseText} - ${verseReference}`
+                        });
+                        shared = true;
+                    } catch (shareError: any) {
+                        if (shareError.name !== 'AbortError') {
+                            console.warn("Share failed:", shareError);
+                        } else {
+                            shared = true; // Treated as handled
+                        }
                     }
                 }
+
+                if (!shared) {
+                    const link = document.createElement('a');
+                    link.download = `versiculo-${verseReference.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.png`;
+                    link.href = dataUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+
+            } catch (captureError: any) {
+                if (document.body.contains(clone)) {
+                    document.body.removeChild(clone);
+                }
+                throw captureError;
             }
 
-            // Fallback to Download if share wasn't successful (and wasn't just cancelled)
-            if (!shared) {
-                const link = document.createElement('a');
-                link.download = `versiculo-${verseReference.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.png`;
-                link.href = dataUrl;
-                document.body.appendChild(link); // Required for Firefox sometimes
-                link.click();
-                document.body.removeChild(link);
-            }
-
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error generating image:', err);
-            alert('Não foi possível gerar a imagem. Tente novamente.');
+            // Show ACTUAL error to user for debugging
+            alert(`Erro ao criar imagem: ${err.message || err.toString()}. Tente novamente.`);
         } finally {
             setLoading(false);
         }
