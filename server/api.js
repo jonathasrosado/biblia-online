@@ -14,6 +14,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const require = createRequire(import.meta.url);
 
+// --- POLYFILL CRYPTO (Required for some libs on Railway/older Node) ---
+import crypto from 'crypto';
+if (!global.crypto) {
+    global.crypto = crypto;
+}
+
 // --- CRASH HANDLERS (MUST BE FIRST) ---
 process.on('uncaughtException', (error) => {
     console.error('FATAL: Uncaught Exception:', error);
