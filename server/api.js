@@ -690,7 +690,7 @@ app.post('/api/audio/edge', async (req, res) => {
         // 1. Setup TTS
         const tts = new MsEdgeTTS();
         const voiceId = voice === 'female' ? "pt-BR-FranciscaNeural" : "pt-BR-AntonioNeural";
-        await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+        await tts.setMetadata(voiceId, "audio-48khz-96kbitrate-mono-mp3");
 
         // 2. Generate
         log("Generating stream...");
