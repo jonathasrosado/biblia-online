@@ -691,8 +691,8 @@ app.post('/api/audio/edge', async (req, res) => {
         const tts = new MsEdgeTTS();
         const voiceId = voice === 'female' ? "pt-BR-FranciscaNeural" : "pt-BR-AntonioNeural";
 
-        // Revert to 96kbps (Standard)
-        await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+        // Switch to WebM Opus (Proven to work on PC with Web Audio API)
+        await tts.setMetadata(voiceId, OUTPUT_FORMAT.WEBM_24KHZ_16BIT_MONO_OPUS);
 
         // 2. Generate
         log("Generating stream (96kbps)...");
