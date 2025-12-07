@@ -330,6 +330,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
           source.connect(ctx.destination);
           sourceNodeRef.current = source;
 
+
           source.onended = () => {
             if (isPlayingRef.current) {
               // Cleanup old cache to save memory (keep last 2)
@@ -339,6 +340,11 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
               playNext();
             }
           };
+
+          // iOS Safety: Ensure context is running immediately before play
+          if (ctx.state === 'suspended') {
+            await ctx.resume();
+          }
 
           source.start(0);
           setIsAudioLoading(false);
