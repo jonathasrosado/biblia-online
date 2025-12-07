@@ -8,7 +8,7 @@ Como seu site usa arquivos locais para salvar posts e imagens, precisamos config
 ## Passo 2: Criar Projeto no Railway
 1.  Acesse [railway.app](https://railway.app) e faça login com GitHub.
 2.  Clique em **"New Project"** -> **"Deploy from GitHub repo"**.
-3.  Selecione seu repositório `biblia-online` (ou o nome que você deu).
+3.  Selecione seu repositório: **`jonathasrosado/biblia-online`**.
 4.  Clique em **"Deploy Now"**.
 
 ## Passo 3: Configurar Volumes (IMPORTANTE!)

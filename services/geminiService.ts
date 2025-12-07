@@ -638,9 +638,9 @@ export const generateAudioFromText = async (text: string, voice: 'male' | 'femal
     const data = await response.json();
 
     if (data.base64) {
-      // Simplified: Return the Data URI directly for HTML5 Audio
-      // This bypasses complex AudioContext decoding issues on iOS
-      return `data:audio/mp3;base64,${data.base64}`;
+      console.log(`[Audio] Received base64 audio, size: ${data.base64.length} chars`);
+      // Return just the base64 - BibleReader will convert to appropriate format
+      return data.base64;
     }
 
     return null;

@@ -1,0 +1,50 @@
+﻿node : file:///C:/Use
+rs/Dondon/Desktop/bib
+lia/server/api.js:28
+No linha:1 
+caractere:1
++ node server/api.js 
+> 
+server_output_3.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (file://   
+ /C:/User...erver    
+/api.js:28:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+const require = creat
+eRequire(import.meta.
+url);
+                ^
+
+ReferenceError: 
+createRequire is not 
+defined
+    at file:///C:/Use
+rs/Dondon/Desktop/bib
+lia/server/api.js:28:
+17
+    at ModuleJob.run 
+(node:internal/module
+s/esm/module_job:377:
+25)
+    at async onImport
+.tracePromise.__proto
+__ (node:internal/mod
+ules/esm/loader:671:2
+6)
+    at async asyncRun
+EntryPointWithESMLoad
+er (node:internal/mod
+ules/run_main:101:5)
+
+Node.js v24.11.1

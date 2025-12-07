@@ -1,0 +1,7 @@
+﻿No forced key found.
+Loading env from .env.local
+Registering AI Config Endpoints...
+Registering AI Config Endpoints...
+Serving static files from C:\Users\Dondon\Desktop\biblia\dist
+Server running on http://localhost:3002
+Storage directory: C:\Users\Dondon\Desktop\biblia\src\data\fluid_chapters

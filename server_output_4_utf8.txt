@@ -1,0 +1,66 @@
+﻿No forced key found.
+node : file:///C:/Use
+rs/Dondon/Desktop/bib
+lia/server/api.js:79
+No linha:1 
+caractere:1
++ node server/api.js 
+> 
+server_output_4.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (file://   
+ /C:/User...erver    
+/api.js:79:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+const UPLOADS_DIR = p
+ath.resolve(__dirname
+, '../uploads');
+                     
+            ^
+
+ReferenceError: 
+__dirname is not 
+defined in ES module 
+scope
+This file is being 
+treated as an ES 
+module because it 
+has a '.js' file 
+extension and 'C:\Use
+rs\Dondon\Desktop\bib
+lia\package.json' 
+contains "type": 
+"module". To treat 
+it as a CommonJS 
+script, rename it to 
+use the '.cjs' file 
+extension.
+    at file:///C:/Use
+rs/Dondon/Desktop/bib
+lia/server/api.js:79:
+34
+    at ModuleJob.run 
+(node:internal/module
+s/esm/module_job:377:
+25)
+    at async onImport
+.tracePromise.__proto
+__ (node:internal/mod
+ules/esm/loader:671:2
+6)
+    at async asyncRun
+EntryPointWithESMLoad
+er (node:internal/mod
+ules/run_main:101:5)
+
+Node.js v24.11.1

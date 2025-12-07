@@ -124,14 +124,14 @@ export class AIManager {
         this.config = this.loadConfig(); // Force reload to ensure latest config
         const featureConfig = this.config.features[feature];
 
-        // FORCE OPENROUTER TO BYPASS BLOCKS
-        const provider = 'openrouter';
-        // FORCE MODEL TO FREE VERSION (Ignore config file which might be stale/1.5)
-        const model = 'google/gemini-2.0-flash-exp:free';
+        console.log(`[AIManager] Generating for ${feature} using ${featureConfig?.provider}/${featureConfig?.model}`);
+
+        const provider = featureConfig?.provider || 'gemini';
+        const model = modelOverride || featureConfig?.model || 'gemini-2.0-flash-exp';
 
         console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
 
-        console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
+
 
         if (provider === 'openrouter') {
             // Pass system instruction separately to OpenRouter for correct role handling

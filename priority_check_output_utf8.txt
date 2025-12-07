@@ -1,0 +1,15 @@
+﻿[Test] Loading env from .env.local
+[Test] Key from .env: NONE
+[Test] No force_key found or error: module is not defined in ES module scope
+This file is being treated as an ES module because it has a '.js' file extension and 'C:\Users\Dondon\Desktop\biblia\package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+[Test] Server would use ENV KEY (no force key)
+
+[Test] Testing gemma-3-27b-it...
+[Test] gemma-3-27b-it Status: 403
+
+[Test] Testing gemini-2.0-flash...
+[Test] gemini-2.0-flash Status: 403
+
+[Test] Testing gemini-1.5-flash...
+[Test] gemini-1.5-flash Status: 403
+[Test] ALL MODELS FAILED.

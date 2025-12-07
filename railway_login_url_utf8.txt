@@ -1,0 +1,16 @@
+﻿node.exe : Cannot login in 
+non-interactive mode
+No C:\Users\Dondon\AppData\Roaming\np
+m\railway.ps1:24 caractere:5
++     & "node$exe"  "$basedir/node_mo
+dules/@railway/cli/bin/railway.js" 
+...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpe 
+   cified: (Cannot login in non-int  
+  eractive mode:String) [], Remote   
+ Exception
+    + FullyQualifiedErrorId : Native 
+   CommandError
+ 

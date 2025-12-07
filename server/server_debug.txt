@@ -1053,3 +1053,353 @@ Stack: ReferenceError: stream is not defined
 [2025-12-05T19:31:22.196Z] Calling toStream
 [2025-12-05T19:31:22.197Z] Stream obtained. Setting up events.
 [2025-12-05T19:31:23.232Z] Stream ended
+[2025-12-05T21:02:26.682Z] Endpoint hit
+[2025-12-05T21:02:26.683Z] Generating for: No princíp... Voice: female
+[2025-12-05T21:02:26.683Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T21:02:26.683Z] Endpoint hit
+[2025-12-05T21:02:26.683Z] Generating for: E a terra ... Voice: female
+[2025-12-05T21:02:26.684Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T21:02:27.871Z] Calling toStream
+[2025-12-05T21:02:27.871Z] Stream obtained. Setting up events.
+[2025-12-05T21:02:27.876Z] Calling toStream
+[2025-12-05T21:02:27.876Z] Stream obtained. Setting up events.
+[2025-12-05T21:02:29.032Z] Stream ended
+[2025-12-05T21:02:29.217Z] Endpoint hit
+[2025-12-05T21:02:29.217Z] Generating for: E disse De... Voice: female
+[2025-12-05T21:02:29.218Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T21:02:29.330Z] Stream ended
+[2025-12-05T21:02:29.916Z] Calling toStream
+[2025-12-05T21:02:29.916Z] Stream obtained. Setting up events.
+[2025-12-05T21:02:30.697Z] Stream ended
+[2025-12-05T21:02:32.549Z] Endpoint hit
+[2025-12-05T21:02:32.549Z] Generating for: E viu Deus... Voice: female
+[2025-12-05T21:02:32.549Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T21:02:33.785Z] Calling toStream
+[2025-12-05T21:02:33.785Z] Stream obtained. Setting up events.
+[2025-12-05T21:02:35.499Z] Stream ended
+[2025-12-05T21:02:36.440Z] Endpoint hit
+[2025-12-05T21:02:36.440Z] Generating for: No princíp... Voice: female
+[2025-12-05T21:02:36.441Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T21:02:36.441Z] Endpoint hit
+[2025-12-05T21:02:36.441Z] Generating for: Em seguida... Voice: female
+[2025-12-05T21:02:36.442Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T21:02:37.076Z] Calling toStream
+[2025-12-05T21:02:37.077Z] Stream obtained. Setting up events.
+[2025-12-05T21:02:37.340Z] Calling toStream
+[2025-12-05T21:02:37.341Z] Stream obtained. Setting up events.
+[2025-12-05T21:02:39.901Z] Stream ended
+[2025-12-05T21:02:40.046Z] Stream ended
+[2025-12-05T21:02:40.283Z] Endpoint hit
+[2025-12-05T21:02:40.284Z] Generating for: Então Deus... Voice: female
+[2025-12-05T21:02:40.284Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T21:02:40.900Z] Calling toStream
+[2025-12-05T21:02:40.900Z] Stream obtained. Setting up events.
+[2025-12-05T21:02:46.619Z] Stream ended
+[2025-12-05T22:20:43.665Z] Endpoint hit
+[2025-12-05T22:20:43.665Z] Generating for: Assim, os ... Voice: female
+[2025-12-05T22:20:43.666Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T22:20:43.666Z] Endpoint hit
+[2025-12-05T22:20:43.667Z] Generating for: Esta é a h... Voice: female
+[2025-12-05T22:20:43.667Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T22:20:44.392Z] Calling toStream
+[2025-12-05T22:20:44.393Z] Stream obtained. Setting up events.
+[2025-12-05T22:20:44.393Z] Calling toStream
+[2025-12-05T22:20:44.393Z] Stream obtained. Setting up events.
+[2025-12-05T22:20:45.812Z] Stream ended
+[2025-12-05T22:20:45.991Z] Endpoint hit
+[2025-12-05T22:20:45.992Z] Generating for: O Senhor D... Voice: female
+[2025-12-05T22:20:45.992Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T22:20:46.643Z] Calling toStream
+[2025-12-05T22:20:46.643Z] Stream obtained. Setting up events.
+[2025-12-05T22:20:51.153Z] Stream ended
+[2025-12-05T22:20:51.455Z] Stream ended
+[2025-12-05T22:21:06.735Z] Endpoint hit
+[2025-12-05T22:21:06.736Z] Generating for: O Senhor D... Voice: female
+[2025-12-05T22:21:06.736Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T22:21:07.401Z] Calling toStream
+[2025-12-05T22:21:07.402Z] Stream obtained. Setting up events.
+[2025-12-05T22:21:08.712Z] Stream ended
+[2025-12-05T22:28:03.039Z] Endpoint hit
+[2025-12-05T22:28:03.039Z] Generating for: Assim os c... Voice: female
+[2025-12-05T22:28:03.039Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T22:28:03.040Z] Endpoint hit
+[2025-12-05T22:28:03.041Z] Generating for: E havendo ... Voice: female
+[2025-12-05T22:28:03.041Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T22:28:03.682Z] Calling toStream
+[2025-12-05T22:28:03.682Z] Stream obtained. Setting up events.
+[2025-12-05T22:28:03.702Z] Calling toStream
+[2025-12-05T22:28:03.703Z] Stream obtained. Setting up events.
+[2025-12-05T22:28:04.746Z] Stream ended
+[2025-12-05T22:28:04.865Z] Endpoint hit
+[2025-12-05T22:28:04.866Z] Generating for: E abençoou... Voice: female
+[2025-12-05T22:28:04.866Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T22:28:05.052Z] Stream ended
+[2025-12-05T22:28:05.482Z] Calling toStream
+[2025-12-05T22:28:05.482Z] Stream obtained. Setting up events.
+[2025-12-05T22:28:06.684Z] Stream ended
+[2025-12-05T22:28:09.404Z] Endpoint hit
+[2025-12-05T22:28:09.405Z] Generating for: Estas são ... Voice: female
+[2025-12-05T22:28:09.405Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-05T22:28:10.018Z] Calling toStream
+[2025-12-05T22:28:10.019Z] Stream obtained. Setting up events.
+[2025-12-05T22:28:11.262Z] Stream ended
+[2025-12-06T00:02:32.463Z] Endpoint hit
+[2025-12-06T00:02:32.464Z] Generating for: Aquele que... Voice: male
+[2025-12-06T00:02:32.465Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:02:33.125Z] Calling toStream
+[2025-12-06T00:02:33.125Z] Stream obtained. Setting up events.
+[2025-12-06T00:02:33.866Z] Stream ended
+[2025-12-06T00:02:39.614Z] Endpoint hit
+[2025-12-06T00:02:39.614Z] Generating for: Direi do S... Voice: male
+[2025-12-06T00:02:39.615Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:02:40.271Z] Calling toStream
+[2025-12-06T00:02:40.272Z] Stream obtained. Setting up events.
+[2025-12-06T00:02:41.384Z] Stream ended
+[2025-12-06T00:02:42.096Z] Endpoint hit
+[2025-12-06T00:02:42.097Z] Generating for: Porque ele... Voice: male
+[2025-12-06T00:02:42.098Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:02:42.792Z] Calling toStream
+[2025-12-06T00:02:42.792Z] Stream obtained. Setting up events.
+[2025-12-06T00:02:43.411Z] Endpoint hit
+[2025-12-06T00:02:43.411Z] Generating for: Ele te cob... Voice: male
+[2025-12-06T00:02:43.411Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:02:43.936Z] Stream ended
+[2025-12-06T00:02:44.061Z] Calling toStream
+[2025-12-06T00:02:44.061Z] Stream obtained. Setting up events.
+[2025-12-06T00:02:44.317Z] Endpoint hit
+[2025-12-06T00:02:44.317Z] Generating for: Aquele que... Voice: male
+[2025-12-06T00:02:44.318Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:02:44.318Z] Endpoint hit
+[2025-12-06T00:02:44.318Z] Generating for: Ele te env... Voice: male
+[2025-12-06T00:02:44.318Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:02:44.935Z] Calling toStream
+[2025-12-06T00:02:44.936Z] Stream obtained. Setting up events.
+[2025-12-06T00:02:44.947Z] Stream ended
+[2025-12-06T00:02:44.975Z] Calling toStream
+[2025-12-06T00:02:44.976Z] Stream obtained. Setting up events.
+[2025-12-06T00:02:46.818Z] Stream ended
+[2025-12-06T00:02:47.192Z] Stream ended
+[2025-12-06T00:07:44.114Z] Endpoint hit
+[2025-12-06T00:07:44.114Z] Generating for: Ora, o SEN... Voice: male
+[2025-12-06T00:07:44.115Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:07:44.766Z] Calling toStream
+[2025-12-06T00:07:44.766Z] Stream obtained. Setting up events.
+[2025-12-06T00:07:45.791Z] Stream ended
+[2025-12-06T00:07:53.247Z] Endpoint hit
+[2025-12-06T00:07:53.247Z] Generating for: E far-te-e... Voice: male
+[2025-12-06T00:07:53.248Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:07:53.858Z] Calling toStream
+[2025-12-06T00:07:53.858Z] Stream obtained. Setting up events.
+[2025-12-06T00:07:54.607Z] Stream ended
+[2025-12-06T00:30:26.666Z] Endpoint hit
+[2025-12-06T00:30:26.667Z] Generating for: Livro da g... Voice: male
+[2025-12-06T00:30:26.667Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:30:27.304Z] Calling toStream
+[2025-12-06T00:30:27.305Z] Stream obtained. Setting up events.
+[2025-12-06T00:30:27.747Z] Stream ended
+[2025-12-06T00:30:31.326Z] Endpoint hit
+[2025-12-06T00:30:31.327Z] Generating for: Abraão ger... Voice: male
+[2025-12-06T00:30:31.327Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:30:31.936Z] Calling toStream
+[2025-12-06T00:30:31.937Z] Stream obtained. Setting up events.
+[2025-12-06T00:30:32.403Z] Endpoint hit
+[2025-12-06T00:30:32.403Z] Generating for: E Judá ger... Voice: male
+[2025-12-06T00:30:32.403Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T00:30:32.425Z] Stream ended
+[2025-12-06T00:30:33.102Z] Calling toStream
+[2025-12-06T00:30:33.103Z] Stream obtained. Setting up events.
+[2025-12-06T00:30:34.215Z] Stream ended
+[2025-12-06T00:35:45.252Z] Endpoint hit
+[2025-12-06T00:35:45.252Z] Generating for: Aquele que... Voice: female
+[2025-12-06T00:35:45.252Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-06T00:35:45.253Z] Endpoint hit
+[2025-12-06T00:35:45.253Z] Generating for: Ele te env... Voice: female
+[2025-12-06T00:35:45.253Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-06T00:35:45.899Z] Calling toStream
+[2025-12-06T00:35:45.899Z] Stream obtained. Setting up events.
+[2025-12-06T00:35:45.903Z] Calling toStream
+[2025-12-06T00:35:45.903Z] Stream obtained. Setting up events.
+[2025-12-06T00:35:47.497Z] Stream ended
+[2025-12-06T00:35:48.193Z] Stream ended
+[2025-12-06T00:39:49.529Z] Endpoint hit
+[2025-12-06T00:39:49.530Z] Generating for: Louvai ao ... Voice: female
+[2025-12-06T00:39:49.530Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-06T00:39:50.189Z] Calling toStream
+[2025-12-06T00:39:50.189Z] Stream obtained. Setting up events.
+[2025-12-06T00:39:50.870Z] Stream ended
+[2025-12-06T00:39:57.258Z] Endpoint hit
+[2025-12-06T00:39:57.259Z] Generating for: Louvai-o p... Voice: female
+[2025-12-06T00:39:57.259Z] Setting metadata for pt-BR-FranciscaNeural
+[2025-12-06T00:39:57.898Z] Calling toStream
+[2025-12-06T00:39:57.898Z] Stream obtained. Setting up events.
+[2025-12-06T00:39:58.868Z] Stream ended
+[2025-12-06T01:37:27.914Z] Endpoint hit
+[2025-12-06T01:37:27.915Z] Generating for: Livro da g... Voice: male
+[2025-12-06T01:37:27.916Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T01:37:28.566Z] Calling toStream
+[2025-12-06T01:37:28.567Z] Stream obtained. Setting up events.
+[2025-12-06T01:37:29.059Z] Stream ended
+[2025-12-06T01:37:35.262Z] Endpoint hit
+[2025-12-06T01:37:35.262Z] Generating for: Abraão ger... Voice: male
+[2025-12-06T01:37:35.263Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T01:37:35.873Z] Calling toStream
+[2025-12-06T01:37:35.873Z] Stream obtained. Setting up events.
+[2025-12-06T01:37:37.466Z] Stream ended
+[2025-12-06T01:37:37.868Z] Endpoint hit
+[2025-12-06T01:37:37.868Z] Generating for: E Judá ger... Voice: male
+[2025-12-06T01:37:37.868Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T01:37:38.485Z] Calling toStream
+[2025-12-06T01:37:38.486Z] Stream obtained. Setting up events.
+[2025-12-06T01:37:39.452Z] Stream ended
+[2025-12-06T01:37:45.341Z] Endpoint hit
+[2025-12-06T01:37:45.341Z] Generating for: E Arão ger... Voice: male
+[2025-12-06T01:37:45.341Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T01:37:45.954Z] Calling toStream
+[2025-12-06T01:37:45.955Z] Stream obtained. Setting up events.
+[2025-12-06T01:37:47.009Z] Stream ended
+[2025-12-06T01:37:47.974Z] Endpoint hit
+[2025-12-06T01:37:47.975Z] Generating for: E Salmom g... Voice: male
+[2025-12-06T01:37:47.975Z] Setting metadata for pt-BR-AntonioNeural
+[2025-12-06T01:37:48.600Z] Calling toStream
+[2025-12-06T01:37:48.601Z] Stream obtained. Setting up events.
+[2025-12-06T01:37:49.113Z] Stream ended
+[17:59:12] --- New Audio Request ---
+[17:59:12] Voice: male, Text Length: 40
+[17:59:13] Generating stream...
+[17:59:14] Success! Buffer size: 40896 bytes
+[17:59:18] --- New Audio Request ---
+[17:59:18] Voice: male, Text Length: 125
+[17:59:18] Generating stream...
+[17:59:20] Success! Buffer size: 102240 bytes
+[17:59:20] --- New Audio Request ---
+[17:59:20] Voice: male, Text Length: 36
+[17:59:20] --- New Audio Request ---
+[17:59:20] Voice: male, Text Length: 75
+[17:59:21] Generating stream...
+[17:59:21] Generating stream...
+[17:59:22] Success! Buffer size: 46368 bytes
+[17:59:22] Success! Buffer size: 67968 bytes
+[22:14:21] --- New Audio Request ---
+[22:14:21] Voice: male, Text Length: 112
+[22:14:22] Generating stream...
+[22:14:22] Success! Buffer size: 0 bytes
+[22:16:55] --- New Audio Request ---
+[22:16:55] Voice: male, Text Length: 41
+[22:16:56] Generating stream...
+[22:16:56] Success! Buffer size: 43488 bytes
+[22:20:13] --- New Audio Request ---
+[22:20:13] Voice: male, Text Length: 21
+[22:20:13] Generating stream...
+[22:20:14] Success! Buffer size: 27360 bytes
+[22:22:15] --- New Audio Request ---
+[22:22:15] Voice: male, Text Length: 65
+[22:22:16] Generating stream...
+[22:22:17] Success! Buffer size: 61056 bytes
+[22:22:23] --- New Audio Request ---
+[22:22:23] Voice: male, Text Length: 82
+[22:22:24] Generating stream...
+[22:22:25] Success! Buffer size: 78624 bytes
+[22:22:25] --- New Audio Request ---
+[22:22:25] Voice: male, Text Length: 86
+[22:22:26] Generating stream...
+[22:22:27] Success! Buffer size: 82944 bytes
+[22:22:32] --- New Audio Request ---
+[22:22:32] Voice: male, Text Length: 80
+[22:22:32] Generating stream...
+[22:22:33] Success! Buffer size: 74304 bytes
+[22:27:18] --- New Audio Request ---
+[22:27:18] Voice: male, Text Length: 65
+[22:27:18] Generating stream...
+[22:27:19] Success! Buffer size: 61056 bytes
+[22:27:19] --- New Audio Request ---
+[22:27:19] Voice: male, Text Length: 82
+[22:27:20] Generating stream...
+[22:27:21] Success! Buffer size: 78624 bytes
+[22:27:26] --- New Audio Request ---
+[22:27:26] Voice: male, Text Length: 65
+[22:27:27] Generating stream...
+[22:27:28] Success! Buffer size: 61056 bytes
+[22:27:28] --- New Audio Request ---
+[22:27:28] Voice: male, Text Length: 82
+[22:27:28] Generating stream...
+[22:27:29] Success! Buffer size: 78624 bytes
+[22:33:19] --- New Audio Request ---
+[22:33:19] Voice: male, Text Length: 65
+[22:33:20] Generating stream...
+[22:33:22] Success! Buffer size: 61056 bytes
+[22:33:22] --- New Audio Request ---
+[22:33:22] Voice: male, Text Length: 82
+[22:33:22] Generating stream...
+[22:33:23] Success! Buffer size: 78624 bytes
+[22:33:24] --- New Audio Request ---
+[22:33:24] Voice: male, Text Length: 65
+[22:33:24] Generating stream...
+[22:33:25] Success! Buffer size: 61056 bytes
+[22:33:25] --- New Audio Request ---
+[22:33:25] Voice: male, Text Length: 82
+[22:33:26] Generating stream...
+[22:33:27] Success! Buffer size: 78624 bytes
+[22:34:33] --- New Audio Request ---
+[22:34:33] Voice: male, Text Length: 43
+[22:34:34] Generating stream...
+[22:34:35] Success! Buffer size: 44352 bytes
+[22:36:02] --- New Audio Request ---
+[22:36:02] Voice: male, Text Length: 65
+[22:36:03] Generating stream...
+[22:36:04] Success! Buffer size: 61056 bytes
+[22:36:04] --- New Audio Request ---
+[22:36:04] Voice: male, Text Length: 82
+[22:36:05] Generating stream...
+[22:36:05] Success! Buffer size: 78624 bytes
+[22:36:30] --- New Audio Request ---
+[22:36:30] Voice: male, Text Length: 65
+[22:36:30] Generating stream...
+[22:36:32] Success! Buffer size: 61056 bytes
+[22:36:32] --- New Audio Request ---
+[22:36:32] Voice: male, Text Length: 82
+[22:36:32] Generating stream...
+[22:36:33] Success! Buffer size: 78624 bytes
+[22:37:30] --- New Audio Request ---
+[22:37:30] Voice: male, Text Length: 65
+[22:37:31] Generating stream...
+[22:37:32] Success! Buffer size: 61056 bytes
+[22:37:32] --- New Audio Request ---
+[22:37:32] Voice: male, Text Length: 82
+[22:37:33] Generating stream...
+[22:37:34] Success! Buffer size: 78624 bytes
+[22:38:36] --- New Audio Request ---
+[22:38:36] Voice: male, Text Length: 65
+[22:38:37] Generating stream...
+[22:38:38] Success! Buffer size: 61056 bytes
+[22:38:38] --- New Audio Request ---
+[22:38:38] Voice: male, Text Length: 82
+[22:38:38] Generating stream...
+[22:38:39] Success! Buffer size: 78624 bytes
+[22:44:10] --- New Audio Request ---
+[22:44:10] Voice: male, Text Length: 65
+[22:44:10] Generating stream...
+[22:44:11] Success! Buffer size: 61056 bytes
+[22:44:16] --- New Audio Request ---
+[22:44:16] Voice: male, Text Length: 82
+[22:44:17] Generating stream...
+[22:44:18] Success! Buffer size: 78624 bytes
+[22:44:25] --- New Audio Request ---
+[22:44:25] Voice: male, Text Length: 86
+[22:44:25] Generating stream...
+[22:44:26] Success! Buffer size: 82944 bytes
+[22:44:33] --- New Audio Request ---
+[22:44:33] Voice: male, Text Length: 80
+[22:44:34] Generating stream...
+[22:44:35] Success! Buffer size: 74304 bytes
+[22:46:02] --- New Audio Request ---
+[22:46:02] Voice: male, Text Length: 65
+[22:46:02] Generating stream...
+[22:46:03] Success! Buffer size: 61056 bytes
+[22:46:08] --- New Audio Request ---
+[22:46:08] Voice: male, Text Length: 82
+[22:46:09] Generating stream...
+[22:46:10] Success! Buffer size: 78624 bytes
+[22:46:17] --- New Audio Request ---
+[22:46:17] Voice: male, Text Length: 86
+[22:46:17] Generating stream...
+[22:46:18] Success! Buffer size: 82944 bytes

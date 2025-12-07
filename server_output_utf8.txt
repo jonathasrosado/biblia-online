@@ -1,0 +1,47 @@
+﻿node : file:///C:/Use
+rs/Dondon/Desktop/bib
+lia/server/api.js:13
+No linha:1 
+caractere:1
++ node server/api.js 
+> server_output.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (file://   
+ /C:/User...erver    
+/api.js:13:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+app.use((req, res, 
+next) => {
+^
+
+ReferenceError: app 
+is not defined
+    at file:///C:/Use
+rs/Dondon/Desktop/bib
+lia/server/api.js:13:
+1
+    at ModuleJob.run 
+(node:internal/module
+s/esm/module_job:377:
+25)
+    at async onImport
+.tracePromise.__proto
+__ (node:internal/mod
+ules/esm/loader:671:2
+6)
+    at async asyncRun
+EntryPointWithESMLoad
+er (node:internal/mod
+ules/run_main:101:5)
+
+Node.js v24.11.1
