@@ -691,8 +691,8 @@ app.post('/api/audio/edge', async (req, res) => {
         const tts = new MsEdgeTTS();
         const voiceId = voice === 'female' ? "pt-BR-FranciscaNeural" : "pt-BR-AntonioNeural";
 
-        // Use WebM Opus - Better compatibility with modern Web Audio (bypass iOS MP3 bug)
-        await tts.setMetadata(voiceId, OUTPUT_FORMAT.WEBM_24KHZ_16BIT_MONO_OPUS);
+        // Revert to MP3 - Safest for HTML5 Audio element on iOS
+        await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
 
         // 2. Generate
         log("Generating stream...");

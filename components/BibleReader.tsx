@@ -289,8 +289,8 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
           const base64 = await generateAudioFromText(chunks[index], preferences.voice || 'male');
 
           if (base64) {
-            // Use Opus MIME type for correct playback of WebM/Opus data
-            src = `data:audio/webm;codecs=opus;base64,${base64}`;
+            // Reverted to MP3 for maximum compatibility with HTML5 Audio
+            src = `data:audio/mp3;base64,${base64}`;
             // @ts-ignore
             audioCacheRef.current.set(index, src);
           }
@@ -306,7 +306,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             generateAudioFromText(chunks[nextIndex], preferences.voice || 'male').then(b64 => {
               if (b64) {
                 // @ts-ignore
-                audioCacheRef.current.set(nextIndex, `data:audio/webm;codecs=opus;base64,${b64}`);
+                audioCacheRef.current.set(nextIndex, `data:audio/mp3;base64,${b64}`);
               }
             }).finally(() => activeFetchRef.current.delete(nextIndex));
           }
