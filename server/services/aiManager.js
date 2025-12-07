@@ -514,7 +514,9 @@ export class AIManager {
 
 
     async generateBookSummary(book, language = 'pt', force = false) {
-        const safeBook = book.toLowerCase().replace(/[^a-z0-9]/g, '');
+        // Robust normalization: NFD splits accents, remove diacritics, then keep only alphanumeric
+        const safeBook = book.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
+
         const summaryDir = path.join(process.cwd(), 'data', 'summaries');
         const summaryFile = path.join(summaryDir, `${language}_${safeBook}.json`);
 
