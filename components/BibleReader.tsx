@@ -182,6 +182,14 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
       audioRef.current = null;
     }
 
+    // New HTML5 Audio Cleanup
+    const globalAudio = (window as any)._activeBibleAudio;
+    if (globalAudio) {
+      globalAudio.pause();
+      globalAudio.src = "";
+      (window as any)._activeBibleAudio = null;
+    }
+
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
@@ -244,12 +252,13 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
   const processAudioQueue = async (chunks: string[], startIndex: number) => {
     let index = startIndex;
+    const htmlAudio = new Audio();
+    // Save reference for cleanups
+    (window as any)._activeBibleAudio = htmlAudio;
 
-    // Recursive function to play chunks
     const playNext = async () => {
       // 1. Strict Stop Check
       if (!isPlayingRef.current) {
-        console.log("[Audio] Stopped by user");
         return;
       }
 
@@ -270,95 +279,71 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
       setIsAudioLoading(true);
 
       try {
-        let audioBuffer: AudioBuffer | null = null;
+        let src: string = "";
 
-        // 1. Check Cache
+        // 1. Check & Get Cache (Treating cache as string DataURI now)
         if (audioCacheRef.current.has(index)) {
-          console.log(`[⚡] Using cached buffer for ${index}`);
-          audioBuffer = audioCacheRef.current.get(index)!;
+          // @ts-ignore
+          src = audioCacheRef.current.get(index);
         } else {
-          // 2. Generate and Decode if not in cache
-          console.log(`[🎵] Generating audio for chunk ${index}/${chunks.length - 1}...`);
-          const base64Data = await generateAudioFromText(chunks[index], preferences.voice || 'male');
+          const base64 = await generateAudioFromText(chunks[index], preferences.voice || 'male');
 
-          if (!isPlayingRef.current) return;
-
-          if (base64Data && audioContextRef.current) {
-            const ctx = audioContextRef.current;
-            const binaryString = atob(base64Data);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
-
-            audioBuffer = await ctx.decodeAudioData(bytes.buffer);
-            audioCacheRef.current.set(index, audioBuffer);
+          if (base64) {
+            // Use Opus MIME type for correct playback of WebM/Opus data
+            src = `data:audio/webm;codecs=opus;base64,${base64}`;
+            // @ts-ignore
+            audioCacheRef.current.set(index, src);
           }
         }
 
         if (!isPlayingRef.current) return;
 
-        if (audioBuffer && audioContextRef.current) {
-          const ctx = audioContextRef.current;
-
-          // --- PREFETCH NEXT CHUNK (GAPLESS LOGIC) ---
+        if (src) {
+          // PRELOAD NEXT
           const nextIndex = index + 1;
           if (nextIndex < chunks.length && !audioCacheRef.current.has(nextIndex) && !activeFetchRef.current.has(nextIndex)) {
-            console.log(`[🚀] Prefetching chunk ${nextIndex}...`);
             activeFetchRef.current.add(nextIndex);
-
-            // Fetch in background
-            generateAudioFromText(chunks[nextIndex], preferences.voice || 'male')
-              .then(async (data) => {
-                if (data && isPlayingRef.current && audioContextRef.current) {
-                  const bin = atob(data);
-                  const b = new Uint8Array(bin.length);
-                  for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
-                  const buf = await audioContextRef.current.decodeAudioData(b.buffer);
-                  audioCacheRef.current.set(nextIndex, buf);
-                  console.log(`[📥] Prefetched chunk ${nextIndex} ready`);
-                }
-              })
-              .catch(e => console.warn("Prefetch failed", e))
-              .finally(() => activeFetchRef.current.delete(nextIndex));
+            generateAudioFromText(chunks[nextIndex], preferences.voice || 'male').then(b64 => {
+              if (b64) {
+                // @ts-ignore
+                audioCacheRef.current.set(nextIndex, `data:audio/webm;codecs=opus;base64,${b64}`);
+              }
+            }).finally(() => activeFetchRef.current.delete(nextIndex));
           }
-          // -------------------------------------------
 
-          console.log(`[▶️] Playing buffer ${index} (Duration: ${audioBuffer.duration.toFixed(2)}s)`);
+          htmlAudio.src = src;
 
-          const source = ctx.createBufferSource();
-          source.buffer = audioBuffer;
-          source.connect(ctx.destination);
-          sourceNodeRef.current = source;
+          // Event Handlers
+          htmlAudio.onended = () => {
+            index++;
+            playNext();
+          };
 
+          htmlAudio.onerror = (e) => {
+            console.error("HTML5 Audio Error", e);
+            // Try skipping to next if one fails
+            index++;
+            playNext();
+          };
 
-          source.onended = () => {
-            if (isPlayingRef.current) {
-              // Cleanup old cache to save memory (keep last 2)
-              if (index > 2) audioCacheRef.current.delete(index - 2);
-
-              index++;
-              playNext();
+          htmlAudio.oncanplaythrough = async () => {
+            try {
+              await htmlAudio.play();
+              setIsAudioLoading(false);
+            } catch (e) {
+              console.warn("Autoplay prevented", e);
             }
           };
 
-          // iOS Safety: Ensure context is running immediately before play
-          if (ctx.state === 'suspended') {
-            await ctx.resume();
-          }
-
-          source.start(0);
-          setIsAudioLoading(false);
-
         } else {
-          console.error("Audio failed or Context missing.");
-          setIsAudioLoading(false);
-          stopAudio();
+          console.error("Failed to get audio src");
+          index++;
+          playNext();
         }
 
-      } catch (err) {
-        console.error("Audio playback error", err);
-        setIsAudioLoading(false);
-        stopAudio();
+      } catch (e) {
+        console.error("Play loop error", e);
+        stopAudio(); // Stop on critical error to prevent infinite loops
       }
     };
 
