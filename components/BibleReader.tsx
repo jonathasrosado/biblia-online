@@ -41,6 +41,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
   // Audio State
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [currentPlayingChunk, setCurrentPlayingChunk] = useState<number>(0);
   const [totalChunks, setTotalChunks] = useState<number>(0);
 
@@ -182,6 +183,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
       window.speechSynthesis.cancel();
     }
     setIsPlaying(false);
+    setIsPaused(true);
     setIsAudioLoading(false);
   };
 
@@ -197,6 +199,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
       globalAudio.src = "";
       (window as any)._activeBibleAudio = null;
     }
+    setIsPaused(false);
   };
 
   const playAudio = async () => {
@@ -207,6 +210,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
     console.log("[🎵 BibleReader] User clicked play audio");
     setIsPlaying(true);
+    setIsPaused(false);
     setIsAudioLoading(true);
     isPlayingRef.current = true;
 
