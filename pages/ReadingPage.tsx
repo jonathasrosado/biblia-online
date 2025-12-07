@@ -194,6 +194,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     // Audio State
     const [isAudioLoading, setIsAudioLoading] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
     const [currentPlayingChunk, setCurrentPlayingChunk] = useState<number>(0);
     const [totalChunks, setTotalChunks] = useState<number>(0);
 
@@ -223,6 +224,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             window.speechSynthesis.cancel();
         }
         setIsPlaying(false);
+        setIsPaused(true);
         setIsAudioLoading(false);
     };
 
@@ -232,6 +234,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
         audioCacheRef.current.clear();
         activeFetchRef.current.clear();
         setCurrentPlayingChunk(0);
+        setIsPaused(false);
         if (audioContextRef.current) {
             audioContextRef.current.close().catch(console.error);
             audioContextRef.current = null;
@@ -262,6 +265,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
         }
 
         setIsPlaying(true);
+        setIsPaused(false);
         isPlayingRef.current = true;
         setIsAudioLoading(true);
 
@@ -554,8 +558,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                                 </>
                             ) : (
                                 <>
-                                    {(readingMode === 'fluid' && currentPlayingChunk > 0) ? <Play size={16} /> : <Volume2 size={16} />}
-                                    <span className="text-sm font-bold">{(readingMode === 'fluid' && currentPlayingChunk > 0) ? "Continuar" : "Ouvir"}</span>
+                                    {(readingMode === 'fluid' && (isPaused || currentPlayingChunk > 0)) ? <Play size={16} /> : <Volume2 size={16} />}
+                                    <span className="text-sm font-bold">{(readingMode === 'fluid' && (isPaused || currentPlayingChunk > 0)) ? "Continuar" : "Ouvir"}</span>
                                 </>
                             )}
                         </button>
@@ -564,14 +568,14 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             </header>
 
             {/* Floating Audio Indicator for Fluid Mode */}
-            {isPlaying && readingMode === 'fluid' && (
+            {(isPlaying || isPaused) && readingMode === 'fluid' && (
                 <div className="fixed bottom-20 right-6 z-40 animate-slideUp">
                     <div className={`p-4 rounded-full shadow-lg flex items-center gap-3 pr-6
                       ${preferences.theme === 'sepia' ? 'bg-[#5c4b37] text-[#f4ecd8]' : 'bg-stone-900 text-white'}`}>
                         <div className="flex gap-1 h-4 items-end">
-                            <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_1s_infinite]' : 'h-1'}`}></span>
-                            <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_1.2s_infinite]' : 'h-1'}`}></span>
-                            <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_0.8s_infinite]' : 'h-1'}`}></span>
+                            <span className={`w-1 bg-bible-gold ${(!isAudioLoading && isPlaying) ? 'animate-[bounce_1s_infinite]' : 'h-1'}`}></span>
+                            <span className={`w-1 bg-bible-gold ${(!isAudioLoading && isPlaying) ? 'animate-[bounce_1.2s_infinite]' : 'h-1'}`}></span>
+                            <span className={`w-1 bg-bible-gold ${(!isAudioLoading && isPlaying) ? 'animate-[bounce_0.8s_infinite]' : 'h-1'}`}></span>
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm font-medium">Ouvindo {currentBook.name} {currentChapter}</span>
@@ -583,8 +587,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                         </div>
 
                         <div className="flex items-center gap-2 ml-2">
-                            <button onClick={pauseAudio} className="w-8 h-8 flex items-center justify-center rounded-full bg-bible-gold/20 hover:bg-bible-gold/30 text-bible-gold transition-colors" title="Pausar">
-                                <Pause size={16} className="fill-current" />
+                            <button onClick={isPlaying ? pauseAudio : playFluidAudio} className="w-8 h-8 flex items-center justify-center rounded-full bg-bible-gold/20 hover:bg-bible-gold/30 text-bible-gold transition-colors" title={isPlaying ? "Pausar" : "Continuar"}>
+                                {isPlaying ? <Pause size={16} className="fill-current" /> : <Play size={16} className="fill-current" />}
                             </button>
                             <button onClick={stopAudio} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/10 hover:text-red-500 transition-colors" title="Parar">
                                 <Square size={16} className="fill-current" />

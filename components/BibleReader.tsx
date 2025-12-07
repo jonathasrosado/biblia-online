@@ -423,15 +423,15 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
         })}
       </div>
 
-      {/* Floating Audio Player Indicator (visible when playing) */}
-      {isPlaying && (
+      {/* Floating Audio Player Indicator (visible when playing or paused) */}
+      {(isPlaying || isPaused) && (
         <div className="fixed bottom-20 right-6 z-40 animate-slideUp">
           <div className={`p-4 rounded-full shadow-lg flex items-center gap-3 pr-6
              ${preferences.theme === 'sepia' ? 'bg-[#5c4b37] text-[#f4ecd8]' : 'bg-stone-900 text-white'}`}>
             <div className="flex gap-1 h-4 items-end">
-              <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_1s_infinite]' : 'h-1'}`}></span>
-              <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_1.2s_infinite]' : 'h-1'}`}></span>
-              <span className={`w-1 bg-bible-gold ${!isAudioLoading ? 'animate-[bounce_0.8s_infinite]' : 'h-1'}`}></span>
+              <span className={`w-1 bg-bible-gold ${(!isAudioLoading && isPlaying) ? 'animate-[bounce_1s_infinite]' : 'h-1'}`}></span>
+              <span className={`w-1 bg-bible-gold ${(!isAudioLoading && isPlaying) ? 'animate-[bounce_1.2s_infinite]' : 'h-1'}`}></span>
+              <span className={`w-1 bg-bible-gold ${(!isAudioLoading && isPlaying) ? 'animate-[bounce_0.8s_infinite]' : 'h-1'}`}></span>
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-medium">{t.listeningTo} {book} {chapter}</span>
