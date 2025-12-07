@@ -312,6 +312,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             }).finally(() => activeFetchRef.current.delete(nextIndex));
           }
 
+
           htmlAudio.src = src;
 
           // Event Handlers
@@ -327,14 +328,17 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             playNext();
           };
 
-          htmlAudio.oncanplaythrough = async () => {
-            try {
-              await htmlAudio.play();
-              setIsAudioLoading(false);
-            } catch (e) {
-              console.warn("Autoplay prevented", e);
-            }
-          };
+          // Call play() immediately - it returns a Promise
+          try {
+            await htmlAudio.play();
+            setIsAudioLoading(false);
+          } catch (playErr) {
+            console.error("Play failed:", playErr);
+            // Skip to next on play failure
+            index++;
+            playNext();
+          }
+
 
         } else {
           console.error("Failed to get audio src");
