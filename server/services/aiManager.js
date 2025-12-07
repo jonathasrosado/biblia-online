@@ -511,32 +511,40 @@ export class AIManager {
         throw new Error(`Unsupported image provider: ${provider}`);
     }
 
-
-
     async generateBookSummary(book, language = 'pt', force = false) {
         // Robust normalization: NFD splits accents, remove diacritics, then keep only alphanumeric
         const safeBook = book.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
 
-        const summaryDir = path.join(process.cwd(), 'data', 'summaries');
-        const summaryFile = path.join(summaryDir, `${language}_${safeBook}.json`);
-
-        // Ensure directory exists
-        if (!fs.existsSync(summaryDir)) {
-            fs.mkdirSync(summaryDir, { recursive: true });
-        }
-
-        // 1. Check Cache (Skip if force is true)
-        if (!force && fs.existsSync(summaryFile)) {
+        // --- 1. Check MongoDB Cache (Skip if force is true) ---
+        if (!force) {
             try {
-                console.log(`[AIManager] Serving cached summary for ${book}`);
-                const cachedContent = fs.readFileSync(summaryFile, 'utf-8');
-                return JSON.parse(cachedContent);
+                // Import Model dynamically if not at top level
+                const BookSummary = (await import('../models/BookSummary.js')).default;
+
+                const cachedSummary = await BookSummary.findOne({
+                    normalizedBook: safeBook,
+                    language: language
+                });
+
+                if (cachedSummary) {
+                    console.log(`[AIManager] Serving MongoDB cached summary for ${book}`);
+                    return {
+                        title: cachedSummary.title,
+                        testament: cachedSummary.testament,
+                        author: cachedSummary.author,
+                        date: cachedSummary.date,
+                        theme: cachedSummary.theme,
+                        keyVerse: cachedSummary.keyVerse,
+                        summary: cachedSummary.summary
+                    };
+                }
             } catch (e) {
-                console.error("[AIManager] Cache read error, regenerating:", e);
+                console.error("[AIManager] MongoDB read error, generating fresh:", e);
+                // Proceed to generate
             }
         }
 
-        // 2. Generate with AI
+        // --- 2. Generate with AI ---
         console.log(`[AIManager] Generating NEW summary for ${book}...`);
         const prompt = `
             Crie uma introdução rica e teologicamente precisa para o livro bíblico de ${book}.
@@ -571,25 +579,30 @@ export class AIManager {
                 // Simple validation
                 if (!data.summary || !data.title) throw new Error("Invalid JSON structure");
 
-                // 3. Save to Cache
-                fs.writeFileSync(summaryFile, JSON.stringify(data, null, 2), 'utf-8');
-                console.log(`[AIManager] Summary saved to ${summaryFile}`);
+                // --- 3. Save to MongoDB ---
+                try {
+                    const BookSummary = (await import('../models/BookSummary.js')).default;
+                    await BookSummary.findOneAndUpdate(
+                        { normalizedBook: safeBook, language: language },
+                        {
+                            book: book,
+                            normalizedBook: safeBook,
+                            language: language,
+                            ...data,
+                            updatedAt: new Date()
+                        },
+                        { upsert: true, new: true }
+                    );
+                    console.log(`[AIManager] Summary saved to MongoDB for ${book}`);
+                } catch (dbError) {
+                    console.error("[AIManager] Failed to save to MongoDB (Non-fatal):", dbError.message);
+                }
 
                 return data;
             } catch (error) {
                 console.error(`[AIManager] Summary generation failed (Attempt ${attempt}):`, error.message);
                 lastError = error;
-                // Log the raw text if available for debugging
-                if (error instanceof SyntaxError) {
-                    fs.appendFileSync(path.join(process.cwd(), 'server-debug.log'), `[JSON Error] Book: ${book}\n${error}\n`);
-                }
             }
-        }
-
-        // If all retries fail, check if we have *any* cached version to fallback to (even if force was true)
-        if (force && fs.existsSync(summaryFile)) {
-            console.log("[AIManager] Force refresh failed, falling back to old cache.");
-            return JSON.parse(fs.readFileSync(summaryFile, 'utf-8'));
         }
 
         throw new Error(`Falha ao gerar resumo após tentativas: ${lastError?.message}`);
@@ -597,7 +610,6 @@ export class AIManager {
 
     async testConnection(provider, apiKey) {
         console.log(`[AIManager] Testing connection for ${provider}...`);
-
         try {
             let result = { success: false, message: '' };
 

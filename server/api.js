@@ -1,3 +1,4 @@
+import 'dotenv/config'; // Load env vars
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -9,6 +10,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createRequire } from "module";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
 import { aiManager } from './services/aiManager.js';
+import connectDB from './config/db.js'; // Import MongoDB config
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,10 +31,13 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error('FATAL: Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
+// Connect to MongoDB
+connectDB();
+
 const app = express();
 const PORT = process.env.PORT || 3002;
 console.log("----------------------------------------");
-console.log("SERVER VERSION: 1.0.6 - FIXED REQUIRE & HANDLERS");
+console.log("SERVER VERSION: 1.1.0 - WITH MONGODB");
 console.log(`Starting in directory: ${process.cwd()}`);
 console.log(`__dirname: ${__dirname}`);
 console.log("----------------------------------------");
