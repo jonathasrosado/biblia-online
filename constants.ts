@@ -77,7 +77,7 @@ export const translations = {
     devotional: "Devocional Diário",
     chat: "Chat Teológico",
     settings: "Configurações",
-    searchPlaceholder: "Buscar...",
+    searchPlaceholder: "Buscar na Bíblia...",
     recent: "Recentes",
     clear: "Limpar",
     books: "Livros",

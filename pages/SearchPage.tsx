@@ -84,36 +84,33 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                 </div>
             ) : (
                 <div className="space-y-12">
-                    {/* Chat Suggestion for Questions */}
-                    {/* Chat Suggestions (Heuristic Chips) - Replaces the Big Banner */}
-                    {(/^(quem|como|qual|quando|onde|por que|o que|\?)/i.test(query) || query.includes('?')) && (
-                        <div className="animate-slideUp">
-                            <div className="flex items-center gap-3 mb-4">
-                                <MessageCircle size={18} className="text-bible-gold" />
-                                <h3 className="font-bold text-sm uppercase tracking-widest text-stone-500">Aprofunde no Chat</h3>
-                            </div>
-                            <div className="flex flex-wrap gap-3">
-                                <button
-                                    onClick={() => navigate(`/chat?p=${encodeURIComponent(query)}`)}
-                                    className="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-bible-gold hover:text-white transition-all text-sm border border-stone-200 dark:border-stone-700"
-                                >
-                                    💬 Conversar sobre "{query}"
-                                </button>
-                                <button
-                                    onClick={() => navigate(`/chat?p=${encodeURIComponent("O que a Bíblia diz sobre " + query + "?")}`)}
-                                    className="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-bible-gold hover:text-white transition-all text-sm border border-stone-200 dark:border-stone-700"
-                                >
-                                    📖 O que a Bíblia diz?
-                                </button>
-                                <button
-                                    onClick={() => navigate(`/chat?p=${encodeURIComponent("Versículos sobre " + query)}`)}
-                                    className="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-bible-gold hover:text-white transition-all text-sm border border-stone-200 dark:border-stone-700"
-                                >
-                                    ✨ Versículos sobre {query}
-                                </button>
-                            </div>
+                    {/* Chat Suggestion - ALWAYS VISIBLE now per user request */}
+                    <div className="animate-slideUp">
+                        <div className="flex items-center gap-3 mb-4">
+                            <MessageCircle size={18} className="text-bible-gold" />
+                            <h3 className="font-bold text-sm uppercase tracking-widest text-stone-500">Aprofunde no Chat</h3>
                         </div>
-                    )}
+                        <div className="flex flex-wrap gap-3">
+                            <button
+                                onClick={() => navigate(`/chat?p=${encodeURIComponent(query)}`)}
+                                className="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-bible-gold hover:text-white transition-all text-sm border border-stone-200 dark:border-stone-700"
+                            >
+                                💬 Conversar sobre "{query}"
+                            </button>
+                            <button
+                                onClick={() => navigate(`/chat?p=${encodeURIComponent("O que a Bíblia diz sobre " + query + "?")}`)}
+                                className="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-bible-gold hover:text-white transition-all text-sm border border-stone-200 dark:border-stone-700"
+                            >
+                                📖 O que a Bíblia diz?
+                            </button>
+                            <button
+                                onClick={() => navigate(`/chat?p=${encodeURIComponent("Versículos sobre " + query)}`)}
+                                className="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-bible-gold hover:text-white transition-all text-sm border border-stone-200 dark:border-stone-700"
+                            >
+                                ✨ Versículos sobre {query}
+                            </button>
+                        </div>
+                    </div>
 
                     {!hasResults && !aiAnswer ? (
                         <div className="text-center py-12 opacity-60">
@@ -188,17 +185,34 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                                         {verseResults.map((res, idx) => {
                                             // Parse reference logic
                                             let linkTarget = '#';
-                                            try {
-                                                const lastColon = res.reference.lastIndexOf(':');
-                                                if (lastColon !== -1) {
-                                                    const verse = res.reference.substring(lastColon + 1);
-                                                    const rest = res.reference.substring(0, lastColon);
-                                                    const lastSpace = rest.lastIndexOf(' ');
-                                                    const chapter = rest.substring(lastSpace + 1);
-                                                    const book = rest.substring(0, lastSpace);
-                                                    linkTarget = `/leitura/${normalizeBookName(book)}/${chapter}?verses=${verse}`;
+
+                                            if (res.context === 'Livro Completo') {
+                                                // Handle Book Link
+                                                linkTarget = `/leitura/${normalizeBookName(res.reference)}`;
+                                            } else {
+                                                // Handle Verse Link
+                                                try {
+                                                    const lastColon = res.reference.lastIndexOf(':');
+                                                    if (lastColon !== -1) {
+                                                        const verse = res.reference.substring(lastColon + 1);
+                                                        const rest = res.reference.substring(0, lastColon);
+                                                        const lastSpace = rest.lastIndexOf(' ');
+                                                        const chapter = rest.substring(lastSpace + 1);
+                                                        const book = rest.substring(0, lastSpace);
+                                                        linkTarget = `/leitura/${normalizeBookName(book)}/${chapter}?verses=${verse}`;
+                                                    } else {
+                                                        // Fallback for just "Book Chapter" references (no colon)
+                                                        const match = res.reference.match(/^(.+)\s+(\d+)$/);
+                                                        if (match) {
+                                                            const book = match[1];
+                                                            const chapter = match[2];
+                                                            linkTarget = `/leitura/${normalizeBookName(book)}/${chapter}`;
+                                                        }
+                                                    }
+                                                } catch (e) {
+                                                    console.error("Error parsing reference link", e);
                                                 }
-                                            } catch (e) { }
+                                            }
 
                                             return (
                                                 <Link

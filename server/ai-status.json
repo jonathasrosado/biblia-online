@@ -1,8 +1,8 @@
 {
   "openrouter": {
     "valid": false,
-    "message": "Erro OpenRouter: 401 - {\"error\":{\"message\":\"No cookie auth credentials found\",\"code\":401}}",
-    "lastChecked": "2025-12-07T01:10:57.156Z"
+    "message": "Erro OpenRouter: 401 - {\"error\":{\"message\":\"User not found.\",\"code\":401}}",
+    "lastChecked": "2025-12-07T22:23:24.492Z"
   },
   "freepik": {
     "valid": true,

@@ -4,152 +4,117 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
-// Load env vars
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Paths
-const DATA_DIR = path.join(__dirname, '..', 'src', 'data');
-const BLOG_DIR = path.join(DATA_DIR, 'blog_posts');
-const CATEGORIES_FILE = path.join(DATA_DIR, 'categories.json');
+// Define Schemas INLINE to avoid import issues
+const blogPostSchema = new mongoose.Schema({
+    slug: { type: String, required: true, unique: true },
+    title: { type: String, required: true },
+    content: { type: String },
+    excerpt: String,
+    date: { type: Date, default: Date.now },
+    status: { type: String, enum: ['published', 'draft'], default: 'draft' },
+    tags: [String],
+    category: String,
+    coverImage: String,
+    author: String,
+    seo: {
+        title: String,
+        description: String,
+        keywords: [String]
+    },
+    views: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+// Use 'BlogPost' model to match the application's expected collection
+const BlogPost = mongoose.models.BlogPost || mongoose.model('BlogPost', blogPostSchema);
 
-console.log("Starting Data Restoration...");
-
-async function connectDB() {
-    if (!process.env.MONGO_URI) {
-        throw new Error("MONGO_URI not defined in .env");
-    }
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("Connected to MongoDB");
-}
+const categorySchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
+    description: { type: String },
+    parentId: { type: String, default: null }
+}, { timestamps: true });
+const Category = mongoose.models.Category || mongoose.model('Category', categorySchema);
 
 async function run() {
     try {
-        await connectDB();
+        console.log("Starting ROBUST migration...");
+        if (!process.env.MONGO_URI) throw new Error("No MONGO_URI");
 
-        // 1. Restore Categories
-        console.log("Restoring Categories...");
-        if (fs.existsSync(CATEGORIES_FILE)) {
-            const categoriesData = JSON.parse(fs.readFileSync(CATEGORIES_FILE, 'utf-8'));
-            const { Category } = await import('./models/Category.js');
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log("Connected to Mongo.");
 
-            for (const cat of categoriesData) {
-                // Check if exists
-                const exists = await Category.findOne({ slug: cat.slug });
-                if (!exists) {
-                    await Category.create(cat);
-                    console.log(`Created Category: ${cat.name}`);
-                } else {
-                    console.log(`Category exists: ${cat.name}`);
-                }
+        // Paths - Use process.cwd() for reliability
+        const ROOT = process.cwd();
+        const POSTS_DIR = path.join(ROOT, 'src', 'data', 'blog_posts');
+        const CATEGORIES_PATH = path.join(ROOT, 'src', 'data', 'categories.json');
+
+        console.log(`Looking for posts in: ${POSTS_DIR}`);
+
+        // 1. Categories
+        if (fs.existsSync(CATEGORIES_PATH)) {
+            const cats = JSON.parse(fs.readFileSync(CATEGORIES_PATH, 'utf-8'));
+            console.log(`Found ${cats.length} categories.`);
+            for (const c of cats) {
+                try {
+                    await Category.findOneAndUpdate(
+                        { slug: c.slug },
+                        c,
+                        { upsert: true, new: true }
+                    );
+                } catch (e) { console.error(`Cat Error ${c.name}:`, e.message); }
             }
-        } else {
-            console.log("No categories.json found.");
+            console.log("Categories synced.");
         }
 
-        // 2. Restore Blog Posts
-        console.log("Restoring Blog Posts...");
-        if (fs.existsSync(BLOG_DIR)) {
-            const files = fs.readdirSync(BLOG_DIR).filter(f => f.endsWith('.json'));
-            // Fix: BlogPost is default export
-            const { default: BlogPost } = await import('./models/BlogPost.js');
-            const { Image } = await import('./models/Image.js');
+        // 2. Posts
+        if (fs.existsSync(POSTS_DIR)) {
+            const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.json'));
+            console.log(`Found ${files.length} post files.`);
 
+            let successCount = 0;
             for (const file of files) {
                 try {
-                    const filePath = path.join(BLOG_DIR, file);
-                    const postData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+                    const raw = fs.readFileSync(path.join(POSTS_DIR, file), 'utf-8');
+                    const data = JSON.parse(raw);
 
-                    // Check key fields
-                    if (!postData.slug || !postData.title) continue;
-
-                    // Handle Image
-                    let finalImage = postData.image;
-
-                    // If image is local path (e.g., /uploads/...)
-                    if (finalImage && !finalImage.startsWith('http')) {
-                        const filename = path.basename(finalImage);
-                        // Try to find file in public/uploads or root uploads
-                        const possiblePaths = [
-                            path.join(process.cwd(), 'public', 'uploads', filename),
-                            path.join(process.cwd(), 'uploads', filename),
-                            path.join(process.cwd(), 'dist', 'uploads', filename)
-                        ];
-
-                        let imageBuffer = null;
-
-                        for (const p of possiblePaths) {
-                            if (fs.existsSync(p)) {
-                                imageBuffer = fs.readFileSync(p);
-                                break;
-                            }
-                        }
-
-                        if (imageBuffer) {
-                            console.log(`Migrating local image: ${filename}`);
-                            // Save to Mongo Image
-                            let existingImg = await Image.findOne({ filename: filename });
-                            if (!existingImg) {
-                                const base64Data = imageBuffer.toString('base64');
-                                const ext = path.extname(filename).toLowerCase();
-                                let mime = 'image/png';
-                                if (ext === '.jpg' || ext === '.jpeg') mime = 'image/jpeg';
-                                if (ext === '.webp') mime = 'image/webp';
-
-                                await Image.create({
-                                    filename: filename,
-                                    contentType: mime,
-                                    data: base64Data
-                                });
-                            }
-                            finalImage = `/api/uploads/${filename}`;
-                        } else {
-                            console.warn(`Local image not found for post ${postData.title}: ${finalImage}`);
-                        }
+                    if (!data.slug || !data.title) {
+                        console.warn(`Skipping invalid file: ${file}`);
+                        continue;
                     }
 
-                    // Check if post exists
-                    const existingPost = await BlogPost.findOne({ slug: postData.slug });
-                    if (!existingPost) {
-                        // Map fields
-                        const newPost = {
-                            slug: postData.slug,
-                            title: postData.title,
-                            content: postData.content,
-                            excerpt: postData.metaDescription || "",
-                            category: postData.category,
-                            date: postData.date ? new Date(postData.date) : new Date(),
-                            status: postData.status || 'published',
-                            coverImage: finalImage,
-                            seo: {
-                                title: postData.seoTitle,
-                                description: postData.metaDescription
-                            },
-                            views: 0,
-                            createdAt: postData.date ? new Date(postData.date) : new Date(),
-                            updatedAt: new Date()
-                        };
+                    // Fix status
+                    if (!data.status) data.status = 'published';
 
-                        await BlogPost.create(newPost);
-                        console.log(`Created Post: ${postData.title}`);
-                    } else {
-                        console.log(`Post exists: ${postData.title}`);
-                    }
-                } catch (err) {
-                    console.error(`Error processing file ${file}:`, err);
+                    // Insert/Update
+                    await BlogPost.findOneAndUpdate(
+                        { slug: data.slug },
+                        data,
+                        { upsert: true, new: true }
+                    );
+                    successCount++;
+                    // console.log(`Processed: ${data.title}`);
+                } catch (e) {
+                    console.error(`Failed ${file}:`, e.message);
                 }
             }
+            console.log(`Successfully migrated ${successCount} posts.`);
         } else {
-            console.log("No blog_posts directory found.");
+            console.error(`DIRECTORY NOT FOUND: ${POSTS_DIR}`);
         }
 
-        console.log("Migration Complete!");
+        const finalCount = await BlogPost.countDocuments({});
+        console.log(`Final DB Count: ${finalCount}`);
+
         process.exit(0);
 
     } catch (e) {
-        console.error("Migration Failed:", e);
+        console.error("Migration Fatal Error:", e);
         process.exit(1);
     }
 }

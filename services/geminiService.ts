@@ -282,26 +282,73 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
 
   let results: SearchResult[] = [];
 
-  // 0. CHECK FOR DIRECT REFERENCES (e.g. "Salmos 91")
+  // 0. CHECK FOR DIRECT REFERENCES (e.g. "Salmos 91", "João 3:16", "Gênesis")
   // This ensures the search page behaves consistently with the reading page
-  const directMatch = query.trim().match(/^([a-zA-Z\u00C0-\u00FF\s]+)\s+(\d+)$/);
+  const lowerQuery = query.trim().toLowerCase();
+
+  // A. Check for exact Book Name (e.g. "Gênesis", "1 Reis")
+  const exactBook = bibleBooks.find(b =>
+    normalizeBookName(b.name) === normalizeBookName(lowerQuery) ||
+    b.name.toLowerCase() === lowerQuery
+  );
+
+  if (exactBook) {
+    console.log(`Direct book match: ${exactBook.name}`);
+    const bookResult: SearchResult = {
+      text: `Livro de ${exactBook.name}`,
+      reference: exactBook.name,
+      context: "Livro Completo",
+      // We'll use a specific format that SearchPage can parse to link to the book
+      // Or we rely on the fact that reference is just the Name
+    };
+    results.push(bookResult);
+    // Continue potential search or return immediately? 
+    // Usually if user types "Genesis", they want the book.
+    // Let's return, but maybe fetch chapter 1 preview?
+    // For now, return this result which SearchPage should interpret.
+    return [bookResult];
+  }
+
+  // B. Check for Book + Chapter (e.g. "João 3") OR Book + Chapter + Verse (e.g. "João 3:16")
+  // Regex: Name (letters/spaces) + Chapter (digits) + Optional Verse (:digits)
+  const directMatch = query.trim().match(/^([a-zA-Z\u00C0-\u00FF\s0-9]+)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$/);
+
   if (directMatch) {
-    const bookName = directMatch[1].trim();
-    const chapter = parseInt(directMatch[2]);
+    // Try to extract book name from the first capture group (which might include numbers like "1 Reis")
+    // The regex above is broad, let's refine parsing logic manually for safety
+    // We treat the last number sequence as Chapter/Verse, everything before as Book
+
+    // Better strategy: split by last number to isolate Book and Number
+    // But directMatch[1] is loosely the book name part if we constructed regex right.
+    const bookPart = directMatch[1].trim();
+    const chapterPart = parseInt(directMatch[2]);
+    const verseStart = directMatch[3] ? parseInt(directMatch[3]) : null;
+    const verseEnd = directMatch[4] ? parseInt(directMatch[4]) : null;
+
     const foundBook = bibleBooks.find(b =>
-      normalizeBookName(b.name) === normalizeBookName(bookName) ||
-      b.name.toLowerCase() === bookName.toLowerCase()
+      normalizeBookName(b.name) === normalizeBookName(bookPart) ||
+      b.name.toLowerCase() === bookPart.toLowerCase()
     );
 
-    if (foundBook && chapter >= 1 && chapter <= foundBook.chapters) {
-      console.log(`Direct reference detected: ${foundBook.name} ${chapter}`);
+    if (foundBook && chapterPart >= 1 && chapterPart <= foundBook.chapters) {
+      console.log(`Direct reference detected: ${foundBook.name} ${chapterPart} ${verseStart ? ':' + verseStart : ''}`);
       try {
-        const verses = await getChapterContent(foundBook.name, chapter, language);
-        const refResults: SearchResult[] = verses.map(v => ({
+        const verses = await getChapterContent(foundBook.name, chapterPart, language);
+
+        // If verse specified, filter
+        let filteredVerses = verses;
+        if (verseStart) {
+          filteredVerses = verses.filter(v => v.number >= verseStart && (!verseEnd || v.number <= verseEnd));
+          // If user asked for specific verse but we didn't find it (e.g. verse 99), fallback to whole chapter or empty?
+          // If array, map to results
+        }
+
+        const refResults: SearchResult[] = filteredVerses.map(v => ({
           text: v.text,
-          reference: `${foundBook.name} ${chapter}:${v.number}`,
-          context: "Capítulo Completo"
+          reference: `${foundBook.name} ${chapterPart}:${v.number}`,
+          context: verseStart ? "Versículo Específico" : "Capítulo Completo"
         }));
+
         saveToCache(cacheKey, refResults);
         return refResults;
       } catch (e) {

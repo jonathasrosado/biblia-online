@@ -26,7 +26,19 @@ const BlogPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     const [searchParams] = useSearchParams();
-    const categoryFilter = searchParams.get('category');
+    // Support both 'category' (English/Standard) and 'categoria' (Portuguese/Legacy)
+    const categoryFilter = searchParams.get('categoria');
+
+    useEffect(() => {
+        // Redirect legacy 'category' param to 'categoria'
+        const legacyCategory = searchParams.get('category');
+        if (legacyCategory) {
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('category');
+            newParams.set('categoria', legacyCategory);
+            navigate(`/blog?${newParams.toString()}`, { replace: true });
+        }
+    }, [searchParams, navigate]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -53,18 +65,34 @@ const BlogPage: React.FC = () => {
         loadData();
     }, []);
 
-    const getCategoryName = (catId: string | undefined) => {
-        if (!catId) return '';
-        const cat = categories.find(c => c.id === catId || c.slug === catId);
-        return cat ? cat.name : '';
+    const getCategoryName = (identifier: string | undefined) => {
+        if (!identifier) return '';
+        // If identifier matches a Name in the list, return it
+        const catByName = categories.find(c => c.name === identifier);
+        if (catByName) return catByName.name;
+
+        const cat = categories.find(c => c.id === identifier || c.slug === identifier);
+        return cat ? cat.name : identifier; // Return identifier if it looks like a name
     };
 
     const filteredPosts = categoryFilter
         ? posts.filter(post => {
-            const catName = getCategoryName(post.category);
-            // Filter by ID or Slug or Name match
-            return post.category === categoryFilter ||
-                (catName && catName.toLowerCase() === categoryFilter.toLowerCase());
+            // Direct match (Name, ID, or Slug)
+            if (post.category === categoryFilter) return true;
+
+            // Resolve post.category to an object to match against filter (Slug/ID)
+            const cat = categories.find(c =>
+                c.name === post.category ||
+                c.id === post.category ||
+                c.slug === post.category
+            );
+
+            if (cat) {
+                return cat.slug === categoryFilter || cat.id === categoryFilter || cat.name === categoryFilter;
+            }
+
+            // Fuzzy match
+            return post.category?.toLowerCase() === categoryFilter.toLowerCase();
         })
         : posts;
 
@@ -84,8 +112,8 @@ const BlogPage: React.FC = () => {
                         <button
                             onClick={() => navigate('/blog')}
                             className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${!categoryFilter
-                                    ? 'bg-bible-gold text-white shadow-md'
-                                    : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700'
+                                ? 'bg-bible-gold text-white shadow-md'
+                                : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700'
                                 }`}
                         >
                             Todos
@@ -95,10 +123,10 @@ const BlogPage: React.FC = () => {
                             return (
                                 <button
                                     key={cat.id}
-                                    onClick={() => navigate(`/blog?category=${cat.slug}`)}
+                                    onClick={() => navigate(`/blog?categoria=${cat.slug}`)}
                                     className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${isActive
-                                            ? 'bg-bible-gold text-white shadow-md'
-                                            : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700'
+                                        ? 'bg-bible-gold text-white shadow-md'
+                                        : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700'
                                         }`}
                                 >
                                     {cat.name}

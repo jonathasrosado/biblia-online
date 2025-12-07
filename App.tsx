@@ -22,6 +22,7 @@ import ChatPage from './pages/ChatPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import CategoryPage from './pages/CategoryPage';
+import TestamentPage from './pages/TestamentPage';
 
 interface ViewWrapperProps {
   children: React.ReactNode;
@@ -487,6 +488,18 @@ function AppContent() {
           <Route path="/" element={
             <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
               <HomePage language={language} t={t} isDark={preferences.theme === 'dark'} history={history} />
+            </ViewWrapper>
+          } />
+
+          <Route path="/antigo-testamento" element={
+            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+              <TestamentPage testament="Old" language={language} t={t} />
+            </ViewWrapper>
+          } />
+
+          <Route path="/novo-testamento" element={
+            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+              <TestamentPage testament="New" language={language} t={t} />
             </ViewWrapper>
           } />
 

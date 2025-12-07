@@ -84,7 +84,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Serve uploads statically
-app.use('/uploads', express.static(UPLOADS_DIR));
+app.use('/api/uploads', express.static(UPLOADS_DIR));
 
 // --- MEDIA API ---
 

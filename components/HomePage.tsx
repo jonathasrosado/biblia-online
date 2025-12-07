@@ -163,12 +163,21 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                 <div className="animate-slideUp" style={{ animationDelay: '0.4s' }}>
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-serif font-bold">Acesso Rápido</h2>
-                        <button
-                            onClick={() => setActiveTestament(activeTestament === 'NT' ? 'OT' : 'NT')}
-                            className="text-xs font-bold uppercase tracking-wider text-bible-gold hover:text-bible-accent transition-colors"
-                        >
-                            {activeTestament === 'NT' ? 'Ver Antigo Testamento' : 'Ver Novo Testamento'}
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => navigate('/antigo-testamento')}
+                                className={`text-xs font-bold uppercase tracking-wider transition-colors ${activeTestament === 'OT' ? 'text-bible-gold underline' : 'text-stone-400 hover:text-bible-gold'}`}
+                            >
+                                Antigo
+                            </button>
+                            <span className="text-stone-300">|</span>
+                            <button
+                                onClick={() => navigate('/novo-testamento')}
+                                className={`text-xs font-bold uppercase tracking-wider transition-colors ${activeTestament === 'NT' ? 'text-bible-gold underline' : 'text-stone-400 hover:text-bible-gold'}`}
+                            >
+                                Novo
+                            </button>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -192,63 +201,29 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                     </div>
                 </div>
 
+
                 {/* 3. BLOG SECTION (Moved Up) */}
-                {posts.length > 0 && (
-                    <div className="animate-slideUp" style={{ animationDelay: '0.45s' }}>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-serif font-bold">Últimas do Blog</h2>
-                            <button
-                                onClick={() => navigate('/blog')}
-                                className="text-xs font-bold uppercase tracking-wider text-bible-gold hover:text-bible-accent transition-colors"
-                            >
-                                Ver Todos
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {posts.slice(0, 3).map((post) => (
-                                <div
-                                    key={post.id}
-                                    onClick={() => navigate(`/blog/${post.slug}`)}
-                                    className={`group cursor-pointer rounded-2xl overflow-hidden border transition-all hover:shadow-lg
-                                        ${isDark ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-100'}
-                                    `}
-                                >
-                                    <div className="h-40 overflow-hidden bg-stone-200 dark:bg-stone-800 relative">
-                                        {post.image ? (
-                                            <img
-                                                src={post.image}
-                                                alt={post.title}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-stone-400">
-                                                <span className="text-4xl font-serif opacity-20">✝</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="p-5">
-                                        <div className="text-[10px] font-bold uppercase tracking-wider text-bible-gold mb-2">
-                                            {new Date(post.date).toLocaleDateString('pt-BR')}
-                                        </div>
-                                        <h3 className="font-bold text-lg leading-tight mb-2 group-hover:text-bible-gold transition-colors line-clamp-2">
-                                            {post.title}
-                                        </h3>
-                                        <p className="text-sm opacity-60 line-clamp-2">
-                                            {post.excerpt || "Leia o artigo completo..."}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                <div className="mb-12 animate-slideUp" style={{ animationDelay: '0.45s' }}>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-xl font-serif font-bold">Recursos Bíblicos</h2>
+                        <button
+                            onClick={() => navigate('/blog')}
+                            className="text-sm font-bold text-bible-gold hover:text-bible-accent transition-colors flex items-center gap-1"
+                        >
+                            Ver Todos <ArrowRight size={16} />
+                        </button>
                     </div>
-                )}
 
-                {/* 1. UNIFIED DASHBOARD (Daily Content + Verse) */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slideUp" style={{ animationDelay: '0.5s' }}>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <BlogPreviewSection navigate={navigate} isDark={isDark} />
+                    </div>
+                </div>
 
-                    {/* Left: Daily Verse Card (Featured) */}
-                    <div id="daily-verse-card" className={`lg:col-span-2 p-8 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[300px]
+
+
+                {/* 1. DAILY VERSE (Featured - Full Width) */}
+                <div className="animate-slideUp" style={{ animationDelay: '0.5s' }}>
+                    <div id="daily-verse-card" className={`w-full p-8 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[200px] text-center items-center
                         ${isDark ? 'bg-stone-900 border border-stone-800' : 'bg-white border border-stone-100 shadow-xl'}
                     `}>
                         <div className="absolute top-0 right-0 w-64 h-64 bg-bible-gold/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
@@ -258,60 +233,15 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                             <span className="text-xs font-bold uppercase tracking-widest">Versículo do Dia</span>
                         </div>
 
-                        <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed mb-6 text-bible-accent dark:text-stone-200">
+                        <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed mb-6 text-bible-accent dark:text-stone-200 max-w-4xl mx-auto">
                             "{dailyVerse.text}"
                         </blockquote>
 
                         <cite className="not-italic font-bold text-bible-gold tracking-wider uppercase text-sm flex items-center gap-2">
                             <div className="h-px w-8 bg-bible-gold"></div>
                             {dailyVerse.ref}
+                            <div className="h-px w-8 bg-bible-gold"></div>
                         </cite>
-                    </div>
-
-                    {/* Right: Quick Actions Grid */}
-                    <div className="grid grid-cols-1 gap-3">
-                        {/* Palavra do Dia */}
-                        <button
-                            onClick={() => {
-                                const words = ['Esperança', 'Fé', 'Amor', 'Paz', 'Gratidão', 'Perdão', 'Sabedoria', 'Cura'];
-                                const randomWord = words[Math.floor(Math.random() * words.length)];
-                                navigate(`/busca?q=${encodeURIComponent(randomWord)}`);
-                            }}
-                            className="flex-1 bg-bible-accent text-white p-6 rounded-3xl flex items-center justify-between group hover:bg-opacity-90 transition-all shadow-lg relative overflow-hidden"
-                        >
-                            <div className="absolute right-0 bottom-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -mr-6 -mb-6"></div>
-                            <div className="relative z-10">
-                                <div className="text-xs font-bold uppercase opacity-70 mb-1">Descubra</div>
-                                <div className="text-xl font-serif font-bold">Palavra do Dia</div>
-                            </div>
-                            <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-                        </button>
-
-                        {/* Salmo & Devocional Split */}
-                        <div className="grid grid-cols-2 gap-3 flex-1">
-                            <button
-                                onClick={() => {
-                                    const randomPsalm = Math.floor(Math.random() * 150) + 1;
-                                    navigate(`/leitura/salmos/${randomPsalm}`);
-                                }}
-                                className={`p-4 rounded-3xl flex flex-col justify-between group transition-all border
-                                    ${isDark ? 'bg-stone-900 border-stone-800 hover:border-bible-gold/30' : 'bg-white border-stone-200 hover:border-bible-gold/50 shadow-sm'}
-                                `}
-                            >
-                                <BookOpen size={24} className="text-bible-gold mb-2" />
-                                <span className="font-bold text-sm">Salmo do Dia</span>
-                            </button>
-
-                            <button
-                                onClick={() => navigate('/devocional')}
-                                className={`p-4 rounded-3xl flex flex-col justify-between group transition-all border
-                                    ${isDark ? 'bg-stone-900 border-stone-800 hover:border-bible-gold/30' : 'bg-white border-stone-200 hover:border-bible-gold/50 shadow-sm'}
-                                `}
-                            >
-                                <Sun size={24} className="text-orange-500 mb-2" />
-                                <span className="font-bold text-sm">Devocional</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
 
@@ -340,25 +270,9 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                     ))}
                 </div>
 
-                {/* 5. LATEST BLOG POSTS */}
-                <div className="mb-16">
-                    <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-2xl font-serif font-bold text-bible-accent dark:text-bible-gold">Últimas do Blog</h2>
-                        <button
-                            onClick={() => navigate('/blog')}
-                            className="text-sm font-bold text-bible-gold hover:text-bible-accent dark:hover:text-white transition-colors flex items-center gap-1"
-                        >
-                            Ver Todos <ArrowRight size={16} />
-                        </button>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* BLOG LOGIC: Fetch in useEffect or use SWR. For now, we'll implement a simple client-side fetch */}
-                        <BlogPreviewSection navigate={navigate} isDark={isDark} />
-                    </div>
-                </div>
             </div>
-        </div>
+        </div >
     );
 };
 
@@ -391,7 +305,7 @@ const BlogPreviewSection = ({ navigate, isDark }: { navigate: any, isDark: boole
                 >
                     <div className="h-48 overflow-hidden relative">
                         <img
-                            src={post.image || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=1000&auto=format&fit=crop'}
+                            src={post.coverImage || post.image || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=1000&auto=format&fit=crop'}
                             alt={post.title}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />

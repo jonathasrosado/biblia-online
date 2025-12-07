@@ -114,9 +114,12 @@ const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t }) => {
 
             {/* Header Section */}
             <div className="text-center mb-12">
-                <span className="inline-block px-3 py-1 bg-bible-gold/10 text-bible-accent dark:text-bible-gold rounded-full text-xs font-bold uppercase tracking-wider mb-4">
+                <Link
+                    to={currentBook.testament === 'Old' ? '/antigo-testamento' : '/novo-testamento'}
+                    className="inline-block px-3 py-1 bg-bible-gold/10 text-bible-accent dark:text-bible-gold rounded-full text-xs font-bold uppercase tracking-wider mb-4 hover:bg-bible-gold/20 transition-colors"
+                >
                     {testamentLabel}
-                </span>
+                </Link>
                 <h1 className="text-4xl md:text-5xl font-serif font-bold text-stone-900 dark:text-stone-100 mb-4">
                     {currentBook.name}
                 </h1>
