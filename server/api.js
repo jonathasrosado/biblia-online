@@ -695,10 +695,12 @@ app.post('/api/audio/edge', async (req, res) => {
         await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
 
         // 2. Generate
+        // 2. Generate
         log("Generating stream (48kbps)...");
         let stream;
+        let result; // Fix scope reference error
         try {
-            const result = await tts.toStream(text);
+            result = await tts.toStream(text);
             stream = result ? result.audioStream : null;
             log(`Stream generated: ${!!stream}`);
         } catch (genErr) {
@@ -707,7 +709,8 @@ app.post('/api/audio/edge', async (req, res) => {
         }
 
         if (!stream) {
-            throw new Error(`Stream is null. Result keys: ${result ? Object.keys(result).join(',') : 'null'}`);
+            const keys = result ? Object.keys(result).join(',') : 'null';
+            throw new Error(`Stream is null. Result keys: ${keys}`);
         }
 
         // 3. Collect Data
