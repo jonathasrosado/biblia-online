@@ -342,12 +342,24 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             activeFetchRef.current.add(index);
 
             try {
-                // generateAudioFromText returns an AudioBuffer (already decoded)
-                const audioBuffer = await generateAudioFromText(chunks[index], preferences.voice || 'male');
-                if (audioBuffer) {
+                // geminiService returns Base64 string now
+                const base64Data: any = await generateAudioFromText(chunks[index], preferences.voice || 'male');
+
+                if (base64Data && typeof base64Data === 'string' && audioContextRef.current) {
+                    const ctx = audioContextRef.current;
+                    const binaryString = atob(base64Data);
+                    const len = binaryString.length;
+                    const bytes = new Uint8Array(len);
+                    for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+
+                    const audioBuffer = await ctx.decodeAudioData(bytes.buffer);
                     audioCacheRef.current.set(index, audioBuffer);
+                } else if (!audioContextRef.current) {
+                    // Should restart context if missing?
+                    console.error("AudioContext missing during fetch");
+                    useWebSpeech = true;
                 } else {
-                    throw new Error("No audio data returned");
+                    throw new Error("No audio data returned or invalid format");
                 }
             } catch (err) {
                 console.error(`Error fetching chunk ${index}`, err);
