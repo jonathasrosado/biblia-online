@@ -12,11 +12,23 @@ import { aiManager } from './services/aiManager.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const require = createRequire(import.meta.url);
+
+// --- CRASH HANDLERS (MUST BE FIRST) ---
+process.on('uncaughtException', (error) => {
+    console.error('FATAL: Uncaught Exception:', error);
+    // Do not exit immediately to allow logs to flush
+});
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('FATAL: Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
 const app = express();
 const PORT = process.env.PORT || 3002;
 console.log("----------------------------------------");
-console.log("SERVER VERSION: 1.0.5 - STRICT STRING PARSING");
+console.log("SERVER VERSION: 1.0.6 - FIXED REQUIRE & HANDLERS");
+console.log(`Starting in directory: ${process.cwd()}`);
+console.log(`__dirname: ${__dirname}`);
 console.log("----------------------------------------");
 
 app.use(cors());
@@ -31,12 +43,15 @@ app.use((req, res, next) => {
 
 let FORCED_KEY = "";
 try {
+    // Now require is defined!
     const forced = require('./force_key.js');
     if (forced && forced.GEMINI_KEY) {
         FORCED_KEY = forced.GEMINI_KEY;
         console.log("⚠️ EMERGENCY: Loaded Hardcoded API Key.");
     }
-} catch (e) { console.log("No forced key found."); }
+} catch (e) {
+    // Ignore error if file missing
+}
 
 // Configure Multer for uploads
 const UPLOADS_DIR = path.resolve(__dirname, '../uploads');
@@ -1584,14 +1599,7 @@ const keepAliveInterval = setInterval(() => {
     // This prevents the Node process from exiting
 }, 60000);
 
-// Error handlers to prevent silent crashes
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
 
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-});
 
 // Graceful shutdown
 process.on('SIGINT', () => {
