@@ -109,6 +109,18 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
         return () => window.removeEventListener('resize', calculateScale);
     }, [selectedFormat, verseText]);
 
+    // Helper to convert data URI to Blob without using fetch (avoids "Failed to fetch" errors)
+    const dataURItoBlob = (dataURI: string) => {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    };
+
     const handleShare = async () => {
         if (!cardRef.current) return;
         setLoading(true);
@@ -120,16 +132,24 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
             const clone = node.cloneNode(true) as HTMLElement;
 
             // 2. Style the clone to be fixed size, invisible but rendered
-            clone.style.position = 'fixed';
-            clone.style.top = '-9999px';
-            clone.style.left = '-9999px';
+            clone.style.position = 'absolute';
+            clone.style.top = '0';
+            clone.style.left = '0';
             clone.style.transform = 'none'; // Ensure no scale
-            clone.style.zIndex = '-1';
+            clone.style.zIndex = '-50'; // Behind everything
+            clone.style.pointerEvents = 'none';
+            clone.style.visibility = 'visible'; // Crucial: must be visible to capture
 
             // Explicitly set width/height matching the original UN-SCALED size
             // The originals have classes like w-[320px] or w-[400px]
             // We'll let the classes dictate, but ensure no parent constraints
-            document.body.appendChild(clone);
+            // Attach to the containerRef (preview area) instead of body
+            // This ensures it inherits local styles and is "in view"
+            if (containerRef.current) {
+                containerRef.current.appendChild(clone);
+            } else {
+                document.body.appendChild(clone);
+            }
 
             // 3. Wait a moment for images/fonts in clone to be ready (optional but safer)
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -143,10 +163,12 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                 });
 
                 // 5. Cleanup Clone
-                document.body.removeChild(clone);
+                if (clone.parentNode) {
+                    clone.parentNode.removeChild(clone);
+                }
 
-                // 6. Convert to Blob
-                const blob = await (await fetch(dataUrl)).blob();
+                // 6. Convert to Blob using HELPER (No fetch)
+                const blob = dataURItoBlob(dataUrl);
                 const file = new File([blob], 'versiculo.png', { type: 'image/png' });
 
                 // 7. Share or Download
@@ -178,8 +200,9 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                 }
 
             } catch (captureError: any) {
-                if (document.body.contains(clone)) {
-                    document.body.removeChild(clone);
+                // Determine parent from the clone itself
+                if (clone.parentNode) {
+                    clone.parentNode.removeChild(clone);
                 }
                 throw captureError;
             }
