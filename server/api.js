@@ -691,26 +691,30 @@ app.post('/api/audio/edge', async (req, res) => {
         const tts = new MsEdgeTTS();
         const voiceId = voice === 'female' ? "pt-BR-FranciscaNeural" : "pt-BR-AntonioNeural";
 
-        // Revert to MP3 (48kbps - lower quality but potentially safer/smaller)
-        await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+        // Revert to 96kbps (Standard)
+        await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
 
         // 2. Generate
-        // 2. Generate
-        log("Generating stream (48kbps)...");
-        let stream;
-        let result; // Fix scope reference error
+        log("Generating stream (96kbps)...");
+        let stream = null;
+        let result = null;
+
         try {
             result = await tts.toStream(text);
-            stream = result ? result.audioStream : null;
+            if (result && result.audioStream) {
+                stream = result.audioStream;
+            }
             log(`Stream generated: ${!!stream}`);
         } catch (genErr) {
-            console.error("TTS Generation Failed:", genErr);
-            throw new Error(`TTS Gen Failed: ${genErr.message}`);
+            console.error("TTS Generation Critical Error:", genErr);
+            // Don't crash, return explicit error
+            return res.status(500).json({ error: `TTS Gen Failed: ${genErr.message}` });
         }
 
         if (!stream) {
-            const keys = result ? Object.keys(result).join(',') : 'null';
-            throw new Error(`Stream is null. Result keys: ${keys}`);
+            const debugKeys = result ? Object.keys(result).join(',') : 'null';
+            console.error(`Stream is null. Result keys: ${debugKeys}`);
+            return res.status(500).json({ error: "Stream unavailable from TTS provider" });
         }
 
         // 3. Collect Data
