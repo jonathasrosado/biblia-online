@@ -1576,7 +1576,8 @@ if (fs.existsSync(distPath)) {
     app.use(express.static(distPath));
 
     // Handle SPA routing - return index.html for all non-API routes
-    app.get('*', (req, res) => {
+    // Express 5 requires regex or specific syntax instead of '*'
+    app.get(/.*/, (req, res) => {
         if (req.path.startsWith('/api')) {
             return res.status(404).json({ error: 'API route not found' });
         }
