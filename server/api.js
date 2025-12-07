@@ -650,7 +650,10 @@ app.post('/api/settings', (req, res) => {
 
 // DEBUG LOG ENDPOINT
 app.get('/api/debug/log', (req, res) => {
-    const debugFile = path.join(__dirname, 'server_debug.txt');
+    const debugFile = process.env.NODE_ENV === 'production'
+        ? path.join('/tmp', 'server_debug.txt')
+        : path.join(__dirname, 'server_debug.txt');
+
     if (fs.existsSync(debugFile)) {
         res.sendFile(debugFile);
     } else {
@@ -659,7 +662,9 @@ app.get('/api/debug/log', (req, res) => {
 });
 
 app.post('/api/audio/edge', async (req, res) => {
-    const debugFile = path.join(__dirname, 'server_debug.txt');
+    const debugFile = process.env.NODE_ENV === 'production'
+        ? path.join('/tmp', 'server_debug.txt')
+        : path.join(__dirname, 'server_debug.txt');
     const log = (msg) => {
         try {
             const time = new Date().toLocaleTimeString();
