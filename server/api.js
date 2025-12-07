@@ -515,7 +515,7 @@ app.get('/api/users', (req, res) => {
     const users = readUsers();
     // Return only safe info
     const safeUsers = users.map(u => ({
-        id: u.id,
+        id: u._id || u.id, // Adaptation for Mongo/FS hybrid state
         name: u.name,
         email: u.email,
         picture: u.picture,
@@ -525,187 +525,7 @@ app.get('/api/users', (req, res) => {
     res.json(safeUsers);
 });
 
-// POST: Google Login (Create/Update user)
-app.post('/api/auth/google', (req, res) => {
-    const { profile } = req.body; // Expecting decoded profile from frontend
-
-    if (!profile || !profile.email) {
-        return res.status(400).json({ error: 'Invalid profile data' });
-    }
-
-    const users = readUsers();
-    let user = users.find(u => u.email === profile.email);
-
-    const timestamp = new Date().toISOString();
-
-    if (user) {
-        // Update existing user
-        user.name = profile.name || user.name;
-        user.picture = profile.picture || user.picture;
-        user.lastLogin = timestamp;
-    } else {
-        // Create new user
-        user = {
-            id: Date.now().toString(), // Simple ID
-            email: profile.email,
-            name: profile.name,
-            picture: profile.picture,
-            role: 'user', // Default role
-            createdAt: timestamp,
-            lastLogin: timestamp
-        };
-        users.push(user);
-    }
-
-    saveUsers(users);
-    res.json({ success: true, user });
-});
-
-// DELETE: Remove user
-app.delete('/api/users/:id', (req, res) => {
-    const { id } = req.params;
-    let users = readUsers();
-    const initialLength = users.length;
-
-    users = users.filter(u => u.id !== id);
-
-    if (users.length < initialLength) {
-        saveUsers(users);
-        res.json({ success: true });
-    } else {
-        res.status(404).json({ error: 'User not found' });
-    }
-});
-
-// POST: Create User (Manual)
-app.post('/api/users', (req, res) => {
-    const { name, email, role, password } = req.body; // Password ignored for now as we use Google Auth primarily, but kept for structure
-    if (!name || !email) return res.status(400).json({ error: 'Name and email required' });
-
-    const users = readUsers();
-    if (users.find(u => u.email === email)) {
-        return res.status(400).json({ error: 'Email already exists' });
-    }
-
-    const newUser = {
-        id: Date.now().toString(),
-        name,
-        email,
-        role: role || 'user',
-        picture: '', // Default empty
-        createdAt: new Date().toISOString(),
-        lastLogin: null
-    };
-
-    users.push(newUser);
-    saveUsers(users);
-    res.json(newUser);
-});
-
-// PUT: Update User
-app.put('/api/users/:id', (req, res) => {
-    const { id } = req.params;
-    const { name, email, role } = req.body;
-
-    const users = readUsers();
-    const index = users.findIndex(u => u.id === id);
-
-    if (index === -1) return res.status(404).json({ error: 'User not found' });
-
-    // Update fields
-    users[index] = {
-        ...users[index],
-        name: name || users[index].name,
-        email: email || users[index].email,
-        role: role || users[index].role
-    };
-
-    saveUsers(users);
-    res.json(users[index]);
-});
-
-// --- UPLOAD API (Base64) ---
-// --- UPLOAD API (Base64) ---
-// Uses the global UPLOADS_DIR defined at the top
-
-app.post('/api/upload', (req, res) => {
-    try {
-        const { image, filename } = req.body; // Expecting base64 string
-        if (!image || !filename) return res.status(400).json({ error: 'Image and filename required' });
-
-        // Remove header if present (e.g., "data:image/png;base64,")
-        const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-        const buffer = Buffer.from(base64Data, 'base64');
-
-        // Generate unique name to prevent overwrites
-        const uniqueName = `${Date.now()}-${filename.replace(/[^a-z0-9.]/gi, '_')}`;
-        const filePath = path.join(UPLOADS_DIR, uniqueName);
-
-        fs.writeFileSync(filePath, buffer);
-
-        // Return public URL
-        res.json({ url: `/uploads/${uniqueName}` });
-    } catch (e) {
-        console.error("Upload error:", e);
-        res.status(500).json({ error: 'Failed to upload image' });
-    }
-});
-
-// LINKS MANAGEMENT
-const LINKS_FILE = path.resolve(__dirname, '../src/data/links.json');
-const LINKS_DIR = path.dirname(LINKS_FILE);
-
-if (!fs.existsSync(LINKS_DIR)) {
-    fs.mkdirSync(LINKS_DIR, { recursive: true });
-}
-
-// GET: Get all custom links
-app.get('/api/admin/links', (req, res) => {
-    if (fs.existsSync(LINKS_FILE)) {
-        try {
-            const content = fs.readFileSync(LINKS_FILE, 'utf-8');
-            res.json(JSON.parse(content));
-        } catch (error) {
-            console.error('Error reading links file:', error);
-            res.json({}); // Return empty object on error
-        }
-    } else {
-        res.json({}); // Return empty object if no file
-    }
-});
-
-// POST: Save custom links
-app.post('/api/admin/links', (req, res) => {
-    const links = req.body;
-    try {
-        fs.writeFileSync(LINKS_FILE, JSON.stringify(links, null, 2), 'utf-8');
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error saving links file:', error);
-        res.status(500).json({ error: 'Failed to save links' });
-    }
-});
-
-const SETTINGS_FILE = path.resolve(__dirname, '../src/data/settings.json');
-
-app.get('/api/settings', (req, res) => {
-    if (fs.existsSync(SETTINGS_FILE)) {
-        res.json(JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf-8')));
-    } else {
-        res.json({});
-    }
-});
-
-app.post('/api/settings', (req, res) => {
-    try {
-        fs.writeFileSync(SETTINGS_FILE, JSON.stringify(req.body, null, 2), 'utf-8');
-        res.json({ success: true });
-    } catch (e) {
-        res.status(500).json({ error: 'Failed to save settings' });
-    }
-});
-
-// DEBUG LOG ENDPOINT
+// --- DEBUG LOG ENDPOINT ---
 app.get('/api/debug/log', (req, res) => {
     const debugFile = process.env.NODE_ENV === 'production'
         ? path.join('/tmp', 'server_debug.txt')
@@ -715,6 +535,69 @@ app.get('/api/debug/log', (req, res) => {
         res.sendFile(debugFile);
     } else {
         res.type('text/plain').send("Log file is empty or missing.");
+    }
+});
+
+// --- IMAGE PERSISTENCE (MongoDB) ---
+app.get('/api/uploads/:filename', async (req, res) => {
+    try {
+        const { Image } = await import('./models/Image.js');
+        const img = await Image.findOne({ filename: req.params.filename });
+
+        if (img) {
+            const base64Data = img.data;
+            const imgBuffer = Buffer.from(base64Data, 'base64');
+            res.writeHead(200, {
+                'Content-Type': img.contentType,
+                'Content-Length': imgBuffer.length
+            });
+            res.end(imgBuffer);
+        } else {
+            // Fallback to FS for legacy images
+            const filePath = path.join(UPLOADS_DIR, req.params.filename);
+            if (fs.existsSync(filePath)) {
+                res.sendFile(filePath);
+            } else {
+                res.status(404).json({ error: 'Image not found' });
+            }
+        }
+    } catch (e) {
+        console.error("Image Serve Error:", e);
+        res.status(500).end();
+    }
+});
+
+app.post('/api/upload', async (req, res) => {
+    try {
+        const { image, filename } = req.body; // Expecting base64 string
+        if (!image || !filename) return res.status(400).json({ error: 'Image and filename required' });
+
+        // Generate unique name
+        const uniqueName = `${Date.now()}-${filename.replace(/[^a-z0-9.]/gi, '_')}`;
+
+        // Save to MongoDB
+        const { Image } = await import('./models/Image.js');
+
+        // Extract content type
+        const match = image.match(/^data:(image\/\w+);base64,/);
+        const contentType = match ? match[1] : 'image/png';
+        const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+
+        const newImage = new Image({
+            filename: uniqueName,
+            contentType,
+            data: base64Data
+        });
+        await newImage.save();
+
+        console.log(`[Upload] Image saved to MongoDB: ${uniqueName}`);
+
+        // Return URL that points to our GET endpoint
+        res.json({ url: `/api/uploads/${uniqueName}` });
+
+    } catch (e) {
+        console.error("Upload error:", e);
+        res.status(500).json({ error: 'Failed to upload image' });
     }
 });
 
@@ -907,27 +790,20 @@ if (!fs.existsSync(BLOG_DIR)) {
     fs.mkdirSync(BLOG_DIR, { recursive: true });
 }
 
-// List all posts
-app.get('/api/blog/posts', (req, res) => {
+// List all posts (MongoDB)
+app.get('/api/blog/posts', async (req, res) => {
     try {
         const { include_drafts } = req.query;
-        const files = fs.readdirSync(BLOG_DIR);
-        const posts = files.map(file => {
-            const content = JSON.parse(fs.readFileSync(path.join(BLOG_DIR, file), 'utf-8'));
-            return {
-                slug: file.replace('.json', ''),
-                ...content
-            };
-        });
+        // Import Model dynamically
+        const BlogPost = (await import('./models/BlogPost.js')).default;
 
-        // Filter drafts unless requested
-        const filteredPosts = include_drafts === 'true'
-            ? posts
-            : posts.filter(p => p.status === 'published');
+        let query = {};
+        if (include_drafts !== 'true') {
+            query.status = 'published';
+        }
 
-        // Sort by date desc
-        filteredPosts.sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
-        res.json(filteredPosts);
+        const posts = await BlogPost.find(query).sort({ date: -1 }); // Sort desc
+        res.json(posts);
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: 'Failed to list posts' });
@@ -935,28 +811,43 @@ app.get('/api/blog/posts', (req, res) => {
 });
 
 // Get single post
-app.get('/api/blog/posts/:slug', (req, res) => {
-    const filePath = path.join(BLOG_DIR, `${req.params.slug}.json`);
-    if (fs.existsSync(filePath)) {
-        res.json(JSON.parse(fs.readFileSync(filePath, 'utf-8')));
-    } else {
-        res.status(404).json({ error: 'Post not found' });
+// Get single post (MongoDB)
+app.get('/api/blog/posts/:slug', async (req, res) => {
+    try {
+        const BlogPost = (await import('./models/BlogPost.js')).default;
+        const post = await BlogPost.findOne({ slug: req.params.slug });
+
+        if (post) {
+            res.json(post);
+        } else {
+            res.status(404).json({ error: 'Post not found' });
+        }
+    } catch (e) {
+        res.status(500).json({ error: e.message });
     }
 });
 
 // Save post (Create)
-app.post('/api/blog/posts', (req, res) => {
+// Save post (Create/Upsert MongoDB)
+app.post('/api/blog/posts', async (req, res) => {
     const { slug, ...data } = req.body;
     if (!slug) return res.status(400).json({ error: 'Slug required' });
 
-    const filePath = path.join(BLOG_DIR, `${slug}.json`);
     try {
-        if (fs.existsSync(filePath)) {
+        const BlogPost = (await import('./models/BlogPost.js')).default;
+
+        // Check for existing text-file based logic removal -> Just direct Mongo save
+        // Using findOneAndUpdate with upsert to handle both create and simple overwrites by slug
+        // But traditional REST implies POST is create. Let's use clean logic.
+
+        const existing = await BlogPost.findOne({ slug });
+        if (existing) {
             return res.status(409).json({ error: 'Post already exists' });
         }
-        const savedPost = { slug, ...data };
-        fs.writeFileSync(filePath, JSON.stringify(savedPost, null, 2), 'utf-8');
-        res.json(savedPost);
+
+        const newPost = new BlogPost({ slug, ...data });
+        await newPost.save();
+        res.json(newPost);
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: `Failed to save post: ${e.message}` });
@@ -964,32 +855,35 @@ app.post('/api/blog/posts', (req, res) => {
 });
 
 // Update post (Rename supported)
-app.put('/api/blog/posts/:oldSlug', (req, res) => {
+// Update post (Rename supported via Mongo)
+app.put('/api/blog/posts/:oldSlug', async (req, res) => {
     const { oldSlug } = req.params;
     const { slug, ...data } = req.body; // New slug and data
 
     if (!slug) return res.status(400).json({ error: 'New slug required' });
 
-    const oldFilePath = path.join(BLOG_DIR, `${oldSlug}.json`);
-    const newFilePath = path.join(BLOG_DIR, `${slug}.json`);
-
     try {
-        if (!fs.existsSync(oldFilePath)) {
+        const BlogPost = (await import('./models/BlogPost.js')).default;
+        const existing = await BlogPost.findOne({ slug: oldSlug });
+
+        if (!existing) {
             return res.status(404).json({ error: 'Post not found' });
         }
 
-        // If slug changed, rename file
+        // If slug changed, ensure new slug doesn't exist
         if (oldSlug !== slug) {
-            if (fs.existsSync(newFilePath)) {
+            const conflict = await BlogPost.findOne({ slug });
+            if (conflict) {
                 return res.status(409).json({ error: 'Target slug already exists' });
             }
-            fs.renameSync(oldFilePath, newFilePath);
+            existing.slug = slug;
         }
 
-        // Write new content
-        const savedPost = { slug, ...data };
-        fs.writeFileSync(newFilePath, JSON.stringify(savedPost, null, 2), 'utf-8');
-        res.json(savedPost);
+        // Update fields
+        Object.assign(existing, data);
+        await existing.save();
+
+        res.json(existing);
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: `Failed to update post: ${e.message}` });
@@ -997,12 +891,11 @@ app.put('/api/blog/posts/:oldSlug', (req, res) => {
 });
 
 // Delete post
-app.delete('/api/blog/posts/:slug', (req, res) => {
-    const filePath = path.join(BLOG_DIR, `${req.params.slug}.json`);
+// Delete post (MongoDB)
+app.delete('/api/blog/posts/:slug', async (req, res) => {
     try {
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
+        const BlogPost = (await import('./models/BlogPost.js')).default;
+        await BlogPost.findOneAndDelete({ slug: req.params.slug });
         res.json({ success: true });
     } catch (e) {
         res.status(500).json({ error: 'Failed to delete post' });

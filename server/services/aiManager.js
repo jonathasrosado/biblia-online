@@ -297,36 +297,49 @@ export class AIManager {
             const safeName = prompt.replace(/[^a-z0-9]/gi, '_').substring(0, 50).toLowerCase();
             filename = `ai-${Date.now()}-${safeName}.png`;
         }
-        const filePath = path.join(UPLOADS_DIR, filename);
 
-        console.log(`[AIManager] Saving image to ${filePath}...`);
+        console.log(`[AIManager] Saving image to MongoDB: ${filename}...`);
 
         try {
+            let buffer;
+            let contentType = 'image/png';
+
             if (imageData.startsWith('http')) {
-                // Download from URL using fetch (handles redirects)
+                // Download from URL
                 console.log(`[AIManager] Downloading from URL: ${imageData}`);
                 const response = await fetch(imageData);
                 if (!response.ok) throw new Error(`Failed to download image: ${response.status} ${response.statusText}`);
-
                 const arrayBuffer = await response.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                fs.writeFileSync(filePath, buffer);
-                console.log(`[AIManager] Image saved successfully.`);
+                buffer = Buffer.from(arrayBuffer);
+                const type = response.headers.get('content-type');
+                if (type) contentType = type;
+
             } else if (imageData.startsWith('data:image')) {
                 // Save Base64
                 console.log(`[AIManager] Saving Base64 image.`);
+                const match = imageData.match(/^data:(image\/\w+);base64,/);
+                if (match) contentType = match[1];
                 const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
-                const buffer = Buffer.from(base64Data, 'base64');
-                fs.writeFileSync(filePath, buffer);
-                console.log(`[AIManager] Image saved successfully.`);
+                buffer = Buffer.from(base64Data, 'base64');
             } else {
                 throw new Error('Unknown image data format');
             }
 
-            return `/uploads/${filename}`;
+            // Save to MongoDB
+            const { Image } = await import('../models/Image.js');
+            const newImage = new Image({
+                filename: filename,
+                contentType: contentType,
+                data: buffer.toString('base64')
+            });
+            await newImage.save();
+
+            console.log(`[AIManager] Image saved to MongoDB successfully.`);
+            return `/api/uploads/${filename}`;
+
         } catch (error) {
-            console.error('[AIManager] Failed to save image locally:', error);
-            // Fallback: return original data if save fails
+            console.error('[AIManager] Failed to save image to MongoDB:', error);
+            // Fallback: return original data if possible, though large strings might break UI if not careful
             return imageData;
         }
     }
@@ -515,6 +528,8 @@ export class AIManager {
         // Robust normalization: NFD splits accents, remove diacritics, then keep only alphanumeric
         const safeBook = book.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
 
+        console.log(`[AIManager] Requested summary for '${book}' (Normalized: '${safeBook}'), Force: ${force}`);
+
         // --- 1. Check MongoDB Cache (Skip if force is true) ---
         if (!force) {
             try {
@@ -527,7 +542,7 @@ export class AIManager {
                 });
 
                 if (cachedSummary) {
-                    console.log(`[AIManager] Serving MongoDB cached summary for ${book}`);
+                    console.log(`[AIManager] CACHE HIT: Found MongoDB summary for ${book} (ID: ${cachedSummary._id})`);
                     return {
                         title: cachedSummary.title,
                         testament: cachedSummary.testament,
@@ -537,11 +552,15 @@ export class AIManager {
                         keyVerse: cachedSummary.keyVerse,
                         summary: cachedSummary.summary
                     };
+                } else {
+                    console.log(`[AIManager] CACHE MISS: No MongoDB summary found for ${book} (Normalized: ${safeBook})`);
                 }
             } catch (e) {
                 console.error("[AIManager] MongoDB read error, generating fresh:", e);
                 // Proceed to generate
             }
+        } else {
+            console.log(`[AIManager] Force refresh requested for ${book}. Skipping cache.`);
         }
 
         // --- 2. Generate with AI ---
