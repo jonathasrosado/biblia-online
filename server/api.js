@@ -685,6 +685,18 @@ app.post('/api/audio/edge', async (req, res) => {
         if (!text) return res.status(400).json({ error: 'Text is required' });
 
 
+        log(`Voice: ${voice}, Text Length: ${text.length}`);
+
+        // 1. Setup TTS
+        const tts = new MsEdgeTTS();
+        const voiceId = voice === 'female' ? "pt-BR-FranciscaNeural" : "pt-BR-AntonioNeural";
+        await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+
+        // 2. Generate
+        log("Generating stream...");
+        const result = await tts.toStream(text);
+        const stream = result ? result.audioStream : null;
+
         if (!stream) {
             throw new Error(`Stream is null. Result keys: ${result ? Object.keys(result).join(',') : 'null'}`);
         }
