@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ChevronRight, Minimize, Maximize, List, AlignLeft, Type, Volume2, Square, Loader2 } from 'lucide-react';
+import { ChevronRight, Minimize, Maximize, List, AlignLeft, Type, Volume2, Square, Loader2, Play, Pause } from 'lucide-react';
 import { bibleBooks, normalizeBookName, findBookByNormalizedName } from '../constants';
 import { chapterTitles } from '../data/chapterTitles';
 import { getChapterContent, getFluidChapterContent, generateAudioFromText } from '../services/geminiService';
@@ -42,7 +42,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     // Get mode from URL, default to 'verse'
     const readingMode = (searchParams.get('mode') as 'verse' | 'fluid') || 'verse';
 
-    // Parse selected verses from URL (e.g. ?verses=1,2,3 or 1-5)
+    // Parse selected verses from URL
     const versesParam = searchParams.get('verses');
     const initialSelectedVerses = React.useMemo(() => {
         if (!versesParam) return [];
@@ -64,12 +64,10 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     const handleSelectionChange = React.useCallback((selected: number[]) => {
         const newParams = new URLSearchParams(searchParams);
         if (selected.length > 0) {
-            // Compress to ranges
             const sorted = [...selected].sort((a, b) => a - b);
             const ranges: string[] = [];
             let start = sorted[0];
             let prev = sorted[0];
-
             for (let i = 1; i < sorted.length; i++) {
                 if (sorted[i] !== prev + 1) {
                     ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
@@ -78,7 +76,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                 prev = sorted[i];
             }
             ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
-
             newParams.set('verses', ranges.join(','));
         } else {
             newParams.delete('verses');
@@ -101,7 +98,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
         setSearchParams({ mode });
     };
 
-    // Find book by abbreviation or name (handling URL params)
+    // Find book
     const currentBook = findBookByNormalizedName(bookAbbrev || '') || bibleBooks[0];
     const currentChapter = parseInt(chapterNum || '1', 10);
 
@@ -134,17 +131,15 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
         };
 
         loadChapter();
-    }, [currentBook.name, currentChapter, language, readingMode]); // Use primitive values for dependency array
+    }, [currentBook.name, currentChapter, language, readingMode]);
 
     const navigateTo = (bookName: string, chapter: number) => {
-        // Immediate feedback is handled by the router, but we can ensure no heavy lifting here
         const normalizedBook = normalizeBookName(bookName);
         navigate(`/leitura/${normalizedBook}/${chapter}?mode=${readingMode}`);
     };
 
     const staticTitle = chapterTitles[currentBook.name]?.[currentChapter];
 
-    // Calculate Next/Prev Chapter
     const getNextChapter = () => {
         if (currentChapter < currentBook.chapters) {
             return { book: currentBook.name, chapter: currentChapter + 1 };
@@ -214,22 +209,9 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     const [isVerseAudioPlaying, setIsVerseAudioPlaying] = useState(false);
     const [isVerseAudioLoading, setIsVerseAudioLoading] = useState(false);
 
-    // Stop audio when component unmounts or book/chapter changes
-    useEffect(() => {
-        return () => stopAudio();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [bookAbbrev, chapterNum, readingMode]);
+    // --- Audio Functions Defined Before Use ---
 
-    const initAudioContext = async () => {
-        if (!audioContextRef.current) {
-            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-        }
-        if (audioContextRef.current.state === 'suspended') {
-            await audioContextRef.current.resume();
-        }
-    };
-
-    const stopAudio = () => {
+    const pauseAudio = () => {
         isPlayingRef.current = false;
         if (sourceNodeRef.current) {
             try {
@@ -237,25 +219,34 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             } catch (e) { }
             sourceNodeRef.current = null;
         }
-        // Ensure Web Speech also stops
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
         }
         setIsPlaying(false);
         setIsAudioLoading(false);
+    };
+
+    const stopAudio = () => {
+        pauseAudio();
+        // Reset state
         audioCacheRef.current.clear();
         activeFetchRef.current.clear();
         setCurrentPlayingChunk(0);
-
         if (audioContextRef.current) {
             audioContextRef.current.close().catch(console.error);
             audioContextRef.current = null;
         }
     };
 
+    // Stop audio when component unmounts or book/chapter changes
+    useEffect(() => {
+        return () => stopAudio();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [bookAbbrev, chapterNum, readingMode]);
+
     const playFluidAudio = async () => {
         if (isPlaying) {
-            stopAudio();
+            pauseAudio();
             return;
         }
 
@@ -275,21 +266,27 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
         setIsAudioLoading(true);
 
         try {
-            // await initAudioContext(); // Removed as it's now handled above
             // Strip markdown (asterisks, etc) for clean reading
             const chunks = fluidContent.paragraphs.map(p =>
                 p.replace(/[*#_`\[\]]/g, '')
             );
             setTotalChunks(chunks.length);
-            processAudioQueue(chunks);
+
+            let startIndex = currentPlayingChunk;
+            if (startIndex >= chunks.length) {
+                startIndex = 0;
+                setCurrentPlayingChunk(0);
+            }
+
+            processAudioQueue(chunks, startIndex);
         } catch (error) {
             console.error("Audio Init Error", error);
             stopAudio();
         }
     };
 
-    const processAudioQueue = async (chunks: string[]) => {
-        let chunkIndex = 0;
+    const processAudioQueue = async (chunks: string[], startIndex: number = 0) => {
+        let chunkIndex = startIndex;
         const MAX_RETRIES = 2;
         const retryCounts = new Map<number, number>();
         let useWebSpeech = false;
@@ -355,7 +352,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                     const audioBuffer = await ctx.decodeAudioData(bytes.buffer);
                     audioCacheRef.current.set(index, audioBuffer);
                 } else if (!audioContextRef.current) {
-                    // Should restart context if missing?
                     console.error("AudioContext missing during fetch");
                     useWebSpeech = true;
                 } else {
@@ -371,8 +367,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
         };
 
         // Initial pre-fetch
-        fetchChunk(0);
-        fetchChunk(1);
+        if (chunkIndex < chunks.length) fetchChunk(chunkIndex);
+        if (chunkIndex + 1 < chunks.length) fetchChunk(chunkIndex + 1);
 
         const playNextChunk = async () => {
             if (!isPlayingRef.current) return;
@@ -445,9 +441,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
         playNextChunk();
     };
 
-
-    // ... existing code ...
-
     return (
         <div className="max-w-4xl mx-auto p-4 md:p-8 lg:p-12 pb-8">
             <Helmet>
@@ -458,7 +451,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
 
             <header className={`mb-8 text-center border-b pb-8 transition-colors relative z-10
          ${preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-200 dark:border-stone-800'}`}>
-                {/* ... existing header content ... */}
 
                 {/* Chapter Title & Navigation */}
                 <div className="flex items-center justify-between max-w-xl mx-auto mb-8">
@@ -550,20 +542,20 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             }}
                             className={`px-4 py-2 rounded-lg transition-all shadow-sm flex items-center gap-2 shrink-0
                                 ${(readingMode === 'fluid' ? isPlaying : isVerseAudioPlaying)
-                                    ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400'
+                                    ? 'bg-bible-gold/20 text-bible-gold hover:bg-bible-gold/30'
                                     : 'bg-bible-gold text-white hover:bg-yellow-600'}`}
                         >
                             {(readingMode === 'fluid' ? isAudioLoading : isVerseAudioLoading) ? (
                                 <Loader2 size={16} className="animate-spin" />
                             ) : (readingMode === 'fluid' ? isPlaying : isVerseAudioPlaying) ? (
                                 <>
-                                    <Square size={16} fill="currentColor" />
-                                    <span className="text-sm font-bold">Parar</span>
+                                    <Pause size={16} fill="currentColor" />
+                                    <span className="text-sm font-bold">Pausar</span>
                                 </>
                             ) : (
                                 <>
-                                    <Volume2 size={16} />
-                                    <span className="text-sm font-bold">Ouvir</span>
+                                    {(readingMode === 'fluid' && currentPlayingChunk > 0) ? <Play size={16} /> : <Volume2 size={16} />}
+                                    <span className="text-sm font-bold">{(readingMode === 'fluid' && currentPlayingChunk > 0) ? "Continuar" : "Ouvir"}</span>
                                 </>
                             )}
                         </button>
@@ -590,9 +582,14 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             )}
                         </div>
 
-                        <button onClick={stopAudio} className="ml-2 hover:text-red-400 transition-colors">
-                            <Square size={16} className="fill-current" />
-                        </button>
+                        <div className="flex items-center gap-2 ml-2">
+                            <button onClick={pauseAudio} className="w-8 h-8 flex items-center justify-center rounded-full bg-bible-gold/20 hover:bg-bible-gold/30 text-bible-gold transition-colors" title="Pausar">
+                                <Pause size={16} className="fill-current" />
+                            </button>
+                            <button onClick={stopAudio} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/10 hover:text-red-500 transition-colors" title="Parar">
+                                <Square size={16} className="fill-current" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -661,8 +658,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                         ) : null
                     ) : (
                         <div className="transition-all duration-200">
-
-
                             <div style={{ fontSize: `${preferences.fontSize}%` }}>
                                 <BibleReader
                                     key={`${currentBook.name}-${currentChapter}`}

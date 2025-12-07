@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Verse, ReadingPreferences } from '../types';
-import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
+import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause } from 'lucide-react';
 import { explainVerse, generateAudioFromText } from '../services/geminiService';
 import VerseImageGenerator from './VerseImageGenerator';
 
@@ -164,46 +164,44 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
   // Use a ref to keep a single Audio instance
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const stopAudio = () => {
-    // Stop Web Audio API Source
+  const pauseAudio = () => {
+    // Just stop playback, preserve state
+    isPlayingRef.current = false;
     if (sourceNodeRef.current) {
       try {
         sourceNodeRef.current.stop();
-      } catch (e) {
-        // Ignore errors if already stopped
-      }
+      } catch (e) { }
       sourceNodeRef.current = null;
     }
-
-    // Legacy Audio Element Cleanup
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-      audioRef.current = null;
-    }
-
-    // New HTML5 Audio Cleanup
+    // Also pause HTML5 audio if active
     const globalAudio = (window as any)._activeBibleAudio;
     if (globalAudio) {
       globalAudio.pause();
-      globalAudio.src = "";
-      (window as any)._activeBibleAudio = null;
     }
-
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
-
     setIsPlaying(false);
     setIsAudioLoading(false);
+  };
+
+  const stopAudio = () => {
+    pauseAudio();
+    // Reset state for full stop
     activeFetchRef.current.clear();
+    audioCacheRef.current.clear();
     setCurrentPlayingChunk(0);
-    isPlayingRef.current = false;
+    // Cleanup global ref
+    const globalAudio = (window as any)._activeBibleAudio;
+    if (globalAudio) {
+      globalAudio.src = "";
+      (window as any)._activeBibleAudio = null;
+    }
   };
 
   const playAudio = async () => {
     if (isPlaying) {
-      stopAudio();
+      pauseAudio();
       return;
     }
 
@@ -212,25 +210,23 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     setIsAudioLoading(true);
     isPlayingRef.current = true;
 
-    // PRIME THE AUDIO ELEMENT (CRITICAL FOR IOS)
-    // We create the audio element synchronously during the click event.
+    // Use current chunk if pausing/resuming
+    let startIndex = currentPlayingChunk;
 
+    // ... (AudioContext Init Logic) ...
     // 1. INITIALIZE AUDIO CONTEXT (IMMEDIATELY - SYNCHRONOUSLY)
     if (!audioContextRef.current) {
       console.log("[🎵] Initializing AudioContext (24kHz)...");
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      // CRITICAL: Force 24kHz sample rate to match Opus source, preventing iOS resampling bugs
       audioContextRef.current = new AudioContextClass({ sampleRate: 24000 });
     }
 
-    // 2. RESUME IF SUSPENDED (Triggered by UI event)
+    // 2. RESUME IF SUSPENDED
     if (audioContextRef.current.state === 'suspended') {
       try {
-        // We do this BEFORE the await unlockAudio
-        audioContextRef.current.resume();
-        console.log("[✅] AudioContext resume triggered");
+        await audioContextRef.current.resume();
       } catch (e) {
-        console.error("[⚠️] Failed to resume AudioContext:", e);
+        console.error("Failed to resume context", e);
       }
     }
 
@@ -239,16 +235,21 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
       const unlockAudio = new Audio();
       unlockAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAgZGF0YQQAAAAAAA==";
       await unlockAudio.play();
-      console.log("[📱] iOS Audio Session Unlocked");
-    } catch (e) {
-      console.warn("[⚠️] iOS Unlock failed:", e);
-    }
+    } catch (e) { }
+
 
     const chunks = verses.map(v => v.text.replace(/[*#_`\[\]]/g, ''));
     setTotalChunks(chunks.length);
-    console.log(`[🎵 BibleReader] Starting queue with ${chunks.length} chunks...`);
 
-    processAudioQueue(chunks, 0);
+    // If we finished the chapter, start over
+    if (startIndex >= chunks.length) {
+      startIndex = 0;
+      setCurrentPlayingChunk(0);
+    }
+
+    console.log(`[🎵 BibleReader] Starting/Resuming queue at ${startIndex}/${chunks.length}...`);
+
+    processAudioQueue(chunks, startIndex);
   };
 
   const processAudioQueue = async (chunks: string[], startIndex: number) => {
@@ -436,14 +437,28 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
               <span className="text-sm font-medium">{t.listeningTo} {book} {chapter}</span>
               {totalChunks > 0 && (
                 <span className="text-[10px] opacity-70">
-                  {t.excerpt} {currentPlayingChunk + 1} / {totalChunks}
+                  Versículo {currentPlayingChunk + 1} / {totalChunks}
                 </span>
               )}
             </div>
 
-            <button onClick={stopAudio} className="ml-2 hover:text-red-400 transition-colors">
-              <Square size={16} className="fill-current" />
-            </button>
+            <div className="flex items-center gap-2 ml-2">
+              <button
+                onClick={playAudio}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-bible-gold/20 hover:bg-bible-gold/30 text-bible-gold transition-colors"
+                title={isPlaying ? "Pausar" : "Continuar"}
+              >
+                {isPlaying ? <Pause size={16} className="fill-current" /> : <Play size={16} className="fill-current" />}
+              </button>
+
+              <button
+                onClick={stopAudio}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/10 hover:text-red-500 transition-colors"
+                title="Parar"
+              >
+                <Square size={16} className="fill-current" />
+              </button>
+            </div>
           </div>
         </div>
       )}
