@@ -190,7 +190,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language, t, initialMessage }) => {
     <div className="flex flex-col h-full bg-stone-50/50 dark:bg-stone-950/50 transition-colors">
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+      <div className={`flex-1 overflow-y-auto p-4 md:p-6 space-y-6 flex flex-col ${messages.length <= 2 ? 'justify-center' : 'justify-start'}`}>
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
 
@@ -251,50 +251,54 @@ const ChatBot: React.FC<ChatBotProps> = ({ language, t, initialMessage }) => {
         )}
 
         {/* Ice Breakers (Show only if standard welcome message is the only one) */}
+        {/* Ice Breakers removed from here, now above input */}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Input Area with Suggestions */}
+      <div className="bg-white dark:bg-stone-950 border-t border-stone-200 dark:border-stone-800 transition-colors z-10 flex flex-col">
+
+        {/* Suggestions Carousel */}
         {!isLoading && messages.length <= 1 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-8 animate-slideUp">
-            <div className="md:col-span-2 text-center mb-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-stone-400">Sugestões de temas</span>
-            </div>
+          <div
+            className="w-full overflow-x-auto px-4 py-3 flex gap-2 border-b border-stone-100 dark:border-stone-800 [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             {suggestions.map((suggestion, idx) => (
               <button
                 key={idx}
                 onClick={() => sendMessage(undefined, suggestion)}
-                className="p-3 text-left bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-bible-gold dark:hover:border-bible-gold hover:shadow-md transition-all group flex items-center justify-between"
+                className="flex-shrink-0 px-4 py-2 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-full text-sm text-stone-600 dark:text-stone-300 hover:border-bible-gold hover:text-bible-gold dark:hover:border-bible-gold transition-all shadow-sm whitespace-nowrap active:scale-95"
               >
-                <span className="text-sm text-stone-600 dark:text-stone-300 group-hover:text-bible-gold transition-colors">{suggestion}</span>
-                <MessageSquare size={14} className="text-stone-300 group-hover:text-bible-gold transition-colors opacity-0 group-hover:opacity-100" />
+                {suggestion}
               </button>
             ))}
           </div>
         )}
 
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Input Area */}
-      <div className="p-4 bg-white dark:bg-stone-950 border-t border-stone-200 dark:border-stone-800 transition-colors z-10">
-        <form onSubmit={(e) => sendMessage(e)} className="flex gap-3 max-w-4xl mx-auto items-end">
-          <div className="flex-1 bg-stone-50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-800 rounded-2xl focus-within:ring-2 focus-within:ring-bible-gold/50 focus-within:border-transparent transition-all shadow-inner">
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={t.chatPlaceholder || "Digite sua pergunta teológica..."}
-              className="w-full p-4 bg-transparent border-none focus:outline-none text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 resize-none max-h-32 min-h-[56px] overflow-y-auto"
-              rows={1}
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            className="p-4 bg-bible-gold hover:bg-yellow-600 text-white rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl active:scale-95"
-          >
-            <Send size={20} />
-          </button>
-        </form>
-        <div className="text-center mt-2">
+        <div className="p-3 md:p-4 pt-2 md:pt-3">
+          <form onSubmit={(e) => sendMessage(e)} className="flex gap-2 md:gap-3 max-w-4xl mx-auto items-end bg-stone-100 dark:bg-stone-900/50 p-2 md:p-0 rounded-3xl md:rounded-none md:bg-transparent">
+            <div className="flex-1 bg-white md:bg-stone-50 md:dark:bg-stone-900/50 border-none md:border border-stone-200 dark:border-stone-800 rounded-2xl focus-within:ring-0 md:focus-within:ring-2 focus-within:ring-bible-gold/50 transition-all shadow-none md:shadow-inner">
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={t.chatPlaceholder || "Digite sua pergunta teológica..."}
+                className="w-full p-3 md:p-4 bg-transparent border-none focus:outline-none text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 resize-none max-h-32 min-h-[48px] md:min-h-[56px] overflow-y-auto text-sm md:text-base"
+                rows={1}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className="p-3 md:p-4 bg-bible-gold hover:bg-yellow-600 text-white rounded-full md:rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl active:scale-95 flex-shrink-0"
+            >
+              <Send size={20} />
+            </button>
+          </form>
+        </div>
+        <div className="text-center mt-2 pb-2">
           <span className="text-[10px] text-stone-400">A IA pode cometer erros. Verifique sempre nas Escrituras.</span>
         </div>
       </div>

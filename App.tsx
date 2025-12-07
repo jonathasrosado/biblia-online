@@ -552,11 +552,8 @@ function AppContent() {
           } />
 
           <Route path="/chat" element={
-            <div className="h-full flex flex-col">
+            <div className="h-full flex flex-col overflow-hidden">
               <ChatPage language={language} t={t} />
-              {!isFullScreen && (
-                <AppFooter onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} />
-              )}
             </div>
           } />
 

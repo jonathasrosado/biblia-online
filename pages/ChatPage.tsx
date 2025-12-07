@@ -19,7 +19,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ language, t }) => {
                 <meta name="description" content="Converse com a IA sobre a Bíblia e tire suas dúvidas teológicas." />
             </Helmet>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 h-full overflow-hidden">
                 <ChatBot
                     language={language}
                     t={t}
