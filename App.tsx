@@ -154,8 +154,8 @@ function AppContent() {
     localStorage.setItem('readingHistory', JSON.stringify(history));
   }, [history]);
 
-  // Scroll Listener & Progress
-  const [scrollProgress, setScrollProgress] = useState(0);
+  // Scroll Listener & Progress - REMOVED per user request
+  // const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const mainContainer = mainScrollRef.current;
@@ -167,13 +167,6 @@ function AppContent() {
         setShowScrollTop(true);
       } else {
         setShowScrollTop(false);
-      }
-
-      // Calculate Progress
-      const totalScroll = mainContainer.scrollHeight - mainContainer.clientHeight;
-      if (totalScroll > 0) {
-        const progress = (mainContainer.scrollTop / totalScroll) * 100;
-        setScrollProgress(progress);
       }
     };
 
@@ -397,6 +390,18 @@ function AppContent() {
             </div>
           </div>
 
+          {/* Mobile Sidebar Header */}
+          <div className={`p-4 border-b flex md:hidden items-center justify-between
+            ${preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-100 dark:border-stone-800'}`}>
+            <h2 className="font-serif text-xl font-bold text-bible-accent dark:text-bible-gold">{t.appTitle}</h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
           <div className="p-4">
             <form onSubmit={handleSearch} className="relative">
               <input
@@ -472,44 +477,11 @@ function AppContent() {
         className={`flex-1 overflow-y-auto relative scroll-smooth ${getMainBackgroundClass()}
           ${isFullScreen ? 'h-screen' : 'h-[calc(100vh-65px)] md:h-screen'}`}
       >
-        {/* Reading Progress Bar */}
-        {location.pathname.includes('/leitura') && (
-          <div className="fixed top-0 left-0 w-full h-1 z-50 bg-transparent">
-            <div
-              className="h-full bg-bible-gold shadow-[0_0_10px_rgba(212,175,55,0.5)] transition-all duration-150 ease-out"
-              style={{ width: `${scrollProgress}%` }}
-            />
-          </div>
-        )}
+        {/* Reading Progress Bar - REMOVED per user request */}
 
-        {/* Reading Progress Bar (Book Level) */}
-        {location.pathname.includes('/leitura') && currentBook && (
-          <div className="fixed bottom-0 left-0 w-full z-40 pointer-events-none">
-            {/* Gradient Fade for text readability above */}
-            <div className="h-24 bg-gradient-to-t from-white dark:from-stone-950 to-transparent w-full absolute bottom-0"></div>
 
-            <div className="relative pb-safe-area">
-              {/* Progress Line */}
-              <div className="w-full h-1.5 bg-stone-200 dark:bg-stone-800">
-                <div
-                  className="h-full bg-bible-gold shadow-[0_0_10px_rgba(212,175,55,0.5)] transition-all duration-300 ease-out"
-                  style={{
-                    width: `${Math.min(100, Math.max(0, ((currentChapter - 1 + (scrollProgress / 100)) / currentBook.chapters) * 100))}%`
-                  }}
-                />
-              </div>
+        {/* Reading Progress Bar (Book Level) - REMOVED per user request */}
 
-              {/* Text Indicator */}
-              <div className="bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 py-2 px-4 text-center">
-                <p className="text-xs font-medium text-stone-500 dark:text-stone-400 font-serif">
-                  Você leu <span className="text-bible-gold font-bold">
-                    {(((currentChapter - 1 + (scrollProgress / 100)) / currentBook.chapters) * 100).toFixed(1)}%
-                  </span> do Livro de {currentBook.name}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         <Routes>
           <Route path="/" element={

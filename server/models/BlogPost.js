@@ -9,6 +9,7 @@ const blogPostSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
     status: { type: String, enum: ['published', 'draft'], default: 'draft' },
     tags: [String],
+    category: String,
     coverImage: String,
     author: String,
     seo: {

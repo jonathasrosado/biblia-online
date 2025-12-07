@@ -339,8 +339,81 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                         </button>
                     ))}
                 </div>
+
+                {/* 5. LATEST BLOG POSTS */}
+                <div className="mb-16">
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-2xl font-serif font-bold text-bible-accent dark:text-bible-gold">Últimas do Blog</h2>
+                        <button
+                            onClick={() => navigate('/blog')}
+                            className="text-sm font-bold text-bible-gold hover:text-bible-accent dark:hover:text-white transition-colors flex items-center gap-1"
+                        >
+                            Ver Todos <ArrowRight size={16} />
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* BLOG LOGIC: Fetch in useEffect or use SWR. For now, we'll implement a simple client-side fetch */}
+                        <BlogPreviewSection navigate={navigate} isDark={isDark} />
+                    </div>
+                </div>
             </div>
         </div>
+    );
+};
+
+// Sub-component to handle fetching logic cleanly
+const BlogPreviewSection = ({ navigate, isDark }: { navigate: any, isDark: boolean }) => {
+    const [posts, setPosts] = React.useState<any[]>([]);
+
+    React.useEffect(() => {
+        fetch('/api/blog/posts')
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setPosts(data.slice(0, 3));
+                }
+            })
+            .catch(err => console.error("Failed to fetch blog posts:", err));
+    }, []);
+
+    if (posts.length === 0) return null; // Hide if empty
+
+    return (
+        <>
+            {posts.map((post) => (
+                <div
+                    key={post.id || post._id}
+                    onClick={() => navigate(`/blog/${post.slug}`)}
+                    className={`group cursor-pointer rounded-3xl overflow-hidden border transition-all hover:shadow-xl
+                        ${isDark ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'}
+                    `}
+                >
+                    <div className="h-48 overflow-hidden relative">
+                        <img
+                            src={post.image || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=1000&auto=format&fit=crop'}
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                    <div className="p-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="px-3 py-1 bg-bible-gold/20 text-bible-gold rounded-full text-xs font-bold uppercase tracking-wide">
+                                {post.category || 'Geral'}
+                            </span>
+                            <span className="text-stone-400 text-xs">{new Date(post.createdAt || Date.now()).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                        <h3 className={`text-xl font-bold mb-2 line-clamp-2 ${isDark ? 'text-stone-200 group-hover:text-bible-gold' : 'text-bible-accent group-hover:text-bible-gold'} transition-colors`}>
+                            {post.title}
+                        </h3>
+                        <p className="text-sm text-stone-500 dark:text-stone-400 line-clamp-2 mb-4">
+                            {post.excerpt}
+                        </p>
+                    </div>
+                </div>
+            ))}
+        </>
     );
 };
 
