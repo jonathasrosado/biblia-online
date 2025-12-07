@@ -691,13 +691,20 @@ app.post('/api/audio/edge', async (req, res) => {
         const tts = new MsEdgeTTS();
         const voiceId = voice === 'female' ? "pt-BR-FranciscaNeural" : "pt-BR-AntonioNeural";
 
-        // Revert to MP3 - Safest for HTML5 Audio element on iOS
-        await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+        // Revert to MP3 (48kbps - lower quality but potentially safer/smaller)
+        await tts.setMetadata(voiceId, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
 
         // 2. Generate
-        log("Generating stream...");
-        const result = await tts.toStream(text);
-        const stream = result ? result.audioStream : null;
+        log("Generating stream (48kbps)...");
+        let stream;
+        try {
+            const result = await tts.toStream(text);
+            stream = result ? result.audioStream : null;
+            log(`Stream generated: ${!!stream}`);
+        } catch (genErr) {
+            console.error("TTS Generation Failed:", genErr);
+            throw new Error(`TTS Gen Failed: ${genErr.message}`);
+        }
 
         if (!stream) {
             throw new Error(`Stream is null. Result keys: ${result ? Object.keys(result).join(',') : 'null'}`);
