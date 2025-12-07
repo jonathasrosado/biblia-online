@@ -320,7 +320,40 @@ app.post('/api/ai/blog-title', async (req, res) => {
 
     } catch (error) {
         console.error("AI Title Error:", error);
-        res.status(500).json({ error: 'Failed to generate titles' });
+    }
+});
+
+// --- FLUID READING GENERATION ENDPOINT ---
+app.post('/api/ai/fluid-gen', async (req, res) => {
+    try {
+        const { book, chapter, language, originalText } = req.body;
+
+        const systemInstruction = `
+            You are a biblical scholar and writer. Your task is to rewrite the provided Bible text (Book: ${book}, Chapter: ${chapter}) into a fluid, modern, and engaging narrative in ${language || 'pt'}.
+            
+            Rules:
+            1. Keep the theological meaning accurate but improve flow and readability.
+            2. Remove verse numbers. Group text into logical paragraphs.
+            3. Use a respectful but accessible tone.
+            4. Return ONLY a JSON object with this structure:
+            {
+                "title": "A short, engaging title for this chapter",
+                "paragraphs": ["Paragraph 1...", "Paragraph 2..."]
+            }
+        `;
+
+        const response = await aiManager.generateContent(
+            'fluid_reading',
+            originalText,
+            systemInstruction,
+            'json_object'
+        );
+
+        res.json({ text: response });
+
+    } catch (error) {
+        console.error("Fluid Gen Error:", error);
+        res.status(500).json({ error: 'Failed to generate fluid content' });
     }
 });
 
