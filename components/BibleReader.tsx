@@ -206,6 +206,18 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
     // PRIME THE AUDIO ELEMENT (CRITICAL FOR IOS)
     // We create the audio element synchronously during the click event.
+
+    // iOS UNLOCK HACK: Play silent HTML5 audio to force "Playback" category
+    // This makes the iPhone treat this as "Music" (plays even with Silent Switch ON)
+    const unlockAudio = new Audio();
+    unlockAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAgZGF0YQQAAAAAAA==";
+    try {
+      await unlockAudio.play();
+      console.log("[📱] iOS Audio Session Unlocked");
+    } catch (e) {
+      console.warn("[⚠️] iOS Unlock failed:", e);
+    }
+
     // Initialize Audio Context (must be done on user gesture)
     if (!audioContextRef.current) {
       console.log("[🎵] Initializing AudioContext...");
