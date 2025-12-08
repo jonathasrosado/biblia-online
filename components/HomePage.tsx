@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { toPng } from 'html-to-image';
-import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2, Loader2 } from 'lucide-react';
+import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2, Loader2, RefreshCw } from 'lucide-react';
 import { normalizeBookName, bibleBooks } from '../constants';
 import { ReadingHistoryItem } from '../types';
 
@@ -172,6 +172,16 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
         } finally {
             setIsSharing(false);
         }
+    };
+
+    const handleNextVerse = () => {
+        // Ensure we pick a different verse
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * DAILY_VERSES.length);
+        } while (DAILY_VERSES[randomIndex].text === dailyVerse.text && DAILY_VERSES.length > 1);
+
+        setDailyVerse(DAILY_VERSES[randomIndex]);
     };
 
 
@@ -360,7 +370,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                     </div>
 
                     {/* Share Button (Outside Card) */}
-                    <div className="flex justify-center mt-6">
+                    <div className="flex justify-center mt-6 gap-4">
                         <button
                             onClick={handleShare}
                             disabled={isSharing}
@@ -368,6 +378,14 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                         >
                             {isSharing ? <Loader2 size={18} className="animate-spin" /> : <Share2 size={18} />}
                             {isSharing ? 'Gerando...' : 'Compartilhar'}
+                        </button>
+
+                        <button
+                            onClick={handleNextVerse}
+                            className="flex items-center gap-2 px-6 py-2 rounded-full border border-bible-gold/30 text-bible-gold hover:bg-bible-gold/10 transition-all font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md"
+                        >
+                            <RefreshCw size={18} />
+                            Outro
                         </button>
                     </div>
                 </div>
