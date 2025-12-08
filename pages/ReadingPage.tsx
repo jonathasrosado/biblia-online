@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { ChevronRight, ChevronLeft, Volume2, Pause, Play, Share2, BookOpen, Mic, X, ChevronDown, Minimize, Maximize, List, AlignLeft, Type, Square, Loader2 } from 'lucide-react';
 import { bibleBooks, normalizeBookName, findBookByNormalizedName } from '../constants';
 import { chapterTitles } from '../data/chapterTitles';
@@ -171,9 +171,9 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     if (readingMode === 'fluid') {
         const titleText = staticTitle || fluidContent?.title;
         if (titleText) {
-            pageTitle = `${currentBook.name} ${currentChapter} - ${titleText} - ${t.appTitle}`;
+            pageTitle = `${currentBook.name} ${currentChapter} - ${titleText}`;
         } else {
-            pageTitle = `${currentBook.name} ${currentChapter} - Leitura - ${t.appTitle}`;
+            pageTitle = `${currentBook.name} ${currentChapter} - Leitura`;
         }
     } else {
         if (versesParam) {
@@ -186,9 +186,9 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             } else {
                 versePart = `Versículos ${versesParam}`;
             }
-            pageTitle = `${currentBook.name} ${currentChapter} – ${versePart} – ${t.appTitle}`;
+            pageTitle = `${currentBook.name} ${currentChapter} – ${versePart}`;
         } else {
-            pageTitle = `${currentBook.name} ${currentChapter} – Versículos – ${t.appTitle}`;
+            pageTitle = `${currentBook.name} ${currentChapter} – Versículos`;
         }
     }
 
@@ -451,11 +451,35 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
 
     return (
         <div className="max-w-4xl mx-auto p-4 md:p-8 lg:p-12 pb-8">
-            <Helmet>
-                <title>{pageTitle}</title>
-                <meta name="description" content={`Leia ${currentBook.name} ${currentChapter} na Bíblia Sagrada. ${readingMode === 'fluid' ? 'Leitura fluida e moderna.' : 'Versículo por versículo.'}`} />
-                <link rel="canonical" href={window.location.href} />
-            </Helmet>
+            <SEO
+                title={pageTitle}
+                description={`Leia ${currentBook.name} ${currentChapter} na Bíblia Sagrada. ${readingMode === 'fluid' ? 'Leitura fluida e moderna.' : 'Versículo por versículo.'}`}
+                url={window.location.href}
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {
+                            "@type": "ListItem",
+                            "position": 1,
+                            "name": "Bíblia",
+                            "item": "https://bibliaonline.me"
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 2,
+                            "name": currentBook.name,
+                            "item": `https://bibliaonline.me/leitura/${normalizeBookName(currentBook.name)}`
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 3,
+                            "name": `Capítulo ${currentChapter}`,
+                            "item": window.location.href
+                        }
+                    ]
+                }}
+            />
 
             <header className={`mb-8 text-center border-b pb-8 transition-colors relative z-10
          ${preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-200 dark:border-stone-800'}`}>

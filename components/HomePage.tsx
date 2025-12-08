@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import SEO from './SEO';
 import { toPng } from 'html-to-image';
 import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2, Loader2, RefreshCw } from 'lucide-react';
 import { normalizeBookName, bibleBooks } from '../constants';
@@ -184,10 +184,21 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
 
     return (
         <div className="min-h-full animate-fadeIn pb-20">
-            <Helmet>
-                <title>{settings.siteTitle || t.appTitle}</title>
-                <meta name="description" content={settings.siteDescription || "Sua plataforma de estudo bíblico com Inteligência Artificial."} />
-            </Helmet>
+            <SEO
+                title={settings.siteTitle || t.appTitle || "Início"}
+                description={settings.siteDescription || "Sua plataforma de estudo bíblico com Inteligência Artificial. Leia a Bíblia, faça devocionais e tire dúvidas com IA."}
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "name": "Bíblia Online",
+                    "url": "https://bibliaonline.me",
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": "https://bibliaonline.me/busca?q={search_term_string}",
+                        "query-input": "required name=search_term_string"
+                    }
+                }}
+            />
 
             {/* Hero Section - Clean & Focused */}
             <div className={`relative pt-12 pb-24 px-6 md:px-12 text-center overflow-hidden

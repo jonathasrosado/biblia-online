@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Calendar, User, ArrowLeft, Share2, Clock } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 
 interface BlogPost {
     id: string;
@@ -110,11 +110,23 @@ const BlogPostPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-stone-50 dark:bg-stone-950 pb-20">
-            <Helmet>
-                <title>{post.seoTitle || post.title} | Bíblia Online</title>
-                <meta name="description" content={post.metaDescription || post.content.substring(0, 160).replace(/<[^>]*>/g, '')} />
-                <link rel="canonical" href={`${window.location.origin}/${categories.find(c => c.id === post.category)?.slug || 'blog'}/${post.slug}`} />
-            </Helmet>
+            <SEO
+                title={post.seoTitle || post.title}
+                description={post.metaDescription || post.content.substring(0, 160).replace(/<[^>]*>/g, '')}
+                image={post.image}
+                type='article'
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "BlogPosting",
+                    "headline": post.title,
+                    "image": post.image ? [post.image] : [],
+                    "datePublished": post.date,
+                    "author": {
+                        "@type": "Person",
+                        "name": post.author || "Equipe Bíblia Online"
+                    }
+                }}
+            />
             {/* Hero / Header Image */}
             <div className="relative h-[400px] md:h-[500px] w-full overflow-hidden">
                 {post.image ? (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { Sun, Quote } from 'lucide-react';
 import { getDevotional } from '../services/geminiService';
 import { ReadingPreferences, DevotionalContent } from '../types';
@@ -28,10 +28,11 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
 
     return (
         <div className="max-w-3xl mx-auto p-6 md:p-12 flex flex-col items-center">
-            <Helmet>
-                <title>{`${t.dailyDevotionalTitle} - ${t.appTitle}`}</title>
-                <meta name="description" content="Devocional diário para inspiração e reflexão espiritual." />
-            </Helmet>
+            <SEO
+                title={dailyDevotional ? `${dailyDevotional.title} - ${t.t?.dailyDevotionalTitle || t.dailyDevotionalTitle || "Devocional"}` : `${t.t?.dailyDevotionalTitle || t.dailyDevotionalTitle || "Devocional"}`}
+                description="Devocional diário para inspiração e reflexão espiritual."
+                url={window.location.href}
+            />
 
             <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-400 mb-6">
                 <Sun size={32} />

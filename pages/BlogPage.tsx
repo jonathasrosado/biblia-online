@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import SEO from '../components/SEO';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
 interface BlogPost {
@@ -98,6 +99,10 @@ const BlogPage: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-12">
+            <SEO
+                title="Blog & Reflexões"
+                description="Aprofunde seu conhecimento bíblico com nossos artigos, estudos e devocionais diários."
+            />
             <div className="text-center mb-16">
                 <h1 className="text-4xl md:text-5xl font-serif font-bold text-bible-accent dark:text-bible-gold mb-4">
                     Blog & Reflexões

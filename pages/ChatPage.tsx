@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { useSearchParams } from 'react-router-dom';
 import ChatBot from '../components/ChatBot';
 
@@ -14,10 +14,10 @@ const ChatPage: React.FC<ChatPageProps> = ({ language, t }) => {
 
     return (
         <div className="h-full flex flex-col">
-            <Helmet>
-                <title>{`${t.chat} - ${t.appTitle}`}</title>
-                <meta name="description" content="Converse com a IA sobre a Bíblia e tire suas dúvidas teológicas." />
-            </Helmet>
+            <SEO
+                title={`${t.chat}`}
+                description="Converse com a IA sobre a Bíblia e tire suas dúvidas teológicas."
+            />
 
             <div className="flex-1 h-full overflow-hidden">
                 <ChatBot
