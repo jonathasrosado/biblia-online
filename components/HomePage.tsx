@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar } from 'lucide-react';
+import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2 } from 'lucide-react';
 import { normalizeBookName, bibleBooks } from '../constants';
 import { ReadingHistoryItem } from '../types';
 
@@ -228,32 +228,18 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                 </div>
 
 
-                {/* 3. BLOG SECTION (Moved Up) */}
-                <div className="mb-12 animate-slideUp" style={{ animationDelay: '0.45s' }}>
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-serif font-bold">Recursos Bíblicos</h2>
-                        <button
-                            onClick={() => navigate('/blog')}
-                            className="text-sm font-bold text-bible-gold hover:text-bible-accent transition-colors flex items-center gap-1"
-                        >
-                            Ver Todos <ArrowRight size={16} />
-                        </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <BlogPreviewSection navigate={navigate} isDark={isDark} />
-                    </div>
-                </div>
-
-
-
-                {/* 1. DAILY VERSE (Featured - Full Width) */}
-                <div className="animate-slideUp" style={{ animationDelay: '0.5s' }}>
+                {/* 1. DAILY VERSE (Featured - Moved Up) */}
+                <div className="animate-slideUp" style={{ animationDelay: '0.45s' }}>
                     <div id="daily-verse-card" className={`w-full p-10 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[240px] text-center items-center shadow-2xl transition-all hover:scale-[1.01]
                         ${isDark
                             ? 'bg-gradient-to-br from-stone-900 via-stone-900 to-bible-gold/20 border border-bible-gold/20'
                             : 'bg-gradient-to-br from-white via-stone-50 to-bible-gold/10 border border-white'}
                     `}>
+                        {/* Watermark */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[4rem] md:text-[6rem] font-black opacity-[0.03] whitespace-nowrap pointer-events-none select-none font-serif tracking-tighter">
+                            BIBLIAONLINE.ME
+                        </div>
+
                         {/* Decorative Background Elements */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-bible-gold/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none mix-blend-overlay"></div>
                         <div className="absolute bottom-0 left-0 w-48 h-48 bg-bible-accent/5 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
@@ -261,6 +247,30 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                         {/* Quote Icons */}
                         <div className="absolute top-6 left-6 opacity-20 text-bible-gold pointer-events-none">
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21L14.017 18C14.017 16.896 14.321 15.923 14.929 15.081C15.539 14.238 16.417 13.565 17.564 13.06L17.564 12.637C16.956 12.637 16.488 12.483 16.157 12.176C15.828 11.87 15.663 11.464 15.663 10.959C15.663 10.457 15.845 10.051 16.208 9.74001C16.572 9.42901 17.065 9.27401 17.689 9.27401C18.423 9.27401 18.995 9.53701 19.408 10.062C19.821 10.589 20.027 11.233 20.027 11.996C20.027 13.433 19.488 14.82 18.411 16.157C17.334 17.495 15.868 18.775 14.016 19.998L14.017 21ZM5.00201 21L5.00201 18C5.00201 16.896 5.30601 15.923 5.91401 15.081C6.52401 14.238 7.40001 13.565 8.54801 13.06L8.54801 12.637C7.94001 12.637 7.47201 12.483 7.14101 12.176C6.81201 11.87 6.64701 11.464 6.64701 10.959C6.64701 10.457 6.82901 10.051 7.19201 9.74001C7.55601 9.42901 8.05001 9.27401 8.67301 9.27401C9.40701 9.27401 9.97901 9.53701 10.392 10.062C10.805 10.589 11.011 11.233 11.011 11.996C11.011 13.433 10.472 14.82 9.39501 16.157C8.31801 17.495 6.85301 18.775 5.00201 19.998L5.00201 21Z"></path></svg>
+                        </div>
+
+                        {/* Top Bar for Share */}
+                        <div className="absolute top-6 right-6 z-20">
+                            <button
+                                onClick={() => {
+                                    const text = `"${dailyVerse.text}" - ${dailyVerse.ref}\n\nLeia mais em: bibliaonline.me`;
+                                    if (navigator.share) {
+                                        navigator.share({
+                                            title: 'Versículo do Dia',
+                                            text: text,
+                                            url: 'https://bibliaonline.me'
+                                        }).catch(console.error);
+                                    } else {
+                                        navigator.clipboard.writeText(text);
+                                        // Optional: Show toast
+                                        alert('Versículo copiado para a área de transferência!');
+                                    }
+                                }}
+                                className="p-2 rounded-full bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white transition-all shadow-sm"
+                                title="Compartilhar"
+                            >
+                                <Share2 size={18} />
+                            </button>
                         </div>
 
                         <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -279,6 +289,23 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                             {dailyVerse.ref}
                             <span className="h-px w-12 bg-gradient-to-l from-transparent to-bible-gold"></span>
                         </cite>
+                    </div>
+                </div>
+
+                {/* 3. BLOG SECTION (Moved Down) */}
+                <div className="mb-12 animate-slideUp" style={{ animationDelay: '0.5s' }}>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-xl font-serif font-bold">Recursos Bíblicos</h2>
+                        <button
+                            onClick={() => navigate('/blog')}
+                            className="text-sm font-bold text-bible-gold hover:text-bible-accent transition-colors flex items-center gap-1"
+                        >
+                            Ver Todos <ArrowRight size={16} />
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <BlogPreviewSection navigate={navigate} isDark={isDark} />
                     </div>
                 </div>
 
