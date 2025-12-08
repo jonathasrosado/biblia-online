@@ -249,51 +249,103 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
 
                 {/* 1. DAILY VERSE (Featured - Full Width) */}
                 <div className="animate-slideUp" style={{ animationDelay: '0.5s' }}>
-                    <div id="daily-verse-card" className={`w-full p-8 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[200px] text-center items-center
-                        ${isDark ? 'bg-stone-900 border border-stone-800' : 'bg-white border border-stone-100 shadow-xl'}
+                    <div id="daily-verse-card" className={`w-full p-10 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[240px] text-center items-center shadow-2xl transition-all hover:scale-[1.01]
+                        ${isDark
+                            ? 'bg-gradient-to-br from-stone-900 via-stone-900 to-bible-gold/20 border border-bible-gold/20'
+                            : 'bg-gradient-to-br from-white via-stone-50 to-bible-gold/10 border border-white'}
                     `}>
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-bible-gold/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                        {/* Decorative Background Elements */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-bible-gold/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none mix-blend-overlay"></div>
+                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-bible-accent/5 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
 
-                        <div className="flex items-center gap-3 mb-6 opacity-60">
-                            <Calendar size={18} className="text-bible-gold" />
-                            <span className="text-xs font-bold uppercase tracking-widest">Versículo do Dia</span>
+                        {/* Quote Icons */}
+                        <div className="absolute top-6 left-6 opacity-20 text-bible-gold pointer-events-none">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21L14.017 18C14.017 16.896 14.321 15.923 14.929 15.081C15.539 14.238 16.417 13.565 17.564 13.06L17.564 12.637C16.956 12.637 16.488 12.483 16.157 12.176C15.828 11.87 15.663 11.464 15.663 10.959C15.663 10.457 15.845 10.051 16.208 9.74001C16.572 9.42901 17.065 9.27401 17.689 9.27401C18.423 9.27401 18.995 9.53701 19.408 10.062C19.821 10.589 20.027 11.233 20.027 11.996C20.027 13.433 19.488 14.82 18.411 16.157C17.334 17.495 15.868 18.775 14.016 19.998L14.017 21ZM5.00201 21L5.00201 18C5.00201 16.896 5.30601 15.923 5.91401 15.081C6.52401 14.238 7.40001 13.565 8.54801 13.06L8.54801 12.637C7.94001 12.637 7.47201 12.483 7.14101 12.176C6.81201 11.87 6.64701 11.464 6.64701 10.959C6.64701 10.457 6.82901 10.051 7.19201 9.74001C7.55601 9.42901 8.05001 9.27401 8.67301 9.27401C9.40701 9.27401 9.97901 9.53701 10.392 10.062C10.805 10.589 11.011 11.233 11.011 11.996C11.011 13.433 10.472 14.82 9.39501 16.157C8.31801 17.495 6.85301 18.775 5.00201 19.998L5.00201 21Z"></path></svg>
                         </div>
 
-                        <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed mb-6 text-bible-accent dark:text-stone-200 max-w-4xl mx-auto">
+                        <div className="flex items-center gap-3 mb-6 relative z-10">
+                            <div className="p-2 rounded-full bg-bible-gold/10 text-bible-gold">
+                                <Calendar size={20} />
+                            </div>
+                            <span className="text-xs font-bold uppercase tracking-[0.2em] text-bible-gold">Versículo do Dia</span>
+                        </div>
+
+                        <blockquote className="text-3xl md:text-4xl font-serif italic leading-tight mb-8 text-bible-accent dark:text-stone-100 max-w-4xl mx-auto relative z-10 drop-shadow-sm">
                             "{dailyVerse.text}"
                         </blockquote>
 
-                        <cite className="not-italic font-bold text-bible-gold tracking-wider uppercase text-sm flex items-center gap-2">
-                            <div className="h-px w-8 bg-bible-gold"></div>
+                        <cite className="not-italic font-bold text-stone-500 dark:text-stone-400 tracking-wider uppercase text-sm flex items-center gap-4 relative z-10">
+                            <span className="h-px w-12 bg-gradient-to-r from-transparent to-bible-gold"></span>
                             {dailyVerse.ref}
-                            <div className="h-px w-8 bg-bible-gold"></div>
+                            <span className="h-px w-12 bg-gradient-to-l from-transparent to-bible-gold"></span>
                         </cite>
                     </div>
                 </div>
 
-                {/* 4. TOOLS / FEATURES */}
+                {/* 4. TOOLS / FEATURES - Vibrant CTAs */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-12">
-                    {[
-                        { title: t.bibleReading, icon: BookOpen, path: `/leitura/${normalizeBookName('Gênesis')}/1`, desc: "Leitura imersiva e moderna." },
-                        { title: t.devotional, icon: Sun, path: '/devocional', desc: "Inspiração diária para sua alma." },
-                        { title: t.chat, icon: MessageCircle, path: '/chat', desc: "Tire dúvidas com nossa IA." }
-                    ].map((feature, i) => (
-                        <button
-                            key={i}
-                            onClick={() => navigate(feature.path)}
-                            className={`group p-6 rounded-2xl border text-left transition-all hover:shadow-lg relative overflow-hidden
-                                ${isDark ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'}
-                            `}
-                        >
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-colors
-                                ${isDark ? 'bg-stone-800 text-stone-300 group-hover:bg-bible-gold group-hover:text-white' : 'bg-stone-100 text-stone-600 group-hover:bg-bible-gold group-hover:text-white'}
-                            `}>
-                                <feature.icon size={20} />
+                    {/* Reading CTA */}
+                    <button
+                        onClick={() => navigate(`/leitura/${normalizeBookName('Gênesis')}/1`)}
+                        className={`group relative p-8 rounded-3xl text-left transition-all hover:-translate-y-1 hover:shadow-2xl overflow-hidden
+                            ${isDark ? 'bg-stone-900' : 'bg-white'}
+                        `}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="relative z-10 flex flex-col h-full">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
+                                <BookOpen size={28} />
                             </div>
-                            <h3 className="font-bold mb-1">{feature.title}</h3>
-                            <p className="text-xs opacity-60">{feature.desc}</p>
-                        </button>
-                    ))}
+                            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-stone-800'}`}>Iniciar Leitura</h3>
+                            <p className={`text-sm opacity-70 mb-6 ${isDark ? 'text-stone-300' : 'text-stone-600'}`}>Leitura imersiva e moderna da Bíblia Sagrada.</p>
+
+                            <div className="mt-auto flex items-center gap-2 text-blue-500 font-bold text-sm tracking-wide group-hover:gap-3 transition-all">
+                                Começar Agora <ArrowRight size={16} />
+                            </div>
+                        </div>
+                    </button>
+
+                    {/* Devotional CTA */}
+                    <button
+                        onClick={() => navigate('/devocional')}
+                        className={`group relative p-8 rounded-3xl text-left transition-all hover:-translate-y-1 hover:shadow-2xl overflow-hidden
+                            ${isDark ? 'bg-stone-900' : 'bg-white'}
+                        `}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-600/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="relative z-10 flex flex-col h-full">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform duration-300">
+                                <Sun size={28} />
+                            </div>
+                            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-stone-800'}`}>Ler Devocional</h3>
+                            <p className={`text-sm opacity-70 mb-6 ${isDark ? 'text-stone-300' : 'text-stone-600'}`}>Uma palavra de inspiração diária para sua alma.</p>
+
+                            <div className="mt-auto flex items-center gap-2 text-orange-500 font-bold text-sm tracking-wide group-hover:gap-3 transition-all">
+                                Ler Mensagem <ArrowRight size={16} />
+                            </div>
+                        </div>
+                    </button>
+
+                    {/* AI Chat CTA */}
+                    <button
+                        onClick={() => navigate('/chat')}
+                        className={`group relative p-8 rounded-3xl text-left transition-all hover:-translate-y-1 hover:shadow-2xl overflow-hidden
+                            ${isDark ? 'bg-stone-900' : 'bg-white'}
+                        `}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-indigo-600/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="relative z-10 flex flex-col h-full">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300">
+                                <MessageCircle size={28} />
+                            </div>
+                            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-stone-800'}`}>Estudar com IA</h3>
+                            <p className={`text-sm opacity-70 mb-6 ${isDark ? 'text-stone-300' : 'text-stone-600'}`}>Tire dúvidas teológicas com nossa Inteligência Artificial.</p>
+
+                            <div className="mt-auto flex items-center gap-2 text-purple-500 font-bold text-sm tracking-wide group-hover:gap-3 transition-all">
+                                Conversar <ArrowRight size={16} />
+                            </div>
+                        </div>
+                    </button>
                 </div>
 
 
