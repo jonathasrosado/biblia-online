@@ -1,17 +1,17 @@
 {
   "openrouter": {
-    "valid": false,
-    "message": "Erro OpenRouter: 401 - {\"error\":{\"message\":\"User not found.\",\"code\":401}}",
-    "lastChecked": "2025-12-07T22:23:24.492Z"
+    "valid": true,
+    "message": "Conexão com OpenRouter bem-sucedida! (Limite: N/A)",
+    "lastChecked": "2025-12-08T03:15:56.381Z"
   },
   "freepik": {
     "valid": true,
     "message": "Conexão com Freepik bem-sucedida!",
-    "lastChecked": "2025-12-03T22:59:52.503Z"
+    "lastChecked": "2025-12-08T03:14:30.369Z"
   },
   "gemini": {
     "valid": true,
     "message": "Conexão com Gemini bem-sucedida!",
-    "lastChecked": "2025-12-04T14:06:33.841Z"
+    "lastChecked": "2025-12-08T03:14:23.123Z"
   }
 }

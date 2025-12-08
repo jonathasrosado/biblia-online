@@ -347,7 +347,10 @@ export class AIManager {
     // Wrapper to generate AND save
     async generateImage(prompt, options = {}) {
         const rawImage = await this._generateRawImage(prompt, options);
-        return await this.saveImageLocally(rawImage, prompt);
+        // Use provided filename or sanitize the prompt/title to be safe
+        const safePrompt = prompt.substring(0, 30).replace(/[^a-z0-9]/gi, '_');
+        const filename = options.customFilename || `${safePrompt}_${Date.now()}`;
+        return await this.saveImageLocally(rawImage, filename);
     }
 
     async _generateRawImage(prompt, options = {}) {

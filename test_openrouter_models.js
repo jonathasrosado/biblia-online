@@ -1,4 +1,4 @@
-const apiKey = "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";
+const apiKey = "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";
 
 async function checkModels() {
     try {

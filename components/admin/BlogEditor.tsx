@@ -425,7 +425,7 @@ const BlogEditor: React.FC = () => {
                 const autoSaveData = {
                     ...post,
                     content: newContent,
-                    status: post.status === 'trash' ? 'draft' : post.status || 'draft',
+                    status: post.status === 'published' ? 'published' : 'draft',
                     slug: post.slug || post.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
                 };
                 await savePost(autoSaveData, true); // true = isAutoSave (no alert)

@@ -23,9 +23,8 @@ const blogPostSchema = new mongoose.Schema({
 });
 
 // Middleware to update updatedAt
-blogPostSchema.pre('save', function (next) {
+blogPostSchema.pre('save', function () {
     this.updatedAt = new Date();
-    next();
 });
 
 const BlogPost = mongoose.model('BlogPost', blogPostSchema);

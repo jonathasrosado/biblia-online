@@ -3,4 +3,4 @@ Stack: Error: OpenRouter API Error: 401 - {"error":{"message":"User not found.",
     at AIManager._generateRawImage (file:///C:/Users/Dondon/Desktop/biblia/server/services/aiManager.js:431:27)
     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
     at async AIManager.generateImage (file:///C:/Users/Dondon/Desktop/biblia/server/services/aiManager.js:349:26)
-    at async file:///C:/Users/Dondon/Desktop/biblia/server/api.js:1274:26
+    at async file:///C:/Users/Dondon/Desktop/biblia/server/api.js:1280:26

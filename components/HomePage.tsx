@@ -161,21 +161,32 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
 
                 {/* 2. QUICK ACCESS BOOKS (Moved Up) */}
                 <div className="animate-slideUp" style={{ animationDelay: '0.4s' }}>
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                         <h2 className="text-xl font-serif font-bold">Acesso Rápido</h2>
-                        <div className="flex items-center gap-3">
+
+                        {/* Tabs Interface */}
+                        <div className={`flex p-1 rounded-xl w-full md:w-auto
+                            ${isDark ? 'bg-stone-900 border border-stone-800' : 'bg-stone-100 border border-stone-200'}
+                        `}>
                             <button
-                                onClick={() => navigate('/antigo-testamento')}
-                                className={`text-xs font-bold uppercase tracking-wider transition-colors ${activeTestament === 'OT' ? 'text-bible-gold underline' : 'text-stone-400 hover:text-bible-gold'}`}
+                                onClick={() => setActiveTestament('OT')}
+                                className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all
+                                    ${activeTestament === 'OT'
+                                        ? (isDark ? 'bg-stone-800 text-bible-gold shadow-sm' : 'bg-white text-bible-gold shadow-sm')
+                                        : 'text-stone-400 hover:text-stone-500'}
+                                `}
                             >
-                                Antigo
+                                Antigo Testamento
                             </button>
-                            <span className="text-stone-300">|</span>
                             <button
-                                onClick={() => navigate('/novo-testamento')}
-                                className={`text-xs font-bold uppercase tracking-wider transition-colors ${activeTestament === 'NT' ? 'text-bible-gold underline' : 'text-stone-400 hover:text-bible-gold'}`}
+                                onClick={() => setActiveTestament('NT')}
+                                className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all
+                                    ${activeTestament === 'NT'
+                                        ? (isDark ? 'bg-stone-800 text-bible-gold shadow-sm' : 'bg-white text-bible-gold shadow-sm')
+                                        : 'text-stone-400 hover:text-stone-500'}
+                                `}
                             >
-                                Novo
+                                Novo Testamento
                             </button>
                         </div>
                     </div>
@@ -183,7 +194,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                         {bibleBooks
                             .filter(b => b.testament === (activeTestament === 'OT' ? 'Old' : 'New'))
-                            .slice(0, 12)
+                            .slice(0, 11) // Show 11 books to leave room for the "Ver Tudo" button
                             .map((book) => (
                                 <button
                                     key={book.name}
@@ -198,6 +209,21 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                                     <div className="text-[10px] opacity-50 uppercase tracking-wider">{book.chapters} Caps</div>
                                 </button>
                             ))}
+
+                        {/* "Ver Tudo" Button */}
+                        <button
+                            onClick={() => navigate(activeTestament === 'OT' ? '/antigo-testamento' : '/novo-testamento')}
+                            className={`p-4 rounded-2xl text-center transition-all border group flex flex-col items-center justify-center gap-2
+                                ${isDark
+                                    ? 'bg-bible-gold/10 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/20'
+                                    : 'bg-bible-gold/5 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/10'}
+                            `}
+                        >
+                            <div className="p-2 rounded-full bg-bible-gold/20 group-hover:bg-bible-gold/30 transition-colors">
+                                <ArrowRight size={20} />
+                            </div>
+                            <span className="text-xs font-bold uppercase tracking-wider">Ver Tudo</span>
+                        </button>
                     </div>
                 </div>
 

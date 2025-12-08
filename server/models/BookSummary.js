@@ -35,9 +35,8 @@ const bookSummarySchema = new mongoose.Schema({
 });
 
 // Update timestamp on save
-bookSummarySchema.pre('save', function (next) {
+bookSummarySchema.pre('save', function () {
     this.updatedAt = Date.now();
-    next();
 });
 
 const BookSummary = mongoose.model('BookSummary', bookSummarySchema);

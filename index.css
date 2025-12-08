@@ -2,110 +2,142 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Typography for Blog Posts */
-.prose {
-    max-width: 65ch;
-    margin: 0 auto;
-    line-height: 1.75;
-    color: #2c2c2c;
-}
+@layer components {
 
-.dark .prose {
-    color: #e7e5e4;
-}
+    /* --- TYPOGRAPHY DEFAULTS (Legacy .prose support) --- */
+    .prose {
+        @apply max-w-none text-stone-800 dark:text-stone-200 leading-relaxed;
+        font-family: 'Crimson Pro', serif;
+    }
 
-.prose h2 {
-    font-family: 'Crimson Pro', serif;
-    font-size: 1.875rem;
-    /* 30px */
-    font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    color: #1c1917;
-}
+    .prose h2 {
+        @apply text-3xl font-bold mt-12 mb-6 text-stone-900 dark:text-stone-100;
+    }
 
-.dark .prose h2 {
-    color: #fafaf9;
-}
+    .prose h3 {
+        @apply text-2xl font-bold mt-8 mb-4 text-stone-800 dark:text-stone-200;
+    }
 
-.prose h3 {
-    font-family: 'Crimson Pro', serif;
-    font-size: 1.5rem;
-    /* 24px */
-    font-weight: 600;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    color: #44403c;
-}
+    .prose p {
+        @apply mb-6 text-lg;
+    }
 
-.dark .prose h3 {
-    color: #d6d3d1;
-}
+    .prose ul,
+    .prose ol {
+        @apply pl-6 mb-6 space-y-2;
+    }
 
-.prose p {
-    margin-bottom: 1.25rem;
-    font-family: 'Crimson Pro', serif;
-    font-size: 1.125rem;
-    /* 18px */
-}
+    .prose blockquote {
+        @apply pl-4 border-l-4 border-bible-gold italic text-stone-600 dark:text-stone-400 my-6 bg-stone-50 dark:bg-stone-800/50 py-2 pr-2 rounded-r;
+    }
 
-.prose ul {
-    list-style-type: disc;
-    padding-left: 1.625rem;
-    margin-bottom: 1.25rem;
-}
+    .prose strong {
+        @apply font-bold text-bible-accent dark:text-bible-gold;
+    }
 
-.prose ol {
-    list-style-type: decimal;
-    padding-left: 1.625rem;
-    margin-bottom: 1.25rem;
-}
+    .prose a {
+        @apply text-bible-accent dark:text-bible-gold underline underline-offset-2 hover:text-amber-700 transition-colors;
+    }
 
-.prose li {
-    margin-bottom: 0.5rem;
-    font-family: 'Crimson Pro', serif;
-}
+    .prose img {
+        @apply rounded-xl shadow-lg my-8 w-full max-h-[500px] object-cover;
+    }
 
-.prose blockquote {
-    border-left: 4px solid #d4af37;
-    /* bible-gold */
-    padding-left: 1rem;
-    font-style: italic;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    background-color: rgba(212, 175, 55, 0.1);
-    padding: 1rem;
-    border-radius: 0 0.5rem 0.5rem 0;
-}
+    /* --- NEW PROFESSIONAL BLOG BLOCKS --- */
 
-.prose strong {
-    font-weight: 700;
-    color: #8b4513;
-    /* bible-accent */
-}
+    /* 1. Special Bible Verse Block */
+    .blog-verse-block {
+        @apply my-10 p-8 bg-[#FDFBF7] dark:bg-[#1C1917] border-y-2 border-bible-gold/30 text-center relative;
+        font-family: 'Crimson Pro', serif;
+    }
 
-.dark .prose strong {
-    color: #d4af37;
-    /* bible-gold in dark mode */
-}
+    .blog-verse-block::before {
+        content: '"';
+        @apply absolute top-4 left-1/2 -translate-x-1/2 text-6xl text-bible-gold/20 font-serif leading-none;
+    }
 
-.prose a {
-    color: #8b4513;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-}
+    .blog-verse-text {
+        @apply text-2xl italic text-stone-800 dark:text-stone-200 leading-relaxed mb-4 relative z-10;
+    }
 
-.dark .prose a {
-    color: #d4af37;
-}
+    .blog-verse-ref {
+        @apply text-sm font-bold tracking-widest uppercase text-bible-accent dark:text-bible-gold block mt-4;
+    }
 
-.prose img {
-    border-radius: 0.5rem;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    width: 100%;
-    height: auto;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    /* 2. Insight/Reflection Card */
+    .blog-card {
+        @apply my-8 p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-[0_2px_8px_rgba(0, 0, 0, 0.04)] dark:shadow-none hover:shadow-md transition-shadow relative overflow-hidden;
+    }
+
+    .blog-card::after {
+        content: '';
+        @apply absolute top-0 left-0 w-1 h-full bg-bible-gold;
+    }
+
+    .blog-card-title {
+        @apply flex items-center gap-2 font-bold text-lg text-stone-900 dark:text-stone-100 mb-2 font-sans;
+    }
+
+    /* 3. Responsive Tables */
+    .blog-table-container {
+        @apply my-8 overflow-hidden rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm;
+    }
+
+    .blog-table {
+        @apply w-full text-left border-collapse text-base;
+    }
+
+    .blog-table th {
+        @apply p-4 bg-stone-100 dark:bg-stone-800 font-bold text-stone-700 dark:text-stone-200 border-b border-stone-200 dark:border-stone-700 font-sans tracking-wide text-sm uppercase;
+    }
+
+    .blog-table td {
+        @apply p-4 text-stone-600 dark:text-stone-400 border-b border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900;
+    }
+
+    .blog-table tr:last-child td {
+        @apply border-b-0;
+    }
+
+    .blog-table tr:hover td {
+        @apply bg-stone-50 dark:bg-stone-800/50 transition-colors;
+    }
+
+    /* 4. Accordion (Questions & Answers) */
+    .blog-accordion {
+        @apply my-4 space-y-3;
+    }
+
+    .blog-accordion details {
+        @apply group bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 shadow-sm overflow-hidden;
+    }
+
+    .blog-accordion summary {
+        @apply cursor-pointer p-5 flex justify-between items-center font-bold text-stone-800 dark:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors font-sans list-none select-none;
+    }
+
+    /* Custom Icon for Summary */
+    .blog-accordion summary::after {
+        content: '+';
+        @apply text-2xl text-stone-400 font-light leading-none transition-transform duration-300 group-open:rotate-45 group-open:text-bible-gold;
+    }
+
+    .blog-accordion-content {
+        @apply px-5 pb-6 pt-2 text-stone-600 dark:text-stone-400 leading-relaxed border-t border-stone-100 dark:border-stone-800/50 animate-fadeIn;
+    }
+
+    /* 5. Chat Call-to-Action */
+    .blog-chat-cta {
+        @apply my-12 p-1 bg-gradient-to-br from-bible-gold/20 via-transparent to-bible-accent/10 rounded-2xl shadow-sm;
+    }
+
+    .blog-chat-inner {
+        @apply bg-[#FDFBF7] dark:bg-[#151413] p-6 md:p-8 rounded-xl flex flex-col md:flex-row items-center gap-6 text-center md:text-left;
+    }
+
+    .blog-chat-btn {
+        @apply inline-flex items-center gap-2 px-6 py-3 bg-bible-gold text-white font-bold rounded-lg shadow-md hover:bg-yellow-600 hover:shadow-lg transition-all transform hover:-translate-y-0.5 whitespace-nowrap;
+    }
 }
 
 /* Utilities */
@@ -116,4 +148,8 @@
 .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }

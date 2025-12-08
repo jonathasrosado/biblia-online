@@ -1348,27 +1348,56 @@ app.post('/api/ai/blog-post', async (req, res) => {
             "Act as a professional Christian content creator and theologian.\n" +
             "Write a comprehensive, engaging, and visually structured blog post with the title: \"" + title + "\".\n\n" +
             "Context / Instructions: " + context + "\n\n" +
-            "** SEO & AIO(Artificial Intelligence Optimization) Requirements:**\n" +
-            "- ** Keywords:** Naturally integrate relevant keywords related to the title and biblical themes.\n" +
-            "- ** Structure:** Use a clear hierarchy.Use < h2 > for main sections and < h3 > for subsections.NEVER use < h1 > (reserved for page title).\n" +
-            "- ** Readability:** Keep paragraphs short(3 - 4 lines).Use bullet points and numbered lists where possible.\n" +
-            "- ** Engagement:** Ask rhetorical questions to encourage reflection.\n" +
-            "- ** Engagement:** Ask rhetorical questions to encourage reflection.\n" +
-            "- ** Semantic HTML:** Use < strong > for emphasis on key concepts, not just for styling.\n" +
-            "- ** NO MARKDOWN:** Do NOT use markdown formatting like **bold** or *italic*. Use HTML <strong> and <em> tags ONLY.\n\n" +
-            "** Structure & Formatting:**\n" +
-            "    - Use HTML tags for formatting(h2, h3, p, ul, li, blockquote, strong, em).\n" +
-            "- ** Internal Links(CRITICAL):** Whenever you mention a Bible book, chapter, or verse, YOU MUST create an HTML link to the reading page.\n" +
-            "    - Format for Chapter: <a href=\"/leitura/{normalized_book_name}/{chapter}\" class=\"text-bible-gold hover:underline\">{Book} {Chapter}</a>\n" +
-            "    - Format for Verse(s): <a href=\"/leitura/{normalized_book_name}/{chapter}?verses={start}-{end}\" class=\"text-bible-gold hover:underline\">{Book} {Chapter}:{VerseRange}</a>\n" +
-            "    - Example 1: \"Como diz em <a href=\"/leitura/joao/3?verses=16-16\" class=\"text-bible-gold hover:underline\">João 3:16</a>...\"\n" +
-            "    - Example 2: \"Paulo explica em <a href=\"/leitura/1-corintios/8?verses=4-6\" class=\"text-bible-gold hover:underline\">1 Coríntios 8:4-6</a>...\"\n" +
-            "    - Use normalized book names (lowercase, no accents, REPLACE SPACES WITH HYPHENS).\n" +
-            "- **Images (CRITICAL):** You MUST include 2-3 relevant image placeholders where they fit best contextually to break up the text.\n" +
-            "    - Format: [[IMAGE: Descrição detalhada para geração de imagem em Português]]\n" +
-            "    - The description inside the brackets MUST be in Portuguese.\n" +
-            "- **Tone:** Inspiring, educational, and faithful to the Scriptures.\n" +
-            "- **Length:** Approximately 800-1200 words.\n\n" +
+            "** SEO & AIO Requirements:**\n" +
+            "- ** Keywords:** Naturally integrate relevant keywords.\n" +
+            "- ** Structure:** Use <h2 class=\"text-3xl font-bold mt-12 mb-6 text-stone-900 dark:text-stone-100 font-serif\"> and <h3 class=\"text-2xl font-bold mt-8 mb-4 text-stone-800 dark:text-stone-200 font-serif\">. NEVER use h1.\n" +
+            "- ** Typography:** Paragraphs MUST use <p class=\"mb-6 text-lg text-stone-700 dark:text-stone-300 leading-relaxed font-serif\">.\n" +
+            "- ** Tone Analysis:** Analyze the title/theme carefully.\n" +
+            "    - If 'Prayer/Devotional': Use comforting, poetic language. Use more Verse Blocks.\n" +
+            "    - If 'Study/Theology': Use analytical language. Use Tables and Insight Cards.\n" +
+            "    - If 'Q&A/Curiosity': Use a conversational tone. Use Accordions.\n\n" +
+            "** MANDATORY VISUAL BLOCKS (Use these HTML classes EXACTLY):**\n\n" +
+            "1. **BIBLE VERSES (Must appear at least once):**\n" +
+            "   `<div class=\"blog-verse-block\">`\n" +
+            "   `  <p class=\"blog-verse-text\">\"Write the verse text here...\"</p>`\n" +
+            "   `  <span class=\"blog-verse-ref\">Book Chapter:Verse</span>`\n" +
+            "   `</div>`\n\n" +
+            "2. **INSIGHT CARD (Key takeaways, applications, or reflections):**\n" +
+            "   `<div class=\"blog-card\">`\n" +
+            "   `  <h4 class=\"blog-card-title\">💡 Reflexão Prática / Curiosidade</h4>`\n" +
+            "   `  <p>Content goes here...</p>`\n" +
+            "   `</div>`\n\n" +
+            "3. **RESPONSIVE TABLE (If comparing concepts, history, or lists):**\n" +
+            "   `<div class=\"blog-table-container\">`\n" +
+            "   `  <table class=\"blog-table\">`\n" +
+            "   `    <thead><tr><th>Header 1</th><th>Header 2</th></tr></thead>`\n" +
+            "   `    <tbody><tr><td>Data 1</td><td>Data 2</td></tr></tbody>`\n" +
+            "   `  </table>`\n" +
+            "   `</div>`\n\n" +
+            "4. **CHAT INVITATION (Insert naturally in the middle):**\n" +
+            "   `<div class=\"blog-chat-cta\">`\n" +
+            "   `  <div class=\"blog-chat-inner\">`\n" +
+            "   `    <div class=\"flex-1\">`\n" +
+            "   `      <h4 class=\"text-xl font-bold text-stone-900 dark:text-stone-100 mb-2 font-serif\">📖 Quer aprofundar seu estudo?</h4>`\n" +
+            "   `      <p class=\"text-stone-700 dark:text-stone-300\">Tem dúvidas sobre este tema? Nossa IA pode te ajudar a explorar mais.</p>`\n" +
+            "   `    </div>`\n" +
+            "   `    <a href=\"http://localhost:5173/chat?p=Gostaria de saber mais sobre: " + title + "\" class=\"blog-chat-btn\">`\n" +
+            "   `      Conversar com IA`\n" +
+            "   `    </a>`\n" +
+            "   `  </div>`\n" +
+            "   `</div>`\n\n" +
+            "5. **Q&A ACCORDION (At the end - MANDATORY):**\n" +
+            "   `<h2 class=\"text-3xl font-bold mt-12 mb-6 text-stone-900 dark:text-stone-100 font-serif border-b border-stone-200 pb-4\">Perguntas Frequentes</h2>`\n" +
+            "   `<div class=\"blog-accordion\">`\n" +
+            "     (Generate 3-4 Q&A pairs): \n" +
+            "     `<details>`\n" +
+            "     `  <summary>Question goes here?</summary>`\n" +
+            "     `  <div class=\"blog-accordion-content\">Answer goes here...</div>`\n" +
+            "     `</details>`\n" +
+            "   `</div>`\n\n" +
+            "** Internal Links:** Link Bible verses using: <a href=\"/leitura/{normalized_book}/{chapter}\" class=\"text-bible-accent hover:underline font-bold\">{Ref}</a>\n" +
+            "** Images:** Include 2-3: [[IMAGE: Description_in_Portuguese]]\n" +
+            "** Length:** 800-1200 words.\n\n" +
             "Return ONLY the HTML content of the body (no <html>, <head>, or <body> tags).\n" + ((() => {
                 try {
                     const files = fs.readdirSync(BLOG_DIR);
@@ -1443,6 +1472,21 @@ app.post('/api/ai/seo-metadata', async (req, res) => {
     } catch (error) {
         console.error("AI SEO Error:", error);
         res.status(500).json({ error: 'Failed to generate SEO metadata', details: error.message });
+    }
+});
+
+app.post('/api/ai/generate-image', async (req, res) => {
+    try {
+        const { prompt, width, height, customFilename } = req.body;
+        if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
+
+        // Call AI Manager to generate AND save locally
+        const url = await aiManager.generateImage(prompt, { width, height, customFilename });
+
+        res.json({ url });
+    } catch (error) {
+        console.error("Image Generation Error:", error);
+        res.status(500).json({ error: 'Failed to generate image', details: error.message });
     }
 });
 
