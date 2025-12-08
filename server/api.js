@@ -346,14 +346,18 @@ app.post('/api/ai/fluid-gen', async (req, res) => {
     try {
         const { book, chapter, language, originalText } = req.body;
 
+        const langMap = { 'pt': 'Portuguese', 'en': 'English', 'es': 'Spanish' };
+        const fullLang = langMap[language] || 'Portuguese';
+
         const systemInstruction = `
-            You are a biblical scholar and writer. Your task is to rewrite the provided Bible text (Book: ${book}, Chapter: ${chapter}) into a fluid, modern, and engaging narrative in ${language || 'pt'}.
+            You are a biblical scholar and writer. Your task is to rewrite the provided Bible text (Book: ${book}, Chapter: ${chapter}) into a fluid, modern, and engaging narrative in ${fullLang}.
             
             Rules:
             1. Keep the theological meaning accurate but improve flow and readability.
             2. Remove verse numbers. Group text into logical paragraphs.
             3. Use a respectful but accessible tone.
-            4. Return ONLY a JSON object with this structure:
+            4. IMPORTANT: The output MUST be in ${fullLang}.
+            5. Return ONLY a JSON object with this structure:
             {
                 "title": "A short, engaging title for this chapter",
                 "paragraphs": ["Paragraph 1...", "Paragraph 2..."]

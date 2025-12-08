@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Lock, Layout, LogOut, Menu, User, ChevronRight, FileText, Settings, Sparkles, Image as ImageIcon, Plus, List, Tags } from 'lucide-react';
+import { Lock, Layout, LogOut, Menu, User, ChevronRight, FileText, Settings, Sparkles, Image as ImageIcon, Plus, List, Tags, Book } from 'lucide-react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 
 interface AdminPageProps {
@@ -157,6 +157,17 @@ const AdminPage: React.FC<AdminPageProps> = ({ t, isDark }) => {
                             </div>
                         )}
                     </div>
+
+                    <NavLink
+                        to="/admin/bible"
+                        className={({ isActive }) => `w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium
+                            ${isActive
+                                ? 'bg-bible-gold text-white shadow-md'
+                                : 'hover:bg-stone-100 dark:hover:bg-stone-800 opacity-70 hover:opacity-100'}`}
+                    >
+                        <Book size={20} />
+                        Conteúdo Bíblico
+                    </NavLink>
 
                     <NavLink
                         to="/admin/media"

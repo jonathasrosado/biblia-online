@@ -54,6 +54,7 @@ import SettingsManager from './components/admin/SettingsManager';
 import AISettings from './components/admin/AISettings';
 import PromptsManager from './components/admin/PromptsManager';
 import MediaManager from './components/admin/MediaManager';
+import BibleManager from './components/admin/BibleManager';
 
 // Redirect Handler Component
 const RedirectHandler = () => {
@@ -565,6 +566,7 @@ function AppContent() {
             <Route path="ai-settings" element={<AISettings />} />
             <Route path="prompts" element={<PromptsManager />} />
             <Route path="media" element={<MediaManager />} />
+            <Route path="bible" element={<BibleManager />} />
           </Route>
 
           {/* Dynamic Routes - MUST BE LAST */}
