@@ -5,6 +5,7 @@ import { toPng } from 'html-to-image';
 import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2, Loader2, RefreshCw } from 'lucide-react';
 import { normalizeBookName, bibleBooks } from '../constants';
 import { ReadingHistoryItem } from '../types';
+import versesRaw from '../src/data/daily_verses.json';
 
 interface HomePageProps {
     language: string;
@@ -18,19 +19,13 @@ interface SiteSettings {
     siteDescription: string;
 }
 
+
 // Curated list of verses for the "Daily Verse" feature
-const DAILY_VERSES = [
-    { text: "O Senhor é o meu pastor, nada me faltará.", ref: "Salmos 23:1" },
-    { text: "Tudo posso naquele que me fortalece.", ref: "Filipenses 4:13" },
-    { text: "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.", ref: "João 3:16" },
-    { text: "Mil cairão ao teu lado, e dez mil à tua direita, mas não chegarás a ti.", ref: "Salmos 91:7" },
-    { text: "Buscai primeiro o reino de Deus, e a sua justiça, e todas estas coisas vos serão acrescentadas.", ref: "Mateus 6:33" },
-    { text: "O Senhor é a minha luz e a minha salvação; a quem temerei?", ref: "Salmos 27:1" },
-    { text: "Vinde a mim, todos os que estais cansados e oprimidos, e eu vos aliviarei.", ref: "Mateus 11:28" },
-    { text: "Se Deus é por nós, quem será contra nós?", ref: "Romanos 8:31" },
-    { text: "Alegrai-vos sempre no Senhor; outra vez digo, alegrai-vos.", ref: "Filipenses 4:4" },
-    { text: "Lâmpada para os meus pés é a tua palavra, e luz para o meu caminho.", ref: "Salmos 119:105" }
-];
+// Mapped from external JSON file
+const DAILY_VERSES = versesRaw.map(v => ({
+    text: v.texto,
+    ref: v.referencia
+}));
 
 interface BlogPost {
     id: string;
