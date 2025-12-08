@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2 } from 'lucide-react';
 import { normalizeBookName, bibleBooks } from '../constants';
 import { ReadingHistoryItem } from '../types';
+import VerseImageGenerator from './VerseImageGenerator';
 
 interface HomePageProps {
     language: string;
@@ -44,6 +45,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
     const navigate = useNavigate();
     const [localQuery, setLocalQuery] = useState('');
     const [dailyVerse, setDailyVerse] = useState(DAILY_VERSES[0]);
+    const [showImageGenerator, setShowImageGenerator] = useState(false);
     const [activeTestament, setActiveTestament] = useState<'OT' | 'NT'>('NT'); // Default to New Testament as it's often more popular for quick reading
     const [settings, setSettings] = useState<SiteSettings>({ siteTitle: '', siteDescription: '' });
     const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -249,30 +251,6 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21L14.017 18C14.017 16.896 14.321 15.923 14.929 15.081C15.539 14.238 16.417 13.565 17.564 13.06L17.564 12.637C16.956 12.637 16.488 12.483 16.157 12.176C15.828 11.87 15.663 11.464 15.663 10.959C15.663 10.457 15.845 10.051 16.208 9.74001C16.572 9.42901 17.065 9.27401 17.689 9.27401C18.423 9.27401 18.995 9.53701 19.408 10.062C19.821 10.589 20.027 11.233 20.027 11.996C20.027 13.433 19.488 14.82 18.411 16.157C17.334 17.495 15.868 18.775 14.016 19.998L14.017 21ZM5.00201 21L5.00201 18C5.00201 16.896 5.30601 15.923 5.91401 15.081C6.52401 14.238 7.40001 13.565 8.54801 13.06L8.54801 12.637C7.94001 12.637 7.47201 12.483 7.14101 12.176C6.81201 11.87 6.64701 11.464 6.64701 10.959C6.64701 10.457 6.82901 10.051 7.19201 9.74001C7.55601 9.42901 8.05001 9.27401 8.67301 9.27401C9.40701 9.27401 9.97901 9.53701 10.392 10.062C10.805 10.589 11.011 11.233 11.011 11.996C11.011 13.433 10.472 14.82 9.39501 16.157C8.31801 17.495 6.85301 18.775 5.00201 19.998L5.00201 21Z"></path></svg>
                         </div>
 
-                        {/* Top Bar for Share */}
-                        <div className="absolute top-6 right-6 z-20">
-                            <button
-                                onClick={() => {
-                                    const text = `"${dailyVerse.text}" - ${dailyVerse.ref}\n\nLeia mais em: bibliaonline.me`;
-                                    if (navigator.share) {
-                                        navigator.share({
-                                            title: 'Versículo do Dia',
-                                            text: text,
-                                            url: 'https://bibliaonline.me'
-                                        }).catch(console.error);
-                                    } else {
-                                        navigator.clipboard.writeText(text);
-                                        // Optional: Show toast
-                                        alert('Versículo copiado para a área de transferência!');
-                                    }
-                                }}
-                                className="p-2 rounded-full bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white transition-all shadow-sm"
-                                title="Compartilhar"
-                            >
-                                <Share2 size={18} />
-                            </button>
-                        </div>
-
                         <div className="flex items-center gap-3 mb-6 relative z-10">
                             <div className="p-2 rounded-full bg-bible-gold/10 text-bible-gold">
                                 <Calendar size={20} />
@@ -284,11 +262,22 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                             "{dailyVerse.text}"
                         </blockquote>
 
-                        <cite className="not-italic font-bold text-stone-500 dark:text-stone-400 tracking-wider uppercase text-sm flex items-center gap-4 relative z-10">
+                        <cite className="not-italic font-bold text-stone-500 dark:text-stone-400 tracking-wider uppercase text-sm flex items-center gap-4 relative z-10 mb-8">
                             <span className="h-px w-12 bg-gradient-to-r from-transparent to-bible-gold"></span>
                             {dailyVerse.ref}
                             <span className="h-px w-12 bg-gradient-to-l from-transparent to-bible-gold"></span>
                         </cite>
+
+                        {/* Bottom Share Button */}
+                        <div className="relative z-10">
+                            <button
+                                onClick={() => setShowImageGenerator(true)}
+                                className="flex items-center gap-2 px-6 py-2 rounded-full bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white transition-all font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md"
+                            >
+                                <Share2 size={18} />
+                                Compartilhar
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -377,6 +366,15 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
 
 
             </div>
+
+            {/* Verse Image Generator Modal */}
+            {showImageGenerator && (
+                <VerseImageGenerator
+                    verseText={dailyVerse.text}
+                    verseReference={dailyVerse.ref}
+                    onClose={() => setShowImageGenerator(false)}
+                />
+            )}
         </div >
     );
 };
