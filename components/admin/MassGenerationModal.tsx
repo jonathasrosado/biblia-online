@@ -4,6 +4,7 @@ import { X, PlayCircle, StopCircle, CheckCircle, AlertTriangle, Sparkles, FileTe
 interface MassGenerationModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onStart: () => void;
     onStop: () => void;
     isGenerating: boolean;
     bookName: string;
@@ -20,6 +21,7 @@ interface MassGenerationModalProps {
 const MassGenerationModal: React.FC<MassGenerationModalProps> = ({
     isOpen,
     onClose,
+    onStart,
     onStop,
     isGenerating,
     bookName,
@@ -109,7 +111,7 @@ const MassGenerationModal: React.FC<MassGenerationModalProps> = ({
                     <div className="bg-stone-900 rounded-xl p-4 font-mono text-xs text-stone-300 h-48 overflow-y-auto border border-stone-800 shadow-inner">
                         {logs.length === 0 && (
                             <div className="h-full flex items-center justify-center opacity-30 italic">
-                                Aguardando início...
+                                Clique em "Iniciar" para começar...
                             </div>
                         )}
                         {logs.map((log, i) => (
@@ -133,12 +135,23 @@ const MassGenerationModal: React.FC<MassGenerationModalProps> = ({
                             Parar Geração
                         </button>
                     ) : (
-                        <button
-                            onClick={onClose}
-                            className="px-6 py-2 bg-stone-800 hover:bg-stone-700 text-white rounded-lg font-bold transition-colors"
-                        >
-                            Fechar
-                        </button>
+                        <>
+                            <button
+                                onClick={onClose}
+                                className="px-4 py-2 text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200 font-bold transition-colors"
+                            >
+                                Fechar
+                            </button>
+                            {!isFinished && (
+                                <button
+                                    onClick={onStart}
+                                    className="px-6 py-2 bg-bible-gold text-white hover:bg-yellow-600 rounded-lg font-bold flex items-center gap-2 transition-colors shadow-lg"
+                                >
+                                    <PlayCircle size={18} />
+                                    Iniciar Geração
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

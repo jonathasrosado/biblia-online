@@ -83,8 +83,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Serve uploads statically
+// Serve uploads statically (API route)
 app.use('/api/uploads', express.static(UPLOADS_DIR));
+// Fallback: Serve uploads at root /uploads for legacy/frontend compatibility
+app.use('/uploads', express.static(UPLOADS_DIR));
 
 // --- MEDIA API ---
 
@@ -96,7 +98,7 @@ app.get('/api/media', (req, res) => {
             const stats = fs.statSync(path.join(UPLOADS_DIR, file));
             return {
                 name: file,
-                url: `/uploads/${file}`,
+                url: `/api/uploads/${file}`,
                 size: stats.size,
                 date: stats.mtime
             };
@@ -114,7 +116,7 @@ app.post('/api/media/upload', upload.single('file'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     res.json({
         name: req.file.filename,
-        url: `/uploads/${req.file.filename}`
+        url: `/api/uploads/${req.file.filename}`
     });
 });
 
@@ -148,7 +150,7 @@ app.post('/api/media/upload-url', async (req, res) => {
 
         res.json({
             name: filename,
-            url: `/uploads/${filename}`
+            url: `/api/uploads/${filename}`
         });
     } catch (error) {
         console.error("Upload from URL failed:", error);

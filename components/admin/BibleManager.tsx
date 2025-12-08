@@ -323,6 +323,7 @@ const BibleManager: React.FC<BibleManagerProps> = () => {
             <MassGenerationModal
                 isOpen={isMassModalOpen}
                 onClose={() => setIsMassModalOpen(false)}
+                onStart={handleMassGeneration}
                 onStop={stopGeneration}
                 isGenerating={isGenerating}
                 bookName={currentBook.name}
