@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2 } from 'lucide-react';
+import { toPng } from 'html-to-image';
+import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2, Loader2 } from 'lucide-react';
 import { normalizeBookName, bibleBooks } from '../constants';
 import { ReadingHistoryItem } from '../types';
-import VerseImageGenerator from './VerseImageGenerator';
 
 interface HomePageProps {
     language: string;
@@ -43,9 +43,10 @@ interface BlogPost {
 
 const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }) => {
     const navigate = useNavigate();
+    const verseCardRef = useRef<HTMLDivElement>(null);
     const [localQuery, setLocalQuery] = useState('');
     const [dailyVerse, setDailyVerse] = useState(DAILY_VERSES[0]);
-    const [showImageGenerator, setShowImageGenerator] = useState(false);
+    const [isSharing, setIsSharing] = useState(false);
     const [activeTestament, setActiveTestament] = useState<'OT' | 'NT'>('NT'); // Default to New Testament as it's often more popular for quick reading
     const [settings, setSettings] = useState<SiteSettings>({ siteTitle: '', siteDescription: '' });
     const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -85,6 +86,94 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
         if (hour < 18) return language === 'pt' ? 'Boa tarde' : language === 'es' ? 'Buenas tardes' : 'Good afternoon';
         return language === 'pt' ? 'Boa noite' : language === 'es' ? 'Buenas noches' : 'Good evening';
     };
+
+    // Helper to convert data URI to Blob
+    const dataURItoBlob = (dataURI: string) => {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    };
+
+    const handleShare = async () => {
+        if (!verseCardRef.current || isSharing) return;
+        setIsSharing(true);
+
+        try {
+            // 1. Clone the node
+            const node = verseCardRef.current;
+            const clone = node.cloneNode(true) as HTMLElement;
+
+            // 2. Setup clone styling
+            // Create a wrapper to preserve "dark" mode context
+            const wrapper = document.createElement('div');
+            wrapper.className = isDark ? 'dark' : '';
+            wrapper.style.position = 'fixed';
+            wrapper.style.top = '-10000px';
+            wrapper.style.left = '-10000px';
+            wrapper.style.zIndex = '-1000';
+
+            // Set clone dimensions and reset transforms
+            clone.style.width = '600px';
+            clone.style.height = 'auto';
+            clone.style.minHeight = '600px';
+            clone.style.transform = 'none';
+            // Explicitly force text colors if needed, but wrapper should handle it via Tailwind
+
+            wrapper.appendChild(clone);
+            document.body.appendChild(wrapper);
+
+            // 3. Wait for content to settle
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            // 4. Capture settings
+            const options = {
+                cacheBust: true,
+                pixelRatio: 2,
+                backgroundColor: isDark ? '#1c1917' : '#fafaf9',
+                type: 'image/png',
+            };
+
+            // 5. WARMUP
+            try {
+                await toPng(clone, { ...options, pixelRatio: 1 });
+            } catch (e) { console.warn("Warmup capture failed", e); }
+
+            // 6. Final Capture
+            const dataUrl = await toPng(clone, options);
+
+            // Cleanup
+            document.body.removeChild(wrapper);
+
+            // 7. Share
+            const blob = dataURItoBlob(dataUrl);
+            const file = new File([blob], 'versiculo-do-dia.png', { type: 'image/png' });
+
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'Versículo do Dia',
+                    text: `${dailyVerse.text} - ${dailyVerse.ref}`
+                });
+            } else {
+                const link = document.createElement('a');
+                link.download = 'versiculo-do-dia.png';
+                link.href = dataUrl;
+                link.click();
+            }
+
+        } catch (err) {
+            console.error("Error sharing:", err);
+            alert("Erro ao gerar imagem. Tente novamente.");
+        } finally {
+            setIsSharing(false);
+        }
+    };
+
 
     const lastRead = history.length > 0 ? history[0] : null;
 
@@ -232,15 +321,11 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
 
                 {/* 1. DAILY VERSE (Featured - Moved Up) */}
                 <div className="animate-slideUp" style={{ animationDelay: '0.45s' }}>
-                    <div id="daily-verse-card" className={`w-full p-10 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[240px] text-center items-center shadow-2xl transition-all hover:scale-[1.01]
+                    <div id="daily-verse-card" ref={verseCardRef} className={`w-full p-10 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[240px] text-center items-center shadow-2xl transition-all hover:scale-[1.01]
                         ${isDark
                             ? 'bg-gradient-to-br from-stone-900 via-stone-900 to-bible-gold/20 border border-bible-gold/20'
                             : 'bg-gradient-to-br from-white via-stone-50 to-bible-gold/10 border border-white'}
                     `}>
-                        {/* Watermark */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[4rem] md:text-[6rem] font-black opacity-[0.03] whitespace-nowrap pointer-events-none select-none font-serif tracking-tighter">
-                            BIBLIAONLINE.ME
-                        </div>
 
                         {/* Decorative Background Elements */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-bible-gold/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none mix-blend-overlay"></div>
@@ -268,16 +353,22 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                             <span className="h-px w-12 bg-gradient-to-l from-transparent to-bible-gold"></span>
                         </cite>
 
-                        {/* Bottom Share Button */}
-                        <div className="relative z-10">
-                            <button
-                                onClick={() => setShowImageGenerator(true)}
-                                className="flex items-center gap-2 px-6 py-2 rounded-full bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white transition-all font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md"
-                            >
-                                <Share2 size={18} />
-                                Compartilhar
-                            </button>
+                        {/* Visible Watermark Footer */}
+                        <div className="relative z-10 font-serif font-bold tracking-[0.2em] opacity-80 uppercase text-sm mb-2" style={{ color: isDark ? '#e7c674' : '#b45309' }}>
+                            BIBLIAONLINE.ME
                         </div>
+                    </div>
+
+                    {/* Share Button (Outside Card) */}
+                    <div className="flex justify-center mt-6">
+                        <button
+                            onClick={handleShare}
+                            disabled={isSharing}
+                            className="flex items-center gap-2 px-6 py-2 rounded-full bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white transition-all font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md disabled:opacity-50"
+                        >
+                            {isSharing ? <Loader2 size={18} className="animate-spin" /> : <Share2 size={18} />}
+                            {isSharing ? 'Gerando...' : 'Compartilhar'}
+                        </button>
                     </div>
                 </div>
 
@@ -367,14 +458,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
 
             </div>
 
-            {/* Verse Image Generator Modal */}
-            {showImageGenerator && (
-                <VerseImageGenerator
-                    verseText={dailyVerse.text}
-                    verseReference={dailyVerse.ref}
-                    onClose={() => setShowImageGenerator(false)}
-                />
-            )}
+            {/* Verse Image Generator Modal Removed */}
         </div >
     );
 };
