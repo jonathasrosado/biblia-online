@@ -23,6 +23,9 @@ import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import CategoryPage from './pages/CategoryPage';
 import TestamentPage from './pages/TestamentPage';
+import VersesPage from './pages/VersesPage';
+import HowToReadBiblePage from './pages/HowToReadBiblePage';
+import BibleFaqPage from './pages/BibleFaqPage';
 
 interface ViewWrapperProps {
   children: React.ReactNode;
@@ -495,6 +498,24 @@ function AppContent() {
           <Route path="/antigo-testamento" element={
             <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
               <TestamentPage testament="Old" language={language} t={t} />
+            </ViewWrapper>
+          } />
+
+          <Route path="/versiculos" element={
+            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+              <VersesPage />
+            </ViewWrapper>
+          } />
+
+          <Route path="/como-ler-biblia" element={
+            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+              <HowToReadBiblePage />
+            </ViewWrapper>
+          } />
+
+          <Route path="/faq-biblia" element={
+            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+              <BibleFaqPage />
             </ViewWrapper>
           } />
 

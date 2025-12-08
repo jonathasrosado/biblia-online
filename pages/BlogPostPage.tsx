@@ -134,8 +134,9 @@ const BlogPostPage: React.FC = () => {
                         <div className="absolute inset-0 bg-black/40 z-10" />
                         <img
                             src={post.image}
-                            alt={post.title}
+                            alt={`Imagem principal do artigo: ${post.title} - Bíblia Online`}
                             className="w-full h-full object-cover"
+                            priority="true" // React hint for LCP
                         />
                     </>
                 ) : (

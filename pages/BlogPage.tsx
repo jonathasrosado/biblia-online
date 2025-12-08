@@ -159,7 +159,8 @@ const BlogPage: React.FC = () => {
                                 {post.image ? (
                                     <img
                                         src={post.image}
-                                        alt={post.title}
+                                        alt={`Miniatura do artigo: ${post.title} - Bíblia Online`}
+                                        loading="lazy"
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                 ) : (

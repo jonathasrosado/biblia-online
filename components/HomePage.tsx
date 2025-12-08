@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from './SEO';
 import { toPng } from 'html-to-image';
-import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2, Loader2, RefreshCw } from 'lucide-react';
+import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2, Loader2, RefreshCw, HelpCircle } from 'lucide-react';
 import { normalizeBookName, bibleBooks } from '../constants';
 import { ReadingHistoryItem } from '../types';
 import versesRaw from '../src/data/daily_verses.json';
@@ -396,85 +396,132 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                     </div>
                 </div>
 
-                {/* 3. BLOG SECTION (Moved Down) */}
+                {/* 3. FEATURED SECTIONS - SEO Pages */}
                 <div className="mb-12 animate-slideUp" style={{ animationDelay: '0.5s' }}>
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-serif font-bold">Recursos Bíblicos</h2>
-                        <button
-                            onClick={() => navigate('/blog')}
-                            className="text-sm font-bold text-bible-gold hover:text-bible-accent transition-colors flex items-center gap-1"
-                        >
-                            Ver Todos <ArrowRight size={16} />
-                        </button>
+                        <h2 className="text-xl font-serif font-bold">Explore as Escrituras</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <BlogPreviewSection navigate={navigate} isDark={isDark} />
+                        {/* Verses Card */}
+                        <button
+                            onClick={() => navigate('/versiculos')}
+                            className="group relative h-64 rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-stone-800 to-bible-accent"></div>
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-bible-gold uppercase bg-black/50 backdrop-blur-sm rounded-full border border-bible-gold/30">
+                                    Temas Bíblicos
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Encontre Versículos<br />por Tema
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Explorar Coleção <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* Guide Card (Using Generated Image) */}
+                        <button
+                            onClick={() => navigate('/como-ler-biblia')}
+                            className="group relative h-64 rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                        >
+                            <div className="absolute inset-0 bg-stone-900"></div>
+                            {/* Using the generated image we copied to public/images */}
+                            <img
+                                src="/images/guide_feature_card.png"
+                                alt="Guia de Leitura Bíblica"
+                                className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-emerald-400 uppercase bg-emerald-950/50 backdrop-blur-sm rounded-full border border-emerald-500/30">
+                                    Iniciantes
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Como Ler a Bíblia:<br />Guia Completo
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Começar Jornada <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* FAQ Card */}
+                        <button
+                            onClick={() => navigate('/faq-biblia')}
+                            className="group relative h-64 rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-800"></div>
+                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
+                            <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                                <HelpCircle size={180} />
+                            </div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-indigo-400 uppercase bg-indigo-950/50 backdrop-blur-sm rounded-full border border-indigo-500/30">
+                                    Tire Dúvidas
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Perguntas Frequentes<br />sobre a Fé
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Ver Respostas <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
                     </div>
                 </div>
 
                 {/* 4. TOOLS / FEATURES - Vibrant CTAs */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-12">
-                    {/* Reading CTA */}
-                    <button
-                        onClick={() => navigate(`/leitura/${normalizeBookName('Gênesis')}/1`)}
-                        className={`group relative p-8 rounded-3xl text-left transition-all hover:-translate-y-1 hover:shadow-2xl overflow-hidden
-                            ${isDark ? 'bg-stone-900' : 'bg-white'}
-                        `}
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                        <div className="relative z-10 flex flex-col h-full">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
-                                <BookOpen size={28} />
-                            </div>
-                            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-stone-800'}`}>Iniciar Leitura</h3>
-                            <p className={`text-sm opacity-70 mb-6 ${isDark ? 'text-stone-300' : 'text-stone-600'}`}>Leitura imersiva e moderna da Bíblia Sagrada.</p>
-
-                            <div className="mt-auto flex items-center gap-2 text-blue-500 font-bold text-sm tracking-wide group-hover:gap-3 transition-all">
-                                Começar Agora <ArrowRight size={16} />
-                            </div>
-                        </div>
-                    </button>
-
-                    {/* Devotional CTA */}
-                    <button
-                        onClick={() => navigate('/devocional')}
-                        className={`group relative p-8 rounded-3xl text-left transition-all hover:-translate-y-1 hover:shadow-2xl overflow-hidden
-                            ${isDark ? 'bg-stone-900' : 'bg-white'}
-                        `}
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-600/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                        <div className="relative z-10 flex flex-col h-full">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform duration-300">
-                                <Sun size={28} />
-                            </div>
-                            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-stone-800'}`}>Ler Devocional</h3>
-                            <p className={`text-sm opacity-70 mb-6 ${isDark ? 'text-stone-300' : 'text-stone-600'}`}>Uma palavra de inspiração diária para sua alma.</p>
-
-                            <div className="mt-auto flex items-center gap-2 text-orange-500 font-bold text-sm tracking-wide group-hover:gap-3 transition-all">
-                                Ler Mensagem <ArrowRight size={16} />
-                            </div>
-                        </div>
-                    </button>
-
-                    {/* AI Chat CTA */}
+                {/* 4. TOOLS / FEATURES - New Design */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+                    {/* Chat Card */}
                     <button
                         onClick={() => navigate('/chat')}
-                        className={`group relative p-8 rounded-3xl text-left transition-all hover:-translate-y-1 hover:shadow-2xl overflow-hidden
-                            ${isDark ? 'bg-stone-900' : 'bg-white'}
-                        `}
+                        className="group relative overflow-hidden bg-[#1c1c1c] rounded-2xl p-8 text-left shadow-lg border border-stone-800"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-indigo-600/20 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                        <div className="relative z-10 flex flex-col h-full">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300">
-                                <MessageCircle size={28} />
+                        <div className="absolute top-1/2 -translate-y-1/2 right-4 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                            <MessageCircle size={140} className="text-white" />
+                        </div>
+                        <div className="relative z-10">
+                            <div className="bg-stone-800/50 w-fit p-3 rounded-xl mb-6 text-bible-gold border border-stone-700">
+                                <MessageCircle size={24} />
                             </div>
-                            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-stone-800'}`}>Estudar com IA</h3>
-                            <p className={`text-sm opacity-70 mb-6 ${isDark ? 'text-stone-300' : 'text-stone-600'}`}>Tire dúvidas teológicas com nossa Inteligência Artificial.</p>
+                            <h3 className="text-2xl font-bold text-white mb-3">Chat Teológico</h3>
+                            <p className="text-stone-400 mb-8 max-w-sm text-sm leading-relaxed">
+                                Tire suas dúvidas sobre passagens complexas com nossa Inteligência Artificial especializada em teologia.
+                            </p>
+                            <span className="inline-flex items-center text-bible-gold font-bold text-sm tracking-wide group-hover:translate-x-2 transition-transform">
+                                Começar Conversa <ArrowRight size={16} className="ml-2" />
+                            </span>
+                        </div>
+                    </button>
 
-                            <div className="mt-auto flex items-center gap-2 text-purple-500 font-bold text-sm tracking-wide group-hover:gap-3 transition-all">
-                                Conversar <ArrowRight size={16} />
+                    {/* Devotional Card */}
+                    <button
+                        onClick={() => navigate('/devocional')}
+                        className="group relative overflow-hidden bg-[#d9a01c] rounded-2xl p-8 text-left shadow-lg border border-[#c28e18]"
+                    >
+                        <div className="absolute top-1/2 -translate-y-1/2 right-4 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
+                            <Calendar size={140} className="text-white" />
+                        </div>
+                        <div className="relative z-10">
+                            <div className="bg-white/20 w-fit p-3 rounded-xl mb-6 text-white border border-white/10">
+                                <Calendar size={24} />
                             </div>
+                            <h3 className="text-2xl font-bold text-white mb-3">Devocional Diário</h3>
+                            <p className="text-white/90 mb-8 max-w-sm text-sm leading-relaxed">
+                                Receba uma reflexão inspiradora todos os dias para começar sua manhã conectado com Deus.
+                            </p>
+                            <span className="inline-flex items-center text-white font-bold text-sm tracking-wide group-hover:translate-x-2 transition-transform">
+                                Ler Devocional <ArrowRight size={16} className="ml-2" />
+                            </span>
                         </div>
                     </button>
                 </div>
@@ -517,7 +564,8 @@ const BlogPreviewSection = ({ navigate, isDark }: { navigate: any, isDark: boole
                     <div className="h-48 overflow-hidden relative">
                         <img
                             src={post.coverImage || post.image || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=1000&auto=format&fit=crop'}
-                            alt={post.title}
+                            alt={`Imagem de capa do artigo: ${post.title} - Bíblia Online`}
+                            loading="lazy"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>

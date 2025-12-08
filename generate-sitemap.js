@@ -100,6 +100,9 @@ async function generateSitemap() {
     addUrl('/chat', '0.9', 'weekly');
     addUrl('/devocional', '0.9', 'daily');
     addUrl('/blog', '0.9', 'weekly');
+    addUrl('/versiculos', '0.9', 'monthly');
+    addUrl('/como-ler-biblia', '0.9', 'monthly');
+    addUrl('/faq-biblia', '0.9', 'monthly');
 
     // 2. Bible Structure
     bibleBooks.forEach(book => {
