@@ -7,6 +7,10 @@ Vocês fez MUITA coisa importante hoje. Se reverter, perderá:
 4.  **Endpoints de IA:** `api/ai/chat`, `api/ai/devotional`, `api/ai/seo-metadata` (Restaurados).
 5.  **Correção de Chaves:** O servidor agora lê chaves do `ai-config.json` (antes estava quebrado).
 6.  **Página de Resumo:** Nova lógica de carregamento fluido.
+7.  **Interação com Versículo:**
+    *   **Menu Flutuante:** Adicionado menu com "Explicação", "Pergunta", "Gerar Imagem", "Copiar".
+    *   **IA de Versículo:** Backend `/api/ai/explain` e `/api/ai/ask-verse` implementados.
+    *   **Frontend:** `BibleReader` atualizado com modal escuro premium e integração com IA.
 
 ## 🛡️ Plano de Segurança
 1.  Vou **DESATIVAR** o áudio no local (já que ele trava o servidor).

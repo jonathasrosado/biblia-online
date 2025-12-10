@@ -1415,13 +1415,66 @@ app.post('/api/ai/blog-title', async (req, res) => {
         res.json(json);
 
     } catch (error) {
-        console.error("AI Title Generation Error:");
-        console.error("Error message:", error.message);
-        console.error("Error stack:", error.stack);
-        console.error("Full error:", JSON.stringify(error, null, 2));
+        console.error("AI Title Generation Error:", error);
         res.status(500).json({ error: 'Failed to generate titles', details: error.message });
     }
 });
+
+// Explain Verse
+app.post('/api/ai/explain', async (req, res) => {
+    try {
+        const { book, chapter, verse, text, language } = req.body;
+        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+
+        const prompt = `
+      Act as a biblical scholar. provide a brief, insightful, and spiritually enriching explanation of these specific verses:
+      "${book} ${chapter}:${verse} - ${text}"
+
+      Context: Verify the theological context. If multiple verses are provided, explain the passage as a whole.
+      Output Language: ${langName}.
+      Tone: Clear, inspiring, easy to understand.
+      Length: 1-2 paragraphs maximum.
+      Constraint: Start directly with the explanation. Do NOT start with "Okay", "Here is", "Sure", or any intro filler.
+    `;
+
+        const result = await aiManager.model.generateContent(prompt);
+        const response = await result.response;
+        res.json({ text: response.text() });
+    } catch (error) {
+        console.error("Explain Error:", error);
+        res.status(500).json({ error: "Failed to explain verse" });
+    }
+});
+
+// Ask Verse Question
+app.post('/api/ai/ask-verse', async (req, res) => {
+    try {
+        const { book, chapter, verse, text, question, language } = req.body;
+        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+
+        const prompt = `
+      Act as a knowledgeable and friendly Bible study assistant.
+      
+      Verse(s): "${book} ${chapter}:${verse} - ${text}"
+      
+      User Question: "${question}"
+      
+      Task: Answer the user's question specifically based on these verses and their immediate context.
+      Output Language: ${langName}.
+      Tone: Helpful, concise, theological but accessible.
+      Limit: Keep the answer under 100 words if possible.
+      Constraint: Start directly with the answer. Do NOT start with "Okay", "Here is", "Sure", or any intro filler.
+    `;
+
+        const result = await aiManager.model.generateContent(prompt);
+        const response = await result.response;
+        res.json({ text: response.text() });
+    } catch (error) {
+        console.error("Ask Verse Error:", error);
+        res.status(500).json({ error: "Failed to answer question" });
+    }
+});
+
 
 app.post('/api/ai/blog-post', async (req, res) => {
     try {

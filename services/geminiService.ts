@@ -326,6 +326,25 @@ export const explainVerse = async (book: string, chapter: number, verse: number,
   }
 };
 
+// Ask a question about a verse
+export const askVerse = async (book: string, chapter: number, verse: number, text: string, question: string, language: string = 'pt'): Promise<string> => {
+  try {
+    const response = await fetch('/api/ai/ask-verse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ book, chapter, verse, text, question, language })
+    });
+
+    if (!response.ok) return "Não foi possível obter a resposta (Server Error).";
+    const data = await response.json();
+
+    return data.text || "Sem resposta.";
+  } catch (error) {
+    console.error(error);
+    return "Erro ao processar sua pergunta.";
+  }
+};
+
 // Search functionality
 import { searchBibleLocal } from './localBibleService';
 
@@ -437,7 +456,7 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
     const data = await response.json();
 
     // Parse the text which is expected to be JSON string
-    let json = [];
+    let json: any = [];
     try {
       json = JSON.parse(data.text || '[]');
       // Clean up markdown code blocks if present

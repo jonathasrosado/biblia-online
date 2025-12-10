@@ -73,9 +73,48 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
     const [selectedIcon, setSelectedIcon] = useState(ICONS[0]);
     const [selectedFormat, setSelectedFormat] = useState(FORMATS[0]);
     const [loading, setLoading] = useState(false);
+    const [fontSize, setFontSize] = useState(24); // Base font size
+    const [textPos, setTextPos] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStartRef = useRef({ x: 0, y: 0 });
+
     const [scale, setScale] = useState(1);
     const cardRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    const handlePointerDown = (e: React.PointerEvent) => {
+        setIsDragging(true);
+        e.currentTarget.setPointerCapture(e.pointerId);
+        dragStartRef.current = {
+            x: e.clientX - textPos.x,
+            y: e.clientY - textPos.y
+        };
+    };
+
+    const handlePointerMove = (e: React.PointerEvent) => {
+        if (!isDragging) return;
+
+        // Calculate new position relative to initial drag
+        // Divide by scale to maintain 1:1 movement feeling
+        let newX = (e.clientX - dragStartRef.current.x);
+        let newY = (e.clientY - dragStartRef.current.y);
+
+        // Simple constraints (approximate, to keep center vaguely in view)
+        // You can refine these bounds based on card size if needed
+        const limitX = 140;
+        const limitY = 200;
+
+        newX = Math.max(-limitX, Math.min(newX, limitX));
+        newY = Math.max(-limitY, Math.min(newY, limitY));
+
+        setTextPos({ x: newX, y: newY });
+    };
+
+    const handlePointerUp = (e: React.PointerEvent) => {
+        setIsDragging(false);
+        e.currentTarget.releasePointerCapture(e.pointerId);
+    };
+
 
     // Auto-scale the card to fit the container
     React.useEffect(() => {
@@ -85,7 +124,6 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
             const container = containerRef.current;
             const card = cardRef.current;
 
-            // Add some padding/margin
             const padding = 40;
             const availableWidth = container.clientWidth - padding;
             const availableHeight = container.clientHeight - padding;
@@ -96,14 +134,12 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
             const scaleX = availableWidth / cardWidth;
             const scaleY = availableHeight / cardHeight;
 
-            // Use the smaller scale to ensure it fits both dimensions, max 1
             const newScale = Math.min(Math.min(scaleX, scaleY), 1);
             setScale(newScale);
         };
 
         calculateScale();
         window.addEventListener('resize', calculateScale);
-        // Recalculate when format changes
         setTimeout(calculateScale, 100);
 
         return () => window.removeEventListener('resize', calculateScale);
@@ -225,37 +261,57 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                 {/* Preview Area - Fixed height on mobile to ensure visibility */}
                 <div
                     ref={containerRef}
-                    className="h-[45%] md:h-auto md:flex-1 bg-stone-100 dark:bg-stone-950 p-4 md:p-8 flex items-center justify-center relative overflow-hidden"
+                    className="h-[45%] md:h-auto md:flex-1 bg-stone-100 dark:bg-stone-950 p-4 md:p-8 flex items-center justify-center relative overflow-hidden select-none"
                 >
                     {/* Scalable Container */}
                     <div
                         style={{
                             transform: `scale(${scale})`,
-                            transition: 'transform 0.3s ease-out'
+                            transition: 'transform 0.1s ease-out'
                         }}
                     >
                         <div
                             ref={cardRef}
                             className={`${selectedFormat.aspect} w-[320px] md:w-[400px] shadow-2xl rounded-xl p-8 md:p-10 flex flex-col justify-center items-center text-center relative overflow-hidden transition-colors duration-500 ${selectedTheme.bg}`}
                         >
-                            {/* Decorative Elements */}
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-20"></div>
+                            {/* Decorative Elements (FIXED) */}
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 pointer-events-none"></div>
 
-                            <div className={`mb-6 md:mb-8 opacity-80 ${selectedTheme.accent}`}>
-                                <IconComponent size={36} strokeWidth={1.5} />
+                            {/* Draggable Text Area */}
+                            <div
+                                className="z-10 cursor-move active:cursor-grabbing touch-none flex flex-col items-center justify-center w-full"
+                                onPointerDown={handlePointerDown}
+                                onPointerMove={handlePointerMove}
+                                onPointerUp={handlePointerUp}
+                                onPointerLeave={handlePointerUp}
+                                style={{
+                                    transform: `translate(${textPos.x}px, ${textPos.y}px)`,
+                                    touchAction: 'none'
+                                }}
+                            >
+                                <div className={`mb-4 md:mb-6 opacity-80 ${selectedTheme.accent} pointer-events-none`}>
+                                    <IconComponent size={32} strokeWidth={1.5} />
+                                </div>
+
+                                <p
+                                    className={`leading-relaxed font-medium transition-all duration-300 ${selectedTheme.text} ${selectedTheme.font}`}
+                                    style={{
+                                        fontSize: `${fontSize}px`,
+                                        pointerEvents: 'none' // Ensure clicks pass associated logic if any (mostly for selection prev)
+                                    }}
+                                >
+                                    "{verseText}"
+                                </p>
+
+                                <div className={`w-16 h-px bg-current opacity-30 my-4 md:my-6 shrink-0 ${selectedTheme.text} pointer-events-none`}></div>
+
+                                <p className={`text-sm font-bold tracking-widest uppercase ${selectedTheme.accent} pointer-events-none`}>
+                                    {verseReference}
+                                </p>
                             </div>
 
-                            <p className={`text-xl md:text-2xl leading-relaxed mb-8 md:mb-10 font-medium ${selectedTheme.text} ${selectedTheme.font}`}>
-                                "{verseText}"
-                            </p>
-
-                            <div className={`w-16 h-px bg-current opacity-30 mb-6 md:mb-8 ${selectedTheme.text}`}></div>
-
-                            <p className={`text-sm font-bold tracking-widest uppercase ${selectedTheme.accent}`}>
-                                {verseReference}
-                            </p>
-
-                            <p className={`absolute bottom-6 text-[11px] font-bold opacity-50 tracking-[0.2em] uppercase ${selectedTheme.text}`}>
+                            {/* Fixed Footer (NOT Draggable) */}
+                            <p className={`absolute bottom-6 text-[10px] font-bold opacity-50 tracking-[0.2em] uppercase ${selectedTheme.text} z-20 pointer-events-none`}>
                                 BibliaOnline.me
                             </p>
                         </div>
@@ -274,6 +330,26 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
 
                     {/* Scrollable Options */}
                     <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+
+                        {/* Font Size Control */}
+                        <div>
+                            <label className="flex items-center gap-2 text-xs font-bold text-stone-500 mb-3 uppercase tracking-wider">
+                                <Type size={14} /> Tamanho do Texto
+                            </label>
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs text-stone-400">A-</span>
+                                <input
+                                    type="range"
+                                    min="12"
+                                    max="48"
+                                    value={fontSize}
+                                    onChange={(e) => setFontSize(Number(e.target.value))}
+                                    className="flex-1 h-2 bg-stone-200 dark:bg-stone-800 rounded-lg appearance-none cursor-pointer accent-bible-gold"
+                                />
+                                <span className="text-xs text-stone-400">A+</span>
+                            </div>
+                        </div>
+
                         {/* Format Selection */}
                         <div>
                             <label className="flex items-center gap-2 text-xs font-bold text-stone-500 mb-3 uppercase tracking-wider">

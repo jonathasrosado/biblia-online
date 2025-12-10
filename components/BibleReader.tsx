@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Verse, ReadingPreferences } from '../types';
-import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause } from 'lucide-react';
-import { explainVerse, generateAudioFromText } from '../services/geminiService';
+import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause, MessageCircle, ArrowRight, MoreHorizontal } from 'lucide-react';
+import { explainVerse, askVerse, generateAudioFromText } from '../services/geminiService';
 import VerseImageGenerator from './VerseImageGenerator';
 
 export interface BibleReaderRef {
@@ -31,12 +31,17 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
   onSelectionChange,
   onAudioStateChange
 }, ref) => {
-  // Selection State (Multi-select)
+  // Selection State
   const [selectedVerses, setSelectedVerses] = useState<Set<number>>(new Set(initialSelectedVerses));
 
-  // Explanation State (Single verse focus for AI)
-  const [explanation, setExplanation] = useState<string | null>(null);
-  const [loadingExplanation, setLoadingExplanation] = useState(false);
+  // Action State
+  const [activeAction, setActiveAction] = useState<'explain' | 'ask' | null>(null);
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [displayedResponse, setDisplayedResponse] = useState<string>("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [isLoadingAi, setIsLoadingAi] = useState(false);
+  const [askQuery, setAskQuery] = useState('');
+  const [showImageGenerator, setShowImageGenerator] = useState(false);
 
   // Audio State
   const [isAudioLoading, setIsAudioLoading] = useState(false);
@@ -48,14 +53,51 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
   // Refs for audio management
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
-  const isPlayingRef = useRef<boolean>(false); // Ref to track status inside async callbacks
+  const isPlayingRef = useRef<boolean>(false);
   const audioCacheRef = useRef<Map<number, AudioBuffer>>(new Map());
-  const activeFetchRef = useRef<Set<number>>(new Set()); // Track what is currently being fetched
+  const activeFetchRef = useRef<Set<number>>(new Set());
+
+  // Refs for UI
+  const modalRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync audio state with parent
   useEffect(() => {
     onAudioStateChange?.(isPlaying, isAudioLoading);
   }, [isPlaying, isAudioLoading, onAudioStateChange]);
+
+  // Typewriter Effect
+  useEffect(() => {
+    if (aiResponse && !isTyping && displayedResponse !== aiResponse) {
+      setIsTyping(true);
+      setDisplayedResponse("");
+      let currentIndex = 0;
+
+      const typeNextChar = () => {
+        if (currentIndex < aiResponse.length) {
+          setDisplayedResponse(aiResponse.slice(0, currentIndex + 1));
+          currentIndex++;
+          // Randomize typing speed slightly for realism (10ms - 30ms)
+          const delay = Math.random() * 20 + 10;
+          typingTimeoutRef.current = setTimeout(typeNextChar, delay);
+        } else {
+          setIsTyping(false);
+        }
+      };
+
+      typeNextChar();
+    } else if (!aiResponse) {
+      setDisplayedResponse("");
+      setIsTyping(false);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    }
+
+    return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    };
+  }, [aiResponse]);
+
 
   // Expose toggleAudio to parent
   React.useImperativeHandle(ref, () => ({
@@ -68,7 +110,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     }
   }));
 
-  // Sync initial selection if prop changes
+  // Sync initial selection
   useEffect(() => {
     if (initialSelectedVerses.length > 0) {
       setSelectedVerses(new Set(initialSelectedVerses));
@@ -85,10 +127,9 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     onSelectionChangeRef.current?.(Array.from(selectedVerses).sort((a: number, b: number) => a - b));
   }, [selectedVerses]);
 
-  // Stop audio when component unmounts or book/chapter changes
+  // Stop audio on unmount/change
   useEffect(() => {
     return () => stopAudio();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [book, chapter]);
 
   const handleVerseClick = (verse: Verse) => {
@@ -100,46 +141,26 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     }
     setSelectedVerses(newSelection);
 
-    // Clear explanation if we are changing selection logic
-    setExplanation(null);
+    // Reset AI state if selection changes
+    if (activeAction) closeAiModal();
   };
 
   const clearSelection = () => {
     setSelectedVerses(new Set());
-    setExplanation(null);
+    closeAiModal();
   };
 
-  const handleExplain = async () => {
-    // For explanation, we prioritize the first selected verse or the lowest number
-    const targetVerseNum = Array.from(selectedVerses).sort((a: number, b: number) => a - b)[0];
-    if (targetVerseNum === undefined) return;
-
-    const verseText = verses.find(v => v.number === targetVerseNum)?.text || "";
-
-    setLoadingExplanation(true);
-    try {
-      const text = await explainVerse(book, chapter, targetVerseNum as number, verseText, language);
-      setExplanation(text);
-    } catch (error) {
-      console.error("Explanation Error", error);
-      setExplanation("Erro ao gerar explicação. Tente novamente.");
-    } finally {
-      setLoadingExplanation(false);
-    }
+  const closeAiModal = () => {
+    setActiveAction(null);
+    setAiResponse(null);
+    setDisplayedResponse("");
+    setIsTyping(false);
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    setAskQuery('');
+    setIsLoadingAi(false);
   };
 
-  const handleCopy = () => {
-    const text = `${getSelectedText()}\n\n(${getSelectedRef()})`;
-    navigator.clipboard.writeText(text);
-    clearSelection();
-  };
-
-  const handleShareLink = () => {
-    // The URL update is handled by the parent via onSelectionChange,
-    // so we just copy the current URL
-    navigator.clipboard.writeText(window.location.href);
-    alert('Link copiado!');
-  };
+  // --- ACTIONS ---
 
   const getSelectedText = () => {
     const sorted = Array.from(selectedVerses).sort((a: number, b: number) => a - b);
@@ -151,37 +172,77 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     const first = sorted[0];
     const last = sorted[sorted.length - 1];
 
-    if (first === undefined) return ""; // No verses selected
+    if (first === undefined) return "";
+    if (first === last) return `${book} ${chapter}:${first}`;
+    return `${book} ${chapter}:${first}-${last}`;
+  };
 
-    if (first === last) {
-      return `${book} ${chapter}:${first}`;
-    } else {
-      return `${book} ${chapter}:${first}-${last}`;
+  const getPrimaryVerseNum = () => {
+    const sorted = Array.from(selectedVerses).sort((a: number, b: number) => a - b);
+    return sorted[0];
+  };
+
+  const handleCopy = () => {
+    const text = `${getSelectedText()}\n\n(${getSelectedRef()})`;
+    navigator.clipboard.writeText(text);
+    // Optional: Toast notification
+    clearSelection();
+  };
+
+  const handleExplain = async () => {
+    setActiveAction('explain');
+    setIsLoadingAi(true);
+    setAiResponse(null);
+
+    const verseNum = getPrimaryVerseNum();
+    if (!verseNum) return;
+
+    try {
+      const text = await explainVerse(book, chapter, verseNum, getSelectedText(), language);
+      setAiResponse(text);
+    } catch (e) {
+      setAiResponse("Erro ao gerar explicação.");
+    } finally {
+      setIsLoadingAi(false);
     }
   };
 
-  // --- AUDIO LOGIC (Robust iOS/Safari Implementation) ---
+  const handleAsk = () => {
+    setActiveAction('ask');
+    setAiResponse(null);
+    setAskQuery('');
+    // Focus input after render
+    setTimeout(() => inputRef.current?.focus(), 100);
+  };
 
-  // Use a ref to keep a single Audio instance
+  const submitQuestion = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!askQuery.trim()) return;
+
+    setIsLoadingAi(true);
+    const verseNum = getPrimaryVerseNum();
+
+    try {
+      const text = await askVerse(book, chapter, verseNum, getSelectedText(), askQuery, language);
+      setAiResponse(text);
+    } catch (e) {
+      setAiResponse("Erro ao obter resposta.");
+    } finally {
+      setIsLoadingAi(false);
+    }
+  };
+
+  // --- AUDIO (Existing Logic) ---
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const pauseAudio = () => {
-    // Just stop playback, preserve state
     isPlayingRef.current = false;
     if (sourceNodeRef.current) {
-      try {
-        sourceNodeRef.current.stop();
-      } catch (e) { }
+      try { sourceNodeRef.current.stop(); } catch (e) { }
       sourceNodeRef.current = null;
     }
-    // Also pause HTML5 audio if active
     const globalAudio = (window as any)._activeBibleAudio;
-    if (globalAudio) {
-      globalAudio.pause();
-    }
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
+    if (globalAudio) globalAudio.pause();
     setIsPlaying(false);
     setIsPaused(true);
     setIsAudioLoading(false);
@@ -189,11 +250,9 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
   const stopAudio = () => {
     pauseAudio();
-    // Reset state for full stop
     activeFetchRef.current.clear();
     audioCacheRef.current.clear();
     setCurrentPlayingChunk(0);
-    // Cleanup global ref
     const globalAudio = (window as any)._activeBibleAudio;
     if (globalAudio) {
       globalAudio.src = "";
@@ -208,50 +267,35 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
       return;
     }
 
-    console.log("[🎵 BibleReader] User clicked play audio");
     setIsPlaying(true);
     setIsPaused(false);
     setIsAudioLoading(true);
     isPlayingRef.current = true;
 
-    // Use current chunk if pausing/resuming
     let startIndex = currentPlayingChunk;
 
-    // ... (AudioContext Init Logic) ...
-    // 1. INITIALIZE AUDIO CONTEXT (IMMEDIATELY - SYNCHRONOUSLY)
     if (!audioContextRef.current) {
-      console.log("[🎵] Initializing AudioContext (24kHz)...");
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       audioContextRef.current = new AudioContextClass({ sampleRate: 24000 });
     }
 
-    // 2. RESUME IF SUSPENDED
     if (audioContextRef.current.state === 'suspended') {
-      try {
-        await audioContextRef.current.resume();
-      } catch (e) {
-        console.error("Failed to resume context", e);
-      }
+      try { await audioContextRef.current.resume(); } catch (e) { }
     }
 
-    // 3. iOS UNLOCK HACK: Play silent HTML5 audio
     try {
       const unlockAudio = new Audio();
       unlockAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAgZGF0YQQAAAAAAA==";
       await unlockAudio.play();
     } catch (e) { }
 
-
     const chunks = verses.map(v => v.text.replace(/[*#_`\[\]]/g, ''));
     setTotalChunks(chunks.length);
 
-    // If we finished the chapter, start over
     if (startIndex >= chunks.length) {
       startIndex = 0;
       setCurrentPlayingChunk(0);
     }
-
-    console.log(`[🎵 BibleReader] Starting/Resuming queue at ${startIndex}/${chunks.length}...`);
 
     processAudioQueue(chunks, startIndex);
   };
@@ -260,20 +304,13 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     let index = startIndex;
 
     const playNext = async () => {
-      // 1. Strict Stop Check
-      if (!isPlayingRef.current) {
-        return;
-      }
-
-      // 2. End of Queue Check
+      if (!isPlayingRef.current) return;
       if (index >= chunks.length) {
         stopAudio();
         return;
       }
 
       setCurrentPlayingChunk(index);
-
-      // Scroll to verse
       const verseElement = document.getElementById(`v${verses[index].number}`);
       if (verseElement) {
         verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -284,17 +321,10 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
       try {
         let audioBuffer: AudioBuffer | null = null;
 
-        // 1. Check Cache
-        // Note: Cache might contain string from previous session, need to handle that or clear cache
-        // We assume cache is clean or compatible. If string, we ignore/decode.
         if (audioCacheRef.current.has(index) && audioCacheRef.current.get(index) instanceof AudioBuffer) {
-          console.log(`[⚡] Using cached buffer for ${index}`);
           audioBuffer = audioCacheRef.current.get(index) as AudioBuffer;
         } else {
-          // 2. Generate and Decode
-          console.log(`[🎵] Generating audio for chunk ${index}/${chunks.length - 1}...`);
           const base64Data = await generateAudioFromText(chunks[index], preferences.voice || 'male');
-
           if (!isPlayingRef.current) return;
 
           if (base64Data && audioContextRef.current) {
@@ -303,8 +333,6 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             const len = binaryString.length;
             const bytes = new Uint8Array(len);
             for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
-
-            // Decode Opus/WebM
             audioBuffer = await ctx.decodeAudioData(bytes.buffer);
             // @ts-ignore
             audioCacheRef.current.set(index, audioBuffer);
@@ -315,8 +343,6 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
         if (audioBuffer && audioContextRef.current) {
           const ctx = audioContextRef.current;
-
-          // --- PREFETCH NEXT CHUNK ---
           const nextIndex = index + 1;
           if (nextIndex < chunks.length && !audioCacheRef.current.has(nextIndex) && !activeFetchRef.current.has(nextIndex)) {
             activeFetchRef.current.add(nextIndex);
@@ -341,30 +367,22 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
           source.onended = () => {
             if (isPlayingRef.current) {
-              // Cleanup
               if (index > 2) audioCacheRef.current.delete(index - 2);
               index++;
               playNext();
             }
           };
 
-          if (ctx.state === 'suspended') {
-            await ctx.resume();
-          }
+          if (ctx.state === 'suspended') await ctx.resume();
 
           source.start(0);
           setIsAudioLoading(false);
 
         } else {
-          console.error("Audio decoding failed or context missing");
-          setIsAudioLoading(false);
-          // Skip broken chunk
           index++;
           playNext();
         }
-
       } catch (err) {
-        console.error("Audio playback error", err);
         setIsAudioLoading(false);
         stopAudio();
       }
@@ -373,61 +391,106 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     playNext();
   };
 
-  // Helper for Web Speech API (Fallback) - DEACTIVATED
-  const speakWithWebSpeech = (text: string): Promise<void> => {
-    return Promise.resolve();
-  };
-
-  // Image Generator State
-  const [showImageGenerator, setShowImageGenerator] = useState(false);
-
-  const handleOpenImageGenerator = () => {
-    setShowImageGenerator(true);
-  };
-
-
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 animate-fadeIn">
+      {/* Verses List */}
       {/* Verses List */}
       <div className="space-y-4">
         {verses.map((verse) => {
           const isSelected = selectedVerses.has(verse.number);
           const isPlayingThisVerse = isPlaying && currentPlayingChunk === verses.findIndex(v => v.number === verse.number);
+
+          // Determine if we should show the inline menu here
+          // Logic: Show if this is the LAST selected verse (i.e. highest number in selection)
+          const sortedSelection = Array.from(selectedVerses).map(n => Number(n)).sort((a, b) => a - b);
+          const lastSelected = sortedSelection[sortedSelection.length - 1];
+          const isLastSelected = verse.number === lastSelected;
+
           return (
-            <div
-              key={verse.number}
-              id={`v${verse.number}`}
-              onClick={() => handleVerseClick(verse)}
-              className={`flex gap-3 p-2 rounded-lg transition-all cursor-pointer duration-300
+            <React.Fragment key={verse.number}>
+              <div
+                id={`v${verse.number}`}
+                onClick={() => handleVerseClick(verse)}
+                className={`flex gap-3 p-2 rounded-lg transition-all cursor-pointer duration-300
                         ${isSelected
-                  ? 'bg-yellow-200/50 dark:bg-yellow-900/30 ring-1 ring-yellow-400/50'
-                  : isPlayingThisVerse
-                    ? 'bg-bible-gold/10 ring-1 ring-bible-gold/30'
-                    : 'hover:bg-stone-100 dark:hover:bg-stone-800/50'}
+                    ? 'bg-yellow-200/50 dark:bg-yellow-900/30 ring-1 ring-yellow-400/50'
+                    : isPlayingThisVerse
+                      ? 'bg-bible-gold/10 ring-1 ring-bible-gold/30'
+                      : 'hover:bg-stone-100 dark:hover:bg-stone-800/50'}
                     `}
-            >
-              <span className="text-xs font-bold text-bible-gold/70 select-none w-6 text-right pt-1.5 shrink-0">
-                {verse.number}
-              </span>
-              <p
-                className={`text-lg md:text-xl font-serif
+              >
+                <span className="text-xs font-bold text-bible-gold/70 select-none w-6 text-right pt-1.5 shrink-0">
+                  {verse.number}
+                </span>
+                <p
+                  className={`text-lg md:text-xl font-serif
                             ${preferences.fontFamily === 'sans' ? 'font-sans' : 'font-serif'}
                             ${preferences.textAlign === 'justify' ? 'text-justify' : 'text-left'}
                         `}
-                style={{
-                  fontSize: `${preferences.fontSize}%`,
-                  lineHeight: '1.6'
-                }}
-              >
-                {verse.text}
-              </p>
-            </div>
+                  style={{
+                    fontSize: `${preferences.fontSize}%`,
+                    lineHeight: '1.6'
+                  }}
+                >
+                  {verse.text}
+                </p>
+              </div>
+
+              {/* Inline Action Menu (Mobile Optimized) - Shows ONLY after the last selected verse */}
+              {isLastSelected && !activeAction && (
+                <div className="animate-slideDown overflow-hidden mt-2 mb-4">
+                  <div className="bg-stone-50/80 dark:bg-stone-800/80 backdrop-blur-md rounded-2xl p-2 flex items-center justify-between gap-2 shadow-sm border border-stone-200 dark:border-stone-700/50 mx-2">
+
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleExplain(); }}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl hover:bg-white dark:hover:bg-stone-700 transition-all active:scale-95 bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200"
+                    >
+                      <span className="w-4 h-4 flex items-center justify-center rounded-full border border-bible-gold text-[10px] font-serif font-bold text-bible-gold">!</span>
+                      <span className="text-xs font-medium">Explicar</span>
+                    </button>
+
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleAsk(); }}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl hover:bg-white dark:hover:bg-stone-700 transition-all active:scale-95 bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200"
+                    >
+                      <MessageCircle size={16} className="text-bible-gold" />
+                      <span className="text-xs font-medium">Perguntar</span>
+                    </button>
+
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setShowImageGenerator(true); }}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl hover:bg-white dark:hover:bg-stone-700 transition-all active:scale-95 bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200"
+                    >
+                      <ImageIcon size={16} className="text-bible-gold" />
+                      <span className="text-xs font-medium">Imagem</span>
+                    </button>
+
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleCopy(); }}
+                      className="flex items-center justify-center p-2 rounded-xl hover:bg-white dark:hover:bg-stone-700 transition-all active:scale-95 bg-white/50 dark:bg-stone-700/30 text-stone-500 dark:text-stone-400"
+                      title="Copiar"
+                    >
+                      <Copy size={16} />
+                    </button>
+
+                    <button
+                      onClick={(e) => { e.stopPropagation(); clearSelection(); }}
+                      className="flex items-center justify-center p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95 text-stone-400 hover:text-red-500"
+                      title="Fechar"
+                    >
+                      <X size={16} />
+                    </button>
+
+                  </div>
+                </div>
+              )}
+            </React.Fragment>
           );
         })}
       </div>
 
-      {/* Floating Audio Player Indicator (visible when playing or paused) */}
+      {/* Floating Audio Player */}
       {(isPlaying || isPaused) && (
         <div className="fixed bottom-20 right-6 z-40 animate-slideUp">
           <div className={`p-4 rounded-full shadow-lg flex items-center gap-3 pr-6
@@ -445,20 +508,16 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                 </span>
               )}
             </div>
-
             <div className="flex items-center gap-2 ml-2">
               <button
                 onClick={playAudio}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-bible-gold/20 hover:bg-bible-gold/30 text-bible-gold transition-colors"
-                title={isPlaying ? "Pausar" : "Continuar"}
               >
                 {isPlaying ? <Pause size={16} className="fill-current" /> : <Play size={16} className="fill-current" />}
               </button>
-
               <button
                 onClick={stopAudio}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/10 hover:text-red-500 transition-colors"
-                title="Parar"
               >
                 <Square size={16} className="fill-current" />
               </button>
@@ -467,73 +526,119 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
         </div>
       )}
 
-      {/* Floating Action Menu (When verses are selected) */}
-      {selectedVerses.size > 0 && (
-        <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-white dark:bg-stone-900 shadow-2xl border border-stone-200 dark:border-stone-700 rounded-full px-6 py-3 flex items-center gap-4 z-50 animate-slideUp">
-          <span className="text-sm font-bold text-stone-500 dark:text-stone-400 border-r border-stone-200 dark:border-stone-700 pr-4">
-            {selectedVerses.size} selecionado{selectedVerses.size > 1 ? 's' : ''}
-          </span>
 
-          <button
-            onClick={handleCopy}
-            className="flex flex-col items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-bible-gold transition-colors"
-            title="Copiar Texto"
+
+      {/* AI Action Modal (Bottom Sheet - Fixed) */}
+      {activeAction && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 backdrop-blur-sm animate-fadeIn" onClick={closeAiModal}>
+          <div
+            ref={modalRef}
+            className="w-full max-w-4xl mx-auto bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.2)] animate-slideUp overflow-hidden max-h-[85vh] flex flex-col"
+            onClick={e => e.stopPropagation()}
           >
-            <Copy size={20} />
-          </button>
-
-          <button
-            onClick={handleOpenImageGenerator}
-            className="flex flex-col items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-bible-gold transition-colors"
-            title="Criar Imagem"
-          >
-            <ImageIcon size={20} />
-          </button>
-
-          <button
-            onClick={handleExplain}
-            className="flex flex-col items-center gap-1 text-stone-600 dark:text-stone-300 hover:text-bible-gold transition-colors"
-            title="Explicar com IA"
-          >
-            <Sparkles size={20} />
-          </button>
-
-          <button
-            onClick={clearSelection}
-            className="ml-2 p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-red-500 transition-colors"
-          >
-            <X size={18} />
-          </button>
-        </div>
-      )}
-
-      {/* AI Explanation Modal/Panel */}
-      {explanation && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn" onClick={() => setExplanation(null)}>
-          <div className="bg-white dark:bg-stone-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-slideUp" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center bg-stone-50 dark:bg-stone-950">
-              <div className="flex items-center gap-2 text-bible-gold font-bold">
-                <Sparkles size={18} />
-                <span>Explicação IA</span>
+            {/* Drag Handle / Header */}
+            <div className="px-6 py-4 flex items-center justify-between border-b border-stone-100 dark:border-stone-800 shrink-0 bg-stone-50 dark:bg-stone-900 sticky top-0 z-10">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-xl bg-bible-gold/10 text-bible-gold flex items-center justify-center`}>
+                  {activeAction === 'explain' ? (
+                    <span className="w-5 h-5 flex items-center justify-center rounded-full border border-current text-[12px] font-serif font-bold">!</span>
+                  ) : (
+                    <MessageCircle size={20} />
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-stone-900 dark:text-white leading-none">
+                    {activeAction === 'explain' ? 'Explicar' : 'Pergunta'}
+                  </h3>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 font-medium">
+                    {getSelectedRef()}
+                  </p>
+                </div>
               </div>
-              <button onClick={() => setExplanation(null)} className="p-1 hover:bg-stone-200 dark:hover:bg-stone-800 rounded-full transition-colors">
-                <X size={18} />
+              <button onClick={closeAiModal} className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+                <X size={24} />
               </button>
             </div>
-            <div className="p-6 max-h-[70vh] overflow-y-auto">
-              <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
-                {explanation.split('\n').map((line, i) => (
-                  <p key={i} className="mb-3" dangerouslySetInnerHTML={{
-                    __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                  }} />
-                ))}
-              </div>
+
+            {/* Dynamic Content */}
+            <div className="p-6 space-y-6 overflow-y-auto flex-1">
+
+              {/* 1. Prompt Bubble (User) */}
+              {activeAction === 'ask' && (
+                <div className="flex justify-end">
+                  <div className="bg-stone-100 dark:bg-stone-800 px-5 py-3 rounded-2xl rounded-tr-sm text-[15px] text-stone-700 dark:text-stone-200 max-w-[90%] shadow-sm">
+                    {askQuery || "Qual é a sua dúvida sobre este versículo?"}
+                  </div>
+                </div>
+              )}
+
+              {/* Answer/Input Area */}
+              {activeAction === 'ask' && !aiResponse && !isLoadingAi ? (
+                <form onSubmit={submitQuestion} className="w-full relative mt-4">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={askQuery}
+                    onChange={e => setAskQuery(e.target.value)}
+                    placeholder="Digite sua pergunta aqui..."
+                    className="w-full bg-stone-50 dark:bg-stone-800/100 border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-4 pr-12 text-base text-stone-900 dark:text-white placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-bible-gold/50 transition-all font-sans"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!askQuery.trim()}
+                    className="absolute right-3 top-3 p-1.5 bg-bible-gold text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-yellow-600 transition-colors shadow-sm"
+                  >
+                    <ArrowRight size={20} />
+                  </button>
+                </form>
+              ) : (
+                /* AI Response Bubble */
+                <div className="flex justify-start w-full">
+                  {isLoadingAi ? (
+                    <div className="flex flex-col gap-3 max-w-[90%]">
+                      <div className="flex items-center gap-3 px-4 py-3 bg-stone-50 dark:bg-stone-800 rounded-2xl rounded-tl-sm w-fit">
+                        <Loader2 size={18} className="animate-spin text-bible-gold" />
+                        <span className="text-sm text-stone-500 dark:text-stone-400 font-medium animate-pulse">Consultando conhecimento bíblico...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="group relative w-full">
+                      <div className="bg-stone-50 dark:bg-stone-800/60 px-6 py-5 rounded-2xl rounded-tl-sm text-[16px] leading-relaxed text-stone-800 dark:text-stone-200 w-full shadow-sm border border-stone-100 dark:border-stone-700/50">
+                        <div className="prose prose-stone dark:prose-invert max-w-none prose-p:my-3 prose-strong:text-bible-gold prose-a:text-bible-gold prose-headings:text-stone-900 dark:prose-headings:text-white">
+                          {/* Decorative Quote Icon */}
+                          <div className="absolute -top-3 -left-2 text-bible-gold/20 pointer-events-none">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 8.44772 14.017 9V11C14.017 11.5523 13.5693 12 13.017 12H12.017V5H22.017V15C22.017 18.3137 19.3307 21 16.017 21H14.017ZM5.0166 21L5.0166 18C5.0166 16.8954 5.91203 16 7.0166 16H10.0166C10.5689 16 11.0166 15.5523 11.0166 15V9C11.0166 8.44772 10.5689 8 10.0166 8H6.0166C5.46432 8 5.0166 8.44772 5.0166 9V11C5.0166 11.5523 4.56889 12 4.0166 12H3.0166V5H13.0166V15C13.0166 18.3137 10.3303 21 7.0166 21H5.0166Z" /></svg>
+                          </div>
+
+                          {displayedResponse && displayedResponse.split('\n').map((line, i) => (
+                            <p key={i} dangerouslySetInnerHTML={{
+                              __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            }} />
+                          ))}
+                          {isTyping && (
+                            <span className="inline-block w-1.5 h-4 bg-bible-gold ml-1 animate-pulse align-middle"></span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Footer / Action (only if answer is present) */}
+              {aiResponse && !isLoadingAi && (
+                <div className="flex justify-center pt-2 pb-6">
+                  <button onClick={closeAiModal} className="w-full py-3.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 font-semibold hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors shadow-sm">
+                    Fechar
+                  </button>
+                </div>
+              )}
+
             </div>
           </div>
         </div>
       )}
 
-      {/* Image Generator Modal */}
       {showImageGenerator && (
         <VerseImageGenerator
           verseText={getSelectedText()}
@@ -542,15 +647,6 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
         />
       )}
 
-      {/* Loading Overlay for AI */}
-      {loadingExplanation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-          <div className="bg-white dark:bg-stone-900 p-6 rounded-2xl shadow-xl flex flex-col items-center gap-4">
-            <Loader2 size={32} className="animate-spin text-bible-gold" />
-            <p className="font-medium animate-pulse">Gerando explicação...</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 });
