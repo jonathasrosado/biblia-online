@@ -400,9 +400,10 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
         {verses.map((verse) => {
           const isSelected = selectedVerses.has(verse.number);
           const isPlayingThisVerse = isPlaying && currentPlayingChunk === verses.findIndex(v => v.number === verse.number);
+          const isAudioActive = verse.number === currentPlayingChunk; // Defined here
 
           // Determine if we should show the inline menu here
-          // Logic: Show if this is the LAST selected verse (i.e. highest number in selection)
+          // Logic: Show if this is the LAST selected verse
           const sortedSelection = Array.from(selectedVerses).map(n => Number(n)).sort((a, b) => a - b);
           const lastSelected = sortedSelection[sortedSelection.length - 1];
           const isLastSelected = verse.number === lastSelected;
@@ -410,17 +411,17 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
           return (
             <React.Fragment key={verse.number}>
               <div
-                id={`v${verse.number}`}
-                onClick={() => handleVerseClick(verse)}
+                onClick={() => handleVerseClick(verse)} // Click on wrapper, pass full object
                 className={`flex gap-3 p-2 rounded-lg transition-all cursor-pointer duration-300
                         ${isSelected
-                    ? 'bg-yellow-200/50 dark:bg-yellow-900/30 ring-1 ring-yellow-400/50'
+                    ? (preferences.theme === 'bw' ? 'bg-stone-200/50 ring-1 ring-stone-300' : 'bg-yellow-200/50 dark:bg-yellow-900/30 ring-1 ring-yellow-400/50')
                     : isPlayingThisVerse
-                      ? 'bg-bible-gold/10 ring-1 ring-bible-gold/30'
+                      ? (preferences.theme === 'bw' ? 'bg-stone-100 ring-1 ring-stone-300' : 'bg-bible-gold/10 ring-1 ring-bible-gold/30')
                       : 'hover:bg-stone-100 dark:hover:bg-stone-800/50'}
                     `}
               >
-                <span className="text-xs font-bold text-bible-gold/70 select-none w-6 text-right pt-1.5 shrink-0">
+                <span className={`text-xs font-bold select-none w-6 text-right pt-1.5 shrink-0
+                  ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-bible-gold/70'}`}>
                   {verse.number}
                 </span>
                 <p
@@ -433,7 +434,19 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                     lineHeight: '1.6'
                   }}
                 >
-                  {verse.text}
+                  <span
+                    id={`v${verse.number}`}
+                    className={`
+                        relative inline leading-loose transition-all duration-200 rounded px-1
+                        ${isAudioActive && !isSelected
+                        ? (preferences.theme === 'bw' ? 'bg-stone-100 ring-2 ring-stone-900/10' : 'bg-bible-gold/10 ring-2 ring-bible-gold/20')
+                        : ''}
+                      `}
+                  >
+                    <span className={isAudioActive ? (preferences.theme === 'bw' ? 'text-stone-900' : 'text-bible-accent dark:text-stone-200') : ''}>
+                      {verse.text}
+                    </span>
+                  </span>
                 </p>
               </div>
 

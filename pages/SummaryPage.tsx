@@ -180,7 +180,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             />
 
             <header className={`mb-8 text-center border-b pb-8 transition-colors relative z-10
-                ${preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-200 dark:border-stone-800'}`}>
+                ${preferences.theme === 'bw' ? 'border-stone-200' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-200 dark:border-stone-800'}`}>
 
                 {/* Chapter Title & Navigation */}
                 <div className="grid grid-cols-[48px_1fr_48px] items-center max-w-xl mx-auto mb-8">
@@ -188,7 +188,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                         {prevChapter && (
                             <button
                                 onClick={() => navigate(`/resumo/${prevChapter.book}/${prevChapter.chapter}`)}
-                                className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-bible-gold transition-colors"
+                                className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
+                                    ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black' : 'text-stone-400 hover:text-bible-gold'}`}
                                 title="Capítulo Anterior"
                             >
                                 <ChevronRight className="rotate-180" size={24} />
@@ -201,7 +202,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                             onClick={() => setIsChapterGridOpen(!isChapterGridOpen)}
                             className="group flex flex-col items-center mx-auto"
                         >
-                            <h1 className="flex items-center gap-3 text-2xl md:text-3xl font-serif font-bold text-bible-accent dark:text-bible-gold transition-colors hover:text-bible-gold">
+                            <h1 className={`flex items-center gap-3 text-2xl md:text-3xl font-serif font-bold transition-colors
+                                ${preferences.theme === 'bw' ? 'text-black hover:text-stone-600' : 'text-bible-accent dark:text-bible-gold hover:text-bible-gold'}`}>
                                 {currentBook.name} {currentChapter}
                                 <ChevronDown size={24} className={`transition-transform duration-300 ${isChapterGridOpen ? 'rotate-180' : ''}`} />
                             </h1>
@@ -221,8 +223,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                                             className={`
                                                 h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all
                                                 ${currentChapter === chap
-                                                    ? 'bg-bible-gold text-white shadow-md'
-                                                    : 'bg-stone-50 dark:bg-stone-800 border border-transparent hover:border-bible-gold hover:text-bible-gold'}
+                                                    ? (preferences.theme === 'bw' ? 'bg-black text-white shadow-md' : 'bg-bible-gold text-white shadow-md')
+                                                    : (preferences.theme === 'bw' ? 'bg-stone-50 border border-transparent hover:border-black hover:text-black' : 'bg-stone-50 dark:bg-stone-800 border border-transparent hover:border-bible-gold hover:text-bible-gold')}
                                             `}
                                         >
                                             {chap}
@@ -237,7 +239,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                         {nextChapter && (
                             <button
                                 onClick={() => navigate(`/resumo/${nextChapter.book}/${nextChapter.chapter}`)}
-                                className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-bible-gold transition-colors"
+                                className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
+                                    ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black' : 'text-stone-400 hover:text-bible-gold'}`}
                                 title="Próximo Capítulo"
                             >
                                 <ChevronRight size={24} />
@@ -253,13 +256,15 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                         <div className="bg-stone-100 dark:bg-stone-800 p-1 rounded-xl flex gap-1 shadow-inner">
                             <button
                                 onClick={() => navigate(`/leitura/${normalizeBookName(currentBook.name)}/${currentChapter}`)}
-                                className="px-6 py-2 rounded-lg text-sm font-medium text-stone-400 dark:text-stone-500 hover:text-bible-gold hover:bg-white/50 dark:hover:bg-stone-600/50 transition-all"
+                                className={`px-6 py-2 rounded-lg text-sm font-medium transition-all
+                                    ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black hover:bg-white/50' : 'text-stone-400 dark:text-stone-500 hover:text-bible-gold hover:bg-white/50 dark:hover:bg-stone-600/50'}`}
                             >
                                 <List size={16} className="inline mr-2 mb-0.5" />
                                 Versículos
                             </button>
                             <button
-                                className="px-6 py-2 rounded-lg text-sm font-medium bg-white dark:bg-stone-700 text-bible-accent dark:text-bible-gold shadow-sm transition-all"
+                                className={`px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition-all
+                                    ${preferences.theme === 'bw' ? 'bg-white text-black' : 'bg-white dark:bg-stone-700 text-bible-accent dark:text-bible-gold'}`}
                             >
                                 <FileText size={16} className="inline mr-2 mb-0.5" />
                                 Resumo
@@ -288,8 +293,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                             disabled={isAudioLoading || !content}
                             className={`px-4 py-2 rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 h-10
                                 ${isPlaying
-                                    ? 'bg-bible-gold/20 text-bible-gold hover:bg-bible-gold/30'
-                                    : 'bg-bible-gold text-white hover:bg-yellow-600'} 
+                                    ? (preferences.theme === 'bw' ? 'bg-stone-200 text-stone-900' : 'bg-bible-gold/20 text-bible-gold hover:bg-bible-gold/30')
+                                    : (preferences.theme === 'bw' ? 'bg-black text-white hover:bg-stone-800' : 'bg-bible-gold text-white hover:bg-yellow-600')} 
                                 ${isAudioLoading || !content ? 'opacity-50 cursor-not-allowed' : ''}
                             `}
                             title="Ouvir Resumo"
@@ -333,13 +338,15 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                     </div>
                 ) : content && (
                     <div className={`prose prose-lg max-w-none ${preferences.theme === 'dark' ? 'prose-invert' : ''} ${preferences.fontFamily === 'serif' ? 'font-serif' : 'font-sans'}`}>
-                        <h2 className="font-serif text-3xl font-bold mb-6 text-center text-bible-accent dark:text-bible-gold">
+                        <h2 className={`font-serif text-3xl font-bold mb-6 text-center
+                            ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
                             {content.title}
                         </h2>
 
                         {/* Summary */}
                         <div className="mb-8">
-                            <h3 className="text-xl font-bold mb-3 text-bible-accent dark:text-bible-gold flex items-center gap-2">
+                            <h3 className={`text-xl font-bold mb-3 flex items-center gap-2
+                                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
                                 <FileText size={20} />
                                 Resumo
                             </h3>
@@ -348,7 +355,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
 
                         {/* Structure */}
                         <div className="mb-8 p-6 bg-stone-50 dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800">
-                            <h3 className="text-xl font-bold mb-4 text-bible-accent dark:text-bible-gold">Estrutura do Capítulo</h3>
+                            <h3 className={`text-xl font-bold mb-4
+                                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>Estrutura do Capítulo</h3>
                             <p className="mb-4 italic opacity-80" style={{ fontSize: `${preferences.fontSize}%` }}>{content.structure.intro}</p>
                             <div className="space-y-3">
                                 {content.structure.blocks.map((block, idx) => (
@@ -358,15 +366,17 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-6 p-4 bg-bible-gold/10 rounded-lg border-l-4 border-bible-gold">
-                                <span className="font-bold block mb-1 text-bible-gold">Mensagem Central:</span>
+                            <div className={`mt-6 p-4 rounded-lg border-l-4
+                                ${preferences.theme === 'bw' ? 'bg-stone-100 border-black' : 'bg-bible-gold/10 border-bible-gold'}`}>
+                                <span className={`font-bold block mb-1 ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>Mensagem Central:</span>
                                 <p className="italic" style={{ fontSize: `${preferences.fontSize}%` }}>{content.structure.centralMessage}</p>
                             </div>
                         </div>
 
                         {/* Key Verses */}
                         <div className="mb-8">
-                            <h3 className="text-xl font-bold mb-4 text-bible-accent dark:text-bible-gold flex items-center gap-2">
+                            <h3 className={`text-xl font-bold mb-4 flex items-center gap-2
+                                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
                                 <BookOpen size={20} />
                                 Versículos Chave
                             </h3>
@@ -374,7 +384,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                                 {content.keyVerses.map((kv, idx) => (
                                     <div key={idx} className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900/50">
                                         <div className="flex items-center gap-2 mb-2">
-                                            <span className="font-bold text-bible-accent dark:text-bible-gold">{kv.verses}</span>
+                                            <span className={`font-bold ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>{kv.verses}</span>
                                             <span className="text-sm font-medium opacity-70 uppercase tracking-wider">— {kv.title}</span>
                                         </div>
                                         <p className="text-sm opacity-90" style={{ fontSize: `${preferences.fontSize}%` }}>{kv.explanation}</p>
@@ -385,17 +395,19 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
 
                         {/* Historical Context */}
                         <div className="mb-8">
-                            <h3 className="text-xl font-bold mb-3 text-bible-accent dark:text-bible-gold">Contexto Histórico</h3>
+                            <h3 className={`text-xl font-bold mb-3 ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>Contexto Histórico</h3>
                             <p className="leading-relaxed" style={{ fontSize: `${preferences.fontSize}%` }}>{content.historicalContext}</p>
                         </div>
 
                         {/* Practical Application */}
-                        <div className="mb-8 p-6 bg-bible-gold/5 rounded-xl border border-bible-gold/10">
-                            <h3 className="text-xl font-bold mb-4 text-bible-accent dark:text-bible-gold">Aplicação Prática</h3>
+                        <div className={`mb-8 p-6 rounded-xl border
+                            ${preferences.theme === 'bw' ? 'bg-stone-100 border-stone-300' : 'bg-bible-gold/5 border-bible-gold/10'}`}>
+                            <h3 className={`text-xl font-bold mb-4 ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>Aplicação Prática</h3>
                             <ul className="space-y-3">
                                 {content.practicalApplication.map((app, idx) => (
                                     <li key={idx} className="flex gap-3" style={{ fontSize: `${preferences.fontSize}%` }}>
-                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-bible-gold text-white text-xs font-bold shrink-0">
+                                        <span className={`flex items-center justify-center w-6 h-6 rounded-full text-white text-xs font-bold shrink-0
+                                            ${preferences.theme === 'bw' ? 'bg-black' : 'bg-bible-gold'}`}>
                                             {idx + 1}
                                         </span>
                                         <span>{app}</span>
@@ -406,7 +418,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
 
                         {/* Prayer */}
                         <div className="mb-8">
-                            <h3 className="text-xl font-bold mb-3 text-bible-accent dark:text-bible-gold flex items-center gap-2">
+                            <h3 className={`text-xl font-bold mb-3 flex items-center gap-2
+                                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
                                 <Mic size={20} />
                                 Oração
                             </h3>
@@ -420,7 +433,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
 
             {/* Navigation Footer */}
             <div className={`p-4 border-t flex items-center justify-between mt-8
-                ${preferences.theme === 'sepia' ? 'bg-[#efebd6] border-[#e6dcc6]' : 'bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800'}`}>
+                ${preferences.theme === 'bw' ? 'bg-stone-50 border-stone-200' : preferences.theme === 'sepia' ? 'bg-[#efebd6] border-[#e6dcc6]' : 'bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800'}`}>
                 {prevChapter ? (
                     <button
                         onClick={() => navigate(`/resumo/${prevChapter.book}/${prevChapter.chapter}`)}

@@ -25,7 +25,7 @@ export interface SearchResult {
 }
 
 export interface ReadingPreferences {
-  theme: 'light' | 'dark' | 'sepia';
+  theme: 'light' | 'dark' | 'bw';
   fontFamily: 'serif' | 'sans';
   textAlign: 'left' | 'justify';
   fontSize: number; // Percentage (e.g. 100)

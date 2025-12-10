@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { Book, Menu, MessageCircle, Search, Sun, Moon, X, BookOpen, Settings, ArrowUp, Minimize, ChevronLeft, ChevronRight, ChevronDown, User as UserIcon } from 'lucide-react';
+import { Book, Menu, MessageCircle, Search, Sun, Moon, X, BookOpen, Settings, ArrowUp, Minimize, ChevronLeft, ChevronRight, ChevronDown, User as UserIcon, Library } from 'lucide-react';
 import { bibleBooks, translations, findBookByNormalizedName, normalizeBookName } from './constants';
 
 import { BibleBook, ReadingPreferences, ReadingHistoryItem, BibleVersion } from './types';
@@ -246,6 +246,7 @@ function AppContent() {
     switch (preferences.theme) {
       case 'sepia': return 'bg-[#f4ecd8] text-[#5c4b37]';
       case 'dark': return 'bg-stone-950 text-stone-200';
+      case 'bw': return 'bg-white text-black';
       default: return 'bg-bible-paper text-bible-text';
     }
   };
@@ -306,22 +307,43 @@ function AppContent() {
 
       {/* Mobile Header */}
       {!isFullScreen && (
-        <div className={`md:hidden flex items-center justify-between p-4 border-b sticky top-0 z-30 transition-colors
+        <div className={`md:hidden flex items-center justify-between px-4 py-3 border-b sticky top-0 z-30 transition-colors
           ${preferences.theme === 'sepia' ? 'bg-[#f4ecd8] border-[#e6dcc6]' : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}`}>
-          <div className="flex items-center gap-2" onClick={() => navigate('/')}>
-            <BookOpen className="w-6 h-6 text-bible-accent dark:text-bible-gold" />
-            <span className="font-serif font-bold text-xl text-bible-accent dark:text-bible-gold">{t.appTitle}</span>
+          {/* Left: Menu */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+          >
+            <Menu size={24} className="text-stone-700 dark:text-stone-300" />
+          </button>
+
+          {/* Center: Logo */}
+          <div className="flex items-center justify-center cursor-pointer" onClick={() => navigate('/')}>
+            <BookOpen className={`w-8 h-8 ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`} />
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-            >
-              {preferences.theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2">
-              {sidebarOpen ? <X /> : <Menu />}
-            </button>
+
+          {/* Right: Book Access */}
+          <div className="flex items-center gap-1">
+            <BookSelector
+              currentBook={currentBook}
+              currentChapter={currentChapter}
+              history={history}
+              onSelect={navigateToBook}
+              onClearHistory={clearHistory}
+              t={t}
+              customTrigger={(toggle) => (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    toggle();
+                  }}
+                  className="p-2 -mr-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-stone-700 dark:text-stone-300"
+                >
+                  <Book size={24} />
+                </button>
+              )}
+            />
           </div>
         </div>
       )}
@@ -338,20 +360,26 @@ function AppContent() {
       {!isFullScreen && (
         <aside className={`
           fixed inset-y-0 left-0 z-50 border-r transform transition-all duration-300 ease-in-out flex flex-col
-          ${preferences.theme === 'sepia'
-            ? 'bg-[#efebd6] border-[#e6dcc6]'
-            : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
+          ${preferences.theme === 'bw'
+            ? 'bg-white border-stone-200 text-black'
+            : preferences.theme === 'sepia'
+              ? 'bg-[#efebd6] border-[#e6dcc6]'
+              : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
           ${sidebarOpen ? 'translate-x-0 w-80' : '-translate-x-full w-80'}
           md:relative md:translate-x-0 
           ${desktopSidebarOpen ? 'md:w-80' : 'md:w-0 md:overflow-hidden md:border-none'}
         `}>
           <div className={`p-6 border-b hidden md:flex items-center justify-between
-            ${preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-100 dark:border-stone-800'}`}>
+            ${preferences.theme === 'bw' ? 'border-stone-200 bg-white' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-100 dark:border-stone-800'}`}>
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-              <div className="w-8 h-8 rounded-full bg-bible-gold/20 flex items-center justify-center text-bible-accent dark:text-bible-gold">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center
+                ${preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/20 text-bible-accent dark:text-bible-gold'}`}>
                 <BookOpen size={18} />
               </div>
-              <h1 className="font-serif text-2xl font-bold text-bible-accent dark:text-bible-gold">{t.appTitle}</h1>
+              <h1 className={`font-serif text-2xl font-bold
+                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
+                {t.appTitle}
+              </h1>
             </div>
             <div className="flex items-center gap-1">
               <button
@@ -401,14 +429,7 @@ function AppContent() {
           </div>
 
           <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-700">
-            <BookSelector
-              currentBook={currentBook}
-              currentChapter={currentChapter}
-              history={history}
-              onSelect={navigateToBook}
-              onClearHistory={clearHistory}
-              t={t}
-            />
+
 
             <div className="h-px bg-stone-100 dark:bg-stone-800 my-2 mx-2" />
 
@@ -487,6 +508,15 @@ function AppContent() {
             </div>
 
             <button
+              onClick={() => { toggleTheme(); setSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
+                hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100`}
+            >
+              {preferences.theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              {preferences.theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+            </button>
+
+            <button
               onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
             >
@@ -509,7 +539,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={
             <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
-              <HomePage language={language} t={t} isDark={preferences.theme === 'dark'} history={history} />
+              <HomePage language={language} t={t} theme={preferences.theme} history={history} />
             </ViewWrapper>
           } />
 

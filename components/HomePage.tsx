@@ -7,10 +7,12 @@ import { normalizeBookName, bibleBooks } from '../constants';
 import { ReadingHistoryItem } from '../types';
 import versesRaw from '../src/data/daily_verses.json';
 
+import { Theme } from '../types';
+
 interface HomePageProps {
     language: string;
     t: any;
-    isDark: boolean;
+    theme: Theme;
     history?: ReadingHistoryItem[];
 }
 
@@ -18,7 +20,6 @@ interface SiteSettings {
     siteTitle: string;
     siteDescription: string;
 }
-
 
 // Curated list of verses for the "Daily Verse" feature
 // Mapped from external JSON file
@@ -36,8 +37,10 @@ interface BlogPost {
     date: string;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }) => {
+const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] }) => {
+    const isDark = theme === 'dark';
     const navigate = useNavigate();
+
     const verseCardRef = useRef<HTMLDivElement>(null);
     const [localQuery, setLocalQuery] = useState('');
     const [dailyVerse, setDailyVerse] = useState(DAILY_VERSES[0]);
@@ -202,18 +205,22 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
 
             {/* Hero Section - Clean & Focused */}
             <div className={`relative pt-12 pb-24 px-6 md:px-12 text-center overflow-hidden
-                ${isDark ? 'bg-stone-950' : 'bg-stone-50'}
+                ${theme === 'bw' ? 'bg-white text-black' : isDark ? 'bg-stone-950' : 'bg-stone-50'}
             `}>
                 {/* Background Ambience */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-bible-gold/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+                {theme !== 'bw' && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-bible-gold/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+                )}
 
                 <div className="max-w-3xl mx-auto relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bible-gold/10 text-bible-gold font-bold text-[10px] uppercase tracking-widest mb-6 animate-slideUp">
+                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-bold text-[10px] uppercase tracking-widest mb-6 animate-slideUp
+                        ${theme === 'bw' ? 'bg-stone-100 text-stone-900 border border-stone-200' : 'bg-bible-gold/10 text-bible-gold'}`}>
                         <Star size={12} className="fill-current" />
                         <span>Bíblia Online Inteligente</span>
                     </div>
 
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold mb-4 text-bible-accent dark:text-bible-gold tracking-tight animate-slideUp" style={{ animationDelay: '0.1s' }}>
+                    <h1 className={`text-4xl md:text-6xl font-serif font-bold mb-4 tracking-tight animate-slideUp
+                        ${theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`} style={{ animationDelay: '0.1s' }}>
                         {getGreeting()}
                     </h1>
 
@@ -221,13 +228,13 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                         Que a paz de Deus esteja com você hoje.
                     </p>
 
-                    {/* Search Bar - Centered & Premium */}
                     <div className="max-w-xl mx-auto mb-8 animate-slideUp" style={{ animationDelay: '0.3s' }}>
                         <form onSubmit={handleSearchSubmit} className="relative group">
-                            <div className={`absolute inset-0 rounded-2xl blur opacity-20 transition-opacity group-focus-within:opacity-40 bg-bible-gold`}></div>
+                            <div className={`absolute inset-0 rounded-2xl blur opacity-20 transition-opacity group-focus-within:opacity-40
+                                ${theme === 'bw' ? 'opacity-0' : 'bg-bible-gold'}`}></div>
                             <div className="relative flex items-center">
                                 <Search className={`absolute left-5 w-5 h-5 transition-colors z-10
-                                    ${isDark ? 'text-stone-500 group-focus-within:text-bible-gold' : 'text-stone-400 group-focus-within:text-bible-gold'}
+                                    ${theme === 'bw' ? 'text-black' : isDark ? 'text-stone-500 group-focus-within:text-bible-gold' : 'text-stone-400 group-focus-within:text-bible-gold'}
                                 `} />
                                 <input
                                     type="text"
@@ -235,9 +242,11 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                                     onChange={(e) => setLocalQuery(e.target.value)}
                                     placeholder={t.searchPlaceholder}
                                     className={`w-full p-4 pl-12 pr-4 rounded-2xl border outline-none transition-all shadow-lg text-base
-                                        ${isDark
-                                            ? 'bg-stone-900/80 backdrop-blur-xl border-stone-800 focus:border-bible-gold/50 text-stone-100 placeholder-stone-600'
-                                            : 'bg-white/90 backdrop-blur-xl border-stone-200 focus:border-bible-gold/50 text-stone-800 placeholder-stone-400'}
+                                        ${theme === 'bw'
+                                            ? 'bg-white border-black text-black placeholder-stone-500 shadow-none ring-1 ring-black/5'
+                                            : isDark
+                                                ? 'bg-stone-900/80 backdrop-blur-xl border-stone-800 focus:border-bible-gold/50 text-stone-100 placeholder-stone-600'
+                                                : 'bg-white/90 backdrop-blur-xl border-stone-200 focus:border-bible-gold/50 text-stone-800 placeholder-stone-400'}
                                     `}
                                 />
                             </div>
@@ -250,9 +259,11 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                                     key={s}
                                     onClick={() => navigate(`/busca?q=${encodeURIComponent(s)}`)}
                                     className={`px-3 py-1 rounded-full text-xs font-medium transition-all hover:-translate-y-0.5
-                                        ${isDark
-                                            ? 'bg-stone-900 text-stone-400 hover:text-bible-gold border border-stone-800'
-                                            : 'bg-white text-stone-500 hover:text-bible-gold border border-stone-200 shadow-sm'}
+                                        ${theme === 'bw'
+                                            ? 'bg-white text-black border border-stone-300 hover:bg-stone-100'
+                                            : isDark
+                                                ? 'bg-stone-900 text-stone-400 hover:text-bible-gold border border-stone-800'
+                                                : 'bg-white text-stone-500 hover:text-bible-gold border border-stone-200 shadow-sm'}
                                     `}
                                     style={{ animationDelay: `${0.4 + (i * 0.05)}s` }}
                                 >
@@ -279,7 +290,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                                 onClick={() => setActiveTestament('OT')}
                                 className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all
                                     ${activeTestament === 'OT'
-                                        ? (isDark ? 'bg-stone-800 text-bible-gold shadow-sm' : 'bg-white text-bible-gold shadow-sm')
+                                        ? (theme === 'bw' ? 'bg-black text-white' : isDark ? 'bg-stone-800 text-bible-gold shadow-sm' : 'bg-white text-bible-gold shadow-sm')
                                         : 'text-stone-400 hover:text-stone-500'}
                                 `}
                             >
@@ -289,7 +300,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                                 onClick={() => setActiveTestament('NT')}
                                 className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all
                                     ${activeTestament === 'NT'
-                                        ? (isDark ? 'bg-stone-800 text-bible-gold shadow-sm' : 'bg-white text-bible-gold shadow-sm')
+                                        ? (theme === 'bw' ? 'bg-black text-white' : isDark ? 'bg-stone-800 text-bible-gold shadow-sm' : 'bg-white text-bible-gold shadow-sm')
                                         : 'text-stone-400 hover:text-stone-500'}
                                 `}
                             >
@@ -307,9 +318,11 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                                     key={book.name}
                                     onClick={() => navigate(`/leitura/${normalizeBookName(book.name)}`)}
                                     className={`p-4 rounded-2xl text-center transition-all border hover:-translate-y-1
-                                    ${isDark
-                                            ? 'bg-stone-900 border-stone-800 text-stone-400 hover:text-bible-gold hover:border-bible-gold/30'
-                                            : 'bg-white border-stone-100 text-stone-600 hover:text-bible-gold hover:shadow-md'}
+                                    ${theme === 'bw'
+                                            ? 'bg-white border-stone-200 text-black hover:bg-stone-50 hover:border-stone-400'
+                                            : isDark
+                                                ? 'bg-stone-900 border-stone-800 text-stone-400 hover:text-bible-gold hover:border-bible-gold/30'
+                                                : 'bg-white border-stone-100 text-stone-600 hover:text-bible-gold hover:shadow-md'}
                                 `}
                                 >
                                     <div className="font-bold mb-1">{book.name}</div>
@@ -321,9 +334,11 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                         <button
                             onClick={() => navigate(activeTestament === 'OT' ? '/antigo-testamento' : '/novo-testamento')}
                             className={`p-4 rounded-2xl text-center transition-all border group flex flex-col items-center justify-center gap-2
-                                ${isDark
-                                    ? 'bg-bible-gold/10 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/20'
-                                    : 'bg-bible-gold/5 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/10'}
+                                ${theme === 'bw'
+                                    ? 'bg-stone-100 border-stone-200 text-stone-900 hover:bg-stone-200'
+                                    : isDark
+                                        ? 'bg-bible-gold/10 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/20'
+                                        : 'bg-bible-gold/5 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/10'}
                             `}
                         >
                             <div className="p-2 rounded-full bg-bible-gold/20 group-hover:bg-bible-gold/30 transition-colors">
@@ -337,36 +352,44 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
 
                 {/* 1. DAILY VERSE (Featured - Moved Up) */}
                 <div className="animate-slideUp" style={{ animationDelay: '0.45s' }}>
-                    <div id="daily-verse-card" ref={verseCardRef} className={`w-full p-10 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[240px] text-center items-center shadow-2xl transition-all hover:scale-[1.01]
-                        ${isDark
-                            ? 'bg-gradient-to-br from-stone-900 via-stone-900 to-bible-gold/20 border border-bible-gold/20'
-                            : 'bg-gradient-to-br from-white via-stone-50 to-bible-gold/10 border border-white'}
+                    <div id="daily-verse-card" ref={verseCardRef} className={`w-full p-10 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[240px] text-center items-center shadow-md transition-all hover:scale-[1.01]
+                        ${theme === 'bw'
+                            ? 'bg-white border border-stone-200'
+                            : isDark
+                                ? 'bg-gradient-to-br from-stone-900 via-stone-900 to-bible-gold/20 border border-bible-gold/20'
+                                : 'bg-gradient-to-br from-white via-stone-50 to-bible-gold/10 border border-white'}
                     `}>
 
-                        {/* Decorative Background Elements */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-bible-gold/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none mix-blend-overlay"></div>
-                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-bible-accent/5 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
+                        {/* Background Ambience */}
+                        {theme !== 'bw' && (
+                            <>
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-bible-gold/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none mix-blend-overlay"></div>
+                                <div className="absolute bottom-0 left-0 w-48 h-48 bg-bible-accent/5 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
+                            </>
+                        )}
 
                         {/* Quote Icons */}
-                        <div className="absolute top-6 left-6 opacity-20 text-bible-gold pointer-events-none">
+                        <div className={`absolute top-6 left-6 opacity-20 pointer-events-none ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21L14.017 18C14.017 16.896 14.321 15.923 14.929 15.081C15.539 14.238 16.417 13.565 17.564 13.06L17.564 12.637C16.956 12.637 16.488 12.483 16.157 12.176C15.828 11.87 15.663 11.464 15.663 10.959C15.663 10.457 15.845 10.051 16.208 9.74001C16.572 9.42901 17.065 9.27401 17.689 9.27401C18.423 9.27401 18.995 9.53701 19.408 10.062C19.821 10.589 20.027 11.233 20.027 11.996C20.027 13.433 19.488 14.82 18.411 16.157C17.334 17.495 15.868 18.775 14.016 19.998L14.017 21ZM5.00201 21L5.00201 18C5.00201 16.896 5.30601 15.923 5.91401 15.081C6.52401 14.238 7.40001 13.565 8.54801 13.06L8.54801 12.637C7.94001 12.637 7.47201 12.483 7.14101 12.176C6.81201 11.87 6.64701 11.464 6.64701 10.959C6.64701 10.457 6.82901 10.051 7.19201 9.74001C7.55601 9.42901 8.05001 9.27401 8.67301 9.27401C9.40701 9.27401 9.97901 9.53701 10.392 10.062C10.805 10.589 11.011 11.233 11.011 11.996C11.011 13.433 10.472 14.82 9.39501 16.157C8.31801 17.495 6.85301 18.775 5.00201 19.998L5.00201 21Z"></path></svg>
                         </div>
 
                         <div className="flex items-center gap-3 mb-6 relative z-10">
-                            <div className="p-2 rounded-full bg-bible-gold/10 text-bible-gold">
+                            <div className={`p-2 rounded-full ${theme === 'bw' ? 'bg-stone-100 text-black' : 'bg-bible-gold/10 text-bible-gold'}`}>
                                 <Calendar size={20} />
                             </div>
-                            <span className="text-xs font-bold uppercase tracking-[0.2em] text-bible-gold">Versículo do Dia</span>
+                            <span className={`text-xs font-bold uppercase tracking-[0.2em] ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>Versículo do Dia</span>
                         </div>
 
-                        <blockquote className="text-3xl md:text-4xl font-serif italic leading-tight mb-8 text-bible-accent dark:text-stone-100 max-w-4xl mx-auto relative z-10 drop-shadow-sm">
+                        <blockquote className={`text-3xl md:text-4xl font-serif italic leading-tight mb-8 max-w-4xl mx-auto relative z-10 drop-shadow-sm
+                            ${theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-stone-100'}`}>
                             "{dailyVerse.text}"
                         </blockquote>
 
-                        <cite className="not-italic font-bold text-stone-500 dark:text-stone-400 tracking-wider uppercase text-sm flex items-center gap-4 relative z-10 mb-8">
-                            <span className="h-px w-12 bg-gradient-to-r from-transparent to-bible-gold"></span>
+                        <cite className={`not-italic font-bold tracking-wider uppercase text-sm flex items-center gap-4 relative z-10 mb-8
+                            ${theme === 'bw' ? 'text-stone-600' : 'text-stone-500 dark:text-stone-400'}`}>
+                            <span className={`h-px w-12 ${theme === 'bw' ? 'bg-black/20' : 'bg-gradient-to-r from-transparent to-bible-gold'}`}></span>
                             {dailyVerse.ref}
-                            <span className="h-px w-12 bg-gradient-to-l from-transparent to-bible-gold"></span>
+                            <span className={`h-px w-12 ${theme === 'bw' ? 'bg-black/20' : 'bg-gradient-to-l from-transparent to-bible-gold'}`}></span>
                         </cite>
 
                         {/* Visible Watermark Footer */}
@@ -380,7 +403,11 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
                         <button
                             onClick={handleShare}
                             disabled={isSharing}
-                            className="flex items-center gap-2 px-6 py-2 rounded-full bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white transition-all font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md disabled:opacity-50"
+                            className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md disabled:opacity-50 transition-all
+                                ${theme === 'bw'
+                                    ? 'bg-stone-100 text-stone-900 hover:bg-black hover:text-white'
+                                    : 'bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white'}
+                            `}
                         >
                             {isSharing ? <Loader2 size={18} className="animate-spin" /> : <Share2 size={18} />}
                             {isSharing ? 'Gerando...' : 'Compartilhar'}
@@ -388,7 +415,11 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
 
                         <button
                             onClick={handleNextVerse}
-                            className="flex items-center gap-2 px-6 py-2 rounded-full border border-bible-gold/30 text-bible-gold hover:bg-bible-gold/10 transition-all font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md"
+                            className={`flex items-center gap-2 px-6 py-2 rounded-full border font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md transition-all
+                                ${theme === 'bw'
+                                    ? 'border-stone-200 text-stone-600 hover:bg-stone-50'
+                                    : 'border-bible-gold/30 text-bible-gold hover:bg-bible-gold/10'}
+                            `}
                         >
                             <RefreshCw size={18} />
                             Outro

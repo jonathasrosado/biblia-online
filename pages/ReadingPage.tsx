@@ -206,14 +206,15 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             />
 
             <header className={`mb-8 text-center border-b pb-8 transition-colors relative z-10
-         ${preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-200 dark:border-stone-800'}`}>
+         ${preferences.theme === 'bw' ? 'border-stone-200' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-200 dark:border-stone-800'}`}>
 
                 {/* Chapter Title & Navigation */}
                 <div className="flex items-center justify-between max-w-xl mx-auto mb-8">
                     {prevChapter ? (
                         <button
                             onClick={() => navigateTo(prevChapter.book, prevChapter.chapter)}
-                            className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-bible-gold transition-colors"
+                            className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
+                                ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black' : 'text-stone-400 hover:text-bible-gold'}`}
                             title="Capítulo Anterior"
                         >
                             <ChevronRight className="rotate-180" size={24} />
@@ -225,7 +226,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             onClick={() => setIsChapterGridOpen(!isChapterGridOpen)}
                             className="group flex flex-col items-center mx-auto"
                         >
-                            <h1 className="flex items-center gap-3 text-2xl md:text-3xl font-serif font-bold text-bible-accent dark:text-bible-gold transition-colors hover:text-bible-gold">
+                            <h1 className={`flex items-center gap-3 text-2xl md:text-3xl font-serif font-bold transition-colors
+                                ${preferences.theme === 'bw' ? 'text-black hover:text-stone-600' : 'text-bible-accent dark:text-bible-gold hover:text-bible-gold'}`}>
                                 {currentBook.name} {currentChapter}
                                 <ChevronDown size={24} className={`transition-transform duration-300 ${isChapterGridOpen ? 'rotate-180' : ''}`} />
                             </h1>
@@ -251,8 +253,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                                             className={`
                                                 h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all
                                                 ${currentChapter === chap
-                                                    ? 'bg-bible-gold text-white shadow-md'
-                                                    : 'bg-stone-50 dark:bg-stone-800 border border-transparent hover:border-bible-gold hover:text-bible-gold'}
+                                                    ? (preferences.theme === 'bw' ? 'bg-black text-white shadow-md' : 'bg-bible-gold text-white shadow-md')
+                                                    : (preferences.theme === 'bw' ? 'bg-stone-50 border border-transparent hover:border-black hover:text-black' : 'bg-stone-50 dark:bg-stone-800 border border-transparent hover:border-bible-gold hover:text-bible-gold')}
                                             `}
                                         >
                                             {chap}
@@ -266,7 +268,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                     {nextChapter ? (
                         <button
                             onClick={() => navigateTo(nextChapter.book, nextChapter.chapter)}
-                            className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-bible-gold transition-colors"
+                            className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
+                                ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black' : 'text-stone-400 hover:text-bible-gold'}`}
                             title="Próximo Capítulo"
                         >
                             <ChevronRight size={24} />
@@ -280,14 +283,16 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                         {/* Tab Navigation (Verses vs Summary) */}
                         <div className="bg-stone-100 dark:bg-stone-800 p-1 rounded-xl flex gap-1 shadow-inner">
                             <button
-                                className="px-6 py-2 rounded-lg text-sm font-medium bg-white dark:bg-stone-700 text-bible-accent dark:text-bible-gold shadow-sm transition-all"
+                                className={`px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition-all
+                                    ${preferences.theme === 'bw' ? 'bg-white text-black' : 'bg-white dark:bg-stone-700 text-bible-accent dark:text-bible-gold'}`}
                             >
                                 <List size={16} className="inline mr-2 mb-0.5" />
                                 Versículos
                             </button>
                             <button
                                 onClick={() => navigate(`/resumo/${normalizeBookName(currentBook.name)}/${currentChapter}`)}
-                                className="px-6 py-2 rounded-lg text-sm font-medium text-stone-400 dark:text-stone-500 hover:text-bible-gold hover:bg-white/50 dark:hover:bg-stone-600/50 transition-all"
+                                className={`px-6 py-2 rounded-lg text-sm font-medium transition-all
+                                    ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black hover:bg-white/50' : 'text-stone-400 dark:text-stone-500 hover:text-bible-gold hover:bg-white/50 dark:hover:bg-stone-600/50'}`}
                             >
                                 <FileText size={16} className="inline mr-2 mb-0.5" />
                                 Resumo
@@ -304,35 +309,32 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                                 step="5"
                                 value={preferences.fontSize}
                                 onChange={(e) => onUpdatePreferences({ ...preferences, fontSize: parseInt(e.target.value) })}
-                                className="w-24 h-1.5 bg-stone-300 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-bible-gold"
-                                title={`Tamanho da fonte: ${preferences.fontSize}%`}
+                                className={`w-24 h-1.5 bg-stone-300 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer
+                                    ${preferences.theme === 'bw' ? 'accent-black' : 'accent-bible-gold'}`}
                             />
                             <Type size={18} className="opacity-80" />
                         </div>
 
                         {/* Audio Button */}
                         <button
-                            onClick={() => {
-                                bibleReaderRef.current?.toggleAudio();
-                            }}
-                            className={`px-4 py-2 rounded-lg transition-all shadow-sm flex items-center gap-2 shrink-0 h-10
-                                    ${isVerseAudioPlaying
-                                    ? 'bg-bible-gold/20 text-bible-gold hover:bg-bible-gold/30'
-                                    : 'bg-bible-gold text-white hover:bg-yellow-600'}`}
+                            onClick={() => bibleReaderRef.current?.toggleAudio()}
+                            disabled={isVerseAudioLoading} // Only disable if loading initial audio
+                            className={`
+                        h-10 px-6 rounded-lg font-bold text-sm transition-all flex items-center gap-2 active:scale-95
+                        ${isVerseAudioPlaying
+                                    ? (preferences.theme === 'bw' ? 'bg-stone-200 text-stone-900 shadow-inner' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 shadow-inner')
+                                    : (preferences.theme === 'bw' ? 'bg-black text-white hover:bg-stone-800' : 'bg-bible-gold text-white hover:bg-yellow-600 shadow-lg shadow-bible-gold/30 hover:shadow-bible-gold/40')
+                                }
+                    `}
                         >
                             {isVerseAudioLoading ? (
-                                <Loader2 size={16} className="animate-spin" />
+                                <Loader2 size={18} className="animate-spin" />
                             ) : isVerseAudioPlaying ? (
-                                <>
-                                    <Pause size={16} fill="currentColor" />
-                                    <span className="text-sm font-medium">Pausar</span>
-                                </>
+                                <Pause size={18} />
                             ) : (
-                                <>
-                                    <Volume2 size={16} />
-                                    <span className="text-sm font-medium">Ouvir</span>
-                                </>
+                                <Volume2 size={18} />
                             )}
+                            <span className="hidden sm:inline">{isVerseAudioPlaying ? 'Pausar' : 'Ouvir'}</span>
                         </button>
                     </div>
                 </div>

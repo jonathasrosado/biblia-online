@@ -74,14 +74,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, preferen
               </button>
 
               <button
-                onClick={() => update('theme', 'sepia')}
-                className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${preferences.theme === 'sepia'
-                  ? 'border-bible-gold bg-[#f4ecd8] text-[#5c4b37]'
-                  : 'border-transparent bg-[#f4ecd8]/50 text-stone-500 hover:bg-[#f4ecd8]'
+                onClick={() => update('theme', 'bw')}
+                className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${preferences.theme === 'bw'
+                  ? 'border-stone-900 bg-white text-stone-900'
+                  : 'border-transparent bg-stone-100 text-stone-500 hover:bg-stone-200'
                   }`}
               >
-                <Coffee size={24} />
-                <span className="text-sm font-medium">{t.sepia}</span>
+                <AlignJustify size={24} />
+                <span className="text-sm font-medium">P&B</span>
               </button>
 
               <button

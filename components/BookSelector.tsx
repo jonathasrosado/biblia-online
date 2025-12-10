@@ -11,9 +11,10 @@ interface BookSelectorProps {
   onSelect: (book: BibleBook, chapter: number) => void;
   onClearHistory: () => void;
   t: any;
+  customTrigger?: (toggle: () => void) => React.ReactNode;
 }
 
-const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter, history, onSelect, onClearHistory, t }) => {
+const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter, history, onSelect, onClearHistory, t, customTrigger }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,14 +22,14 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
   const [filter, setFilter] = useState<'All' | 'Old' | 'New'>('All');
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null); // Changed to DivElement to support custom trigger wrapper
 
-  // Auto-expand current book when it changes
-  useEffect(() => {
-    if (currentBook) {
-      setExpandedBook(currentBook.name);
-    }
-  }, [currentBook.name]);
+  // Auto-expand removed as per user request to keep list "suspended"/collapsed
+  // useEffect(() => {
+  //   if (currentBook) {
+  //     setExpandedBook(currentBook.name);
+  //   }
+  // }, [currentBook.name]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -96,37 +97,46 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
   };
 
   return (
-    <div className="w-full mb-2">
-      {/* Main Trigger Button - "Most Important" */}
-      <button
-        ref={triggerRef}
-        onClick={() => setIsOpen(!isOpen)}
-        className={`
-          w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300
-          ${isOpen
-            ? 'bg-bible-gold text-white shadow-lg ring-2 ring-bible-gold/50'
-            : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold hover:bg-bible-gold/20'}
-        `}
-      >
-        <div className="flex items-center gap-3">
-          <div className={`p-1.5 rounded-full ${isOpen ? 'bg-white/20' : 'bg-bible-gold/20'}`}>
-            <BookOpen size={20} />
-          </div>
-          <div className="flex flex-col items-start">
-            <span className="text-[10px] uppercase tracking-wider font-bold opacity-70">Livro Atual</span>
-            <span className="font-serif font-bold text-lg leading-none">
-              {currentBook.name} <span className="opacity-60 text-sm">{currentChapter}</span>
-            </span>
-          </div>
+    <div className="w-full mb-0 md:mb-2 relative">
+      {/* Main Trigger Button */}
+      {customTrigger ? (
+        <div ref={triggerRef}>
+          {customTrigger(() => setIsOpen(!isOpen))}
         </div>
-        <ChevronDown size={20} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
+      ) : (
+        <button
+          ref={triggerRef as any}
+          onClick={() => setIsOpen(!isOpen)}
+          className={`
+            w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300
+            ${isOpen
+              ? 'bg-bible-gold text-white shadow-lg ring-2 ring-bible-gold/50'
+              : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold hover:bg-bible-gold/20'}
+          `}
+        >
+          <div className="flex items-center gap-3">
+            <div className={`p-1.5 rounded-full ${isOpen ? 'bg-white/20' : 'bg-bible-gold/20'}`}>
+              <BookOpen size={20} />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-[10px] uppercase tracking-wider font-bold opacity-70">Livro Atual</span>
+              <span className="font-serif font-bold text-lg leading-none">
+                {currentBook.name} <span className="opacity-60 text-sm">{currentChapter}</span>
+              </span>
+            </div>
+          </div>
+          <ChevronDown size={20} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+      )}
 
       {/* Dropdown / Popover */}
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="fixed left-0 md:left-auto md:w-80 w-full z-50 mt-2 bg-white dark:bg-stone-900 rounded-xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden flex flex-col max-h-[70vh] animate-fadeIn"
+          className={`
+            fixed top-[60px] md:top-auto z-[100] mt-2 bg-white dark:bg-stone-900 rounded-xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden flex flex-col max-h-[80vh] animate-fadeIn
+            ${customTrigger ? 'right-4 w-[90vw] md:w-96 md:right-auto md:absolute' : 'left-0 md:left-auto md:w-80 w-full'}
+          `}
         >
           {/* Search Header */}
           <div className="p-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/95 backdrop-blur-sm sticky top-0 z-10">
@@ -203,61 +213,63 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
               <div className="space-y-1">
                 {filteredBooks.map((book) => (
                   <div key={book.name} className="flex flex-col">
-                    <div className="flex items-center w-full group">
-                      {/* Main Main Click - Navigates to Book Page */}
-                      <button
-                        onClick={() => handleBookClick(book)}
-                        className={`
-                          flex-1 flex items-center gap-3 px-3 py-2.5 rounded-l-lg text-sm transition-colors
-                          ${currentBook.name === book.name
-                            ? 'bg-bible-gold/10 text-bible-gold font-bold'
-                            : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'}
-                        `}
-                      >
-                        <span className={`
-                          w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold
-                          ${book.testament === 'Old' ? 'bg-stone-100 text-stone-500 dark:bg-stone-800' : 'bg-blue-50 text-blue-500 dark:bg-blue-900/20'}
-                        `}>
-                          {book.testament === 'Old' ? 'AT' : 'NT'}
-                        </span>
-                        <span>{book.name}</span>
-                      </button>
+                    <div className="flex items-center w-full group mb-1">
+                      {/* Single Unified Button for Toggle */}
+                      <div className={`
+                        w-full flex items-center rounded-xl transition-all overflow-hidden
+                        text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800
+                        ${currentBook.name === book.name ? 'font-bold bg-stone-50 dark:bg-stone-800/50' : ''}
+                      `}>
+                        {/* Zone 1: Navigate to Book (Icon + Name) */}
+                        <button
+                          onClick={() => handleBookClick(book)}
+                          className="flex items-center gap-3 px-3 py-3 flex-none hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-left"
+                        >
+                          <span className={`
+                            w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0
+                            ${book.testament === 'Old' ? 'bg-stone-100 text-stone-500 dark:bg-stone-800' : 'bg-blue-50 text-blue-500 dark:bg-blue-900/20'}
+                          `}>
+                            {book.testament === 'Old' ? 'AT' : 'NT'}
+                          </span>
+                          <span className="text-base">{book.name}</span>
+                        </button>
 
-                      {/* Toggle Button - Opens Chapters */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleBook(book.name);
-                        }}
-                        className={`
-                          px-2 py-2.5 rounded-r-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
-                          ${currentBook.name === book.name ? 'bg-bible-gold/10' : ''}
-                        `}
-                      >
-                        {expandedBook === book.name
-                          ? <ChevronDown size={14} className="text-bible-gold" />
-                          : <ChevronRight size={14} className="opacity-30 group-hover:opacity-100" />
-                        }
-                      </button>
+                        {/* Zone 2: Toggle Chapters (Rest of the bar) */}
+                        <button
+                          onClick={() => toggleBook(book.name)}
+                          className="flex-1 flex justify-end px-3 py-3 h-full items-center active:bg-black/5 dark:active:bg-white/5"
+                        >
+                          {expandedBook === book.name
+                            ? <ChevronDown size={18} className={`${expandedBook === book.name && 'text-stone-900 dark:text-white'} transition-transform rotate-180`} />
+                            : <ChevronRight size={18} className="opacity-30 group-hover:opacity-100 transition-transform" />
+                          }
+                        </button>
+                      </div>
                     </div>
 
+                    {/* Expanded Chapters - "Suspended" Look */}
                     {expandedBook === book.name && (
-                      <div className="grid grid-cols-5 gap-1.5 p-2 pl-11 animate-fadeIn">
-                        {Array.from({ length: book.chapters }, (_, i) => i + 1).map((chap) => (
-                          <button
-                            key={chap}
-                            onClick={() => handleSelect(book, chap)}
-                            className={`
-                              h-8 flex items-center justify-center text-xs rounded-lg transition-all border
-                              ${currentBook.name === book.name && currentChapter === chap
-                                ? 'bg-bible-gold text-white border-bible-gold font-bold shadow-sm'
-                                : 'bg-white dark:bg-stone-800 border-stone-100 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:border-bible-gold hover:text-bible-gold'
-                              }
-                            `}
-                          >
-                            {chap}
-                          </button>
-                        ))}
+                      <div className="relative z-10 mx-1 mb-3 pl-11">
+                        {/* Suspended Card */}
+                        <div className="bg-white dark:bg-stone-800 p-3 rounded-xl shadow-xl border-2 border-stone-100 dark:border-stone-700 animate-in zoom-in-95 duration-200">
+                          <div className="grid grid-cols-5 gap-2">
+                            {Array.from({ length: book.chapters }, (_, i) => i + 1).map((chap) => (
+                              <button
+                                key={chap}
+                                onClick={() => handleSelect(book, chap)}
+                                className={`
+                                  h-9 flex items-center justify-center text-sm font-medium rounded-lg transition-all
+                                  ${currentBook.name === book.name && currentChapter === chap
+                                    ? 'bg-bible-gold text-white shadow-md transform scale-105'
+                                    : 'bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-bible-gold/10 hover:text-bible-gold border border-stone-100 dark:border-stone-700/50'
+                                  }
+                                `}
+                              >
+                                {chap}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
