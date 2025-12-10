@@ -77,9 +77,7 @@ app.use((req, res, next) => {
 });
 
 // --- ROUTES ---
-app.get('/', (req, res) => {
-    res.send('Bíblia Online API is running');
-});
+
 
 // SECURITY: Allow data: blobs for audio (iOS fix)
 app.use((req, res, next) => {
@@ -1635,19 +1633,7 @@ app.post('/api/ai/rewrite', async (req, res) => {
 });
 
 
-// --- SERVE STATIC FRONTEND (Production) ---
-const DIST_DIR = path.resolve(__dirname, '../dist');
-if (fs.existsSync(DIST_DIR)) {
-    console.log(`Serving static files from ${DIST_DIR}`);
-    app.use(express.static(DIST_DIR));
 
-    // Handle SPA routing: return index.html for any unknown route
-    app.get(/.*/, (req, res) => {
-        if (!req.path.startsWith('/api')) {
-            res.sendFile(path.join(DIST_DIR, 'index.html'));
-        }
-    });
-}
 
 app.get('/api/ai/debug-raw', async (req, res) => {
     try {
