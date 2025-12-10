@@ -11,6 +11,7 @@ import { createRequire } from "module";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
 import { aiManager } from './services/aiManager.js';
 import connectDB from './config/db.js'; // Import MongoDB config
+import os from 'os'; // Required for tmpdir
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,6 +23,28 @@ if (!global.crypto) {
     global.crypto = crypto;
 }
 
+// --- LOAD KEYS FROM AI-CONFIG (Fix for missing local .env) ---
+// This ensures process.env is populated even if .env is empty, satisfying libraries that verify keys.
+try {
+    const aiConfig = aiManager.getConfig();
+    if (aiConfig.apiKeys) {
+        if (aiConfig.apiKeys.gemini && !process.env.GEMINI_API_KEY) {
+            process.env.GEMINI_API_KEY = aiConfig.apiKeys.gemini;
+            console.log("[API] Loaded GEMINI_API_KEY from ai-config.json");
+        }
+        if (aiConfig.apiKeys.openrouter && !process.env.OPENROUTER_API_KEY) {
+            process.env.OPENROUTER_API_KEY = aiConfig.apiKeys.openrouter;
+            console.log("[API] Loaded OPENROUTER_API_KEY from ai-config.json");
+        }
+        if (aiConfig.apiKeys.freepik && !process.env.FREEPIK_API_KEY) {
+            process.env.FREEPIK_API_KEY = aiConfig.apiKeys.freepik;
+            console.log("[API] Loaded FREEPIK_API_KEY from ai-config.json");
+        }
+    }
+} catch (e) {
+    console.warn("[API] Failed to auto-load keys from aiManager:", e);
+}
+
 // --- CRASH HANDLERS (MUST BE FIRST) ---
 process.on('uncaughtException', (error) => {
     console.error('FATAL: Uncaught Exception:', error);
@@ -31,8 +54,7 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error('FATAL: Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-// Connect to MongoDB
-connectDB();
+// MongoDB will be connected before server starts (see bottom of file)
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -45,6 +67,19 @@ console.log("----------------------------------------");
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+// Custom request logging for debugging
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        console.log(`[API] ${req.method} ${req.path}`);
+    }
+    next();
+});
+
+// --- ROUTES ---
+app.get('/', (req, res) => {
+    res.send('Bíblia Online API is running');
+});
 
 // SECURITY: Allow data: blobs for audio (iOS fix)
 app.use((req, res, next) => {
@@ -343,41 +378,324 @@ app.get('/api/books/:book/summary', async (req, res) => {
     }
 });
 
-// --- FLUID READING GENERATION ENDPOINT ---
-app.post('/api/ai/fluid-gen', async (req, res) => {
-    try {
-        const { book, chapter, language, originalText } = req.body;
+// --- CHAPTER SUMMARY GENERATION ENDPOINT (LEGACY - NOW HANDLED BY ENDPOINT AT LINE ~477) ---
+// This endpoint has been removed to avoid conflicts. See the second implementation below.
 
-        const langMap = { 'pt': 'Portuguese', 'en': 'English', 'es': 'Spanish' };
-        const fullLang = langMap[language] || 'Portuguese';
+// --- CHAT ENDPOINT ---
+app.post('/api/ai/chat', async (req, res) => {
+    try {
+        const { message, history, language } = req.body;
+
+        // Construct context from history
+        // History is expected to be [{ role: 'user'|'model', text: '...' }]
+        let context = "";
+        if (history && Array.isArray(history)) {
+            context = history.map(msg => (msg.role === 'user' ? 'User' : 'AI') + ": " + msg.text).join('\n');
+        }
+
+        // Construct context from previous messages if needed, or pass full history if aiManager supports it.
+        // For now, simple interaction:
+        // We can pass the history as part of the prompt or system instruction if needed, 
+        // but aiManager.generateContent is designed for single-turn with context.
+        // Let's create a specialized call for chat if we want history, but valid simple fix:
+
+        const systemInstruction =
+            "You are a warm, wise, and knowledgeable Bible study assistant.\n" +
+            "You help users understand scripture, theology, and history.\n" +
+            "You are respectful of different Christian traditions but lean towards orthodox, historical Christianity.\n\n" +
+            "**STYLE GUIDELINES (CRITICAL):**\n" +
+            "- **CHAT LIKE A FRIEND:** Be natural, warm, and simple. Avoid robotic language.\n" +
+            "- **USE EMOJIS:** Use relevant emojis occasionally to make the conversation lighter 🌿 ✨.\n" +
+            "- **KEEP IT BRIEF:** Avoid long lectures. Break text into short paragraphs.\n" +
+            "- **ASK QUESTIONS:** End your answers with a thought-provoking question to keep the conversation going.\n" +
+            "- **NO FLUFF:** Start answering immediately. Don't say 'That is a great question'.\n\n" +
+            "**CITATION RULE (CRITICAL):**\n" +
+            "When citing Bible verses, YOU MUST use Markdown links to the reading page.\n" +
+            "- For Chapters: `[Book Chapter](/leitura/normalized-book/chapter)` (e.g., `[Gênesis 1](/leitura/genesis/1)`)\n" +
+            "- For Verses: `[Book Chapter:Verse](/leitura/normalized-book/chapter?verses=start-end)` (e.g., `[João 3:16](/leitura/joao/3?verses=16-16)`)\n" +
+            "- Use lowercase, no accents, and hyphens for spaces in book names.\n\n" +
+            "Language: " + (language || 'pt') + ".\n\n" +
+            "Previous Conversation:\n" +
+            context;
+
+        const fullPrompt = message;
+
+        const response = await aiManager.generateContent('chat', fullPrompt, systemInstruction);
+        res.json({ text: response });
+    } catch (error) {
+        console.error("Chat API Error:", error);
+        fs.writeFileSync(path.join(__dirname, '../chat_error.log'), `[${new Date().toISOString()}] ${error.message}\n${error.stack}\n`);
+        res.status(500).json({ error: 'Failed to generate chat response' });
+    }
+});
+
+// --- CHAPTER SUMMARY ENDPOINT ---
+app.post('/api/ai/chapter-summary', async (req, res) => {
+    try {
+        const { book, chapter, language } = req.body;
+        if (!book || !chapter) return res.status(400).json({ error: 'Book and Chapter are required' });
+
+        const summary = await aiManager.generateChapterSummary(book, chapter, language);
+        // MOCK DATA FOR DEBUGGING
+        /*
+        const summary = {
+            title: `Capítulo Mock ${chapter}`,
+            summary: "Este é um resumo de teste para verificar a conectividade do servidor.",
+            structure: {
+                intro: "Intro teste",
+                blocks: [],
+                centralMessage: "Mensagem central teste"
+            },
+            keyVerses: [],
+            historicalContext: "Contexto teste",
+            practicalApplication: [],
+            prayer: "Oração teste"
+        };
+        */
+        res.json(summary);
+    } catch (error) {
+        console.error("Chapter Summary API Error:", error);
+        fs.writeFileSync(path.join(__dirname, '../chapter_summary_error.log'), `[${new Date().toISOString()}] ${error.message}\n${error.stack}\n`);
+        res.status(500).json({ error: 'Failed to generate summary' });
+    }
+});
+
+// --- DEVOTIONAL GENERATION ENDPOINT ---
+app.post('/api/ai/devotional', async (req, res) => {
+    try {
+        const { language } = req.body;
+        const targetLang = language || 'pt';
+        // Get today's date in YYYY-MM-DD format (local time approximation or UTC)
+        // Using simplified ISO date for consistency
+        const today = new Date().toISOString().split('T')[0];
+
+        // Dynamic import to avoid issues if model isn't loaded yet
+        const { Devotional } = await import('./models/Devotional.js');
+
+        // 1. Try to fetch from DB
+        try {
+            const existing = await Devotional.findOne({ date: today, language: targetLang });
+            if (existing) {
+                console.log(`[API] Returning cached devotional for ${today} (${targetLang})`);
+                // Frontend expects { text: "JSON_STRING" }
+                // We recreate that structure
+                return res.json({ text: JSON.stringify(existing) });
+            }
+        } catch (dbErr) {
+            console.error("[API] DB Read Error (Devotional):", dbErr);
+            // Continue to generation if DB fails
+        }
+
+        console.log(`[API] Generating new devotional for ${today}...`);
 
         const systemInstruction = `
-            You are a biblical scholar and writer. Your task is to rewrite the provided Bible text (Book: ${book}, Chapter: ${chapter}) into a fluid, modern, and engaging narrative in ${fullLang}.
-            
-            Rules:
-            1. Keep the theological meaning accurate but improve flow and readability.
-            2. Remove verse numbers. Group text into logical paragraphs.
-            3. Use a respectful but accessible tone.
-            4. IMPORTANT: The output MUST be in ${fullLang}.
-            5. Return ONLY a JSON object with this structure:
+            You are a wise and compassionate Christian pastor. Write a daily devotional.
+            Language: ${targetLang}.
+            Return ONLY a valid JSON object:
             {
-                "title": "A short, engaging title for this chapter",
-                "paragraphs": ["Paragraph 1...", "Paragraph 2..."]
+                "date": "${today}",
+                "title": "Inspiring Title",
+                "verse": { "text": "Verse text...", "reference": "Book Chapter:Verse" },
+                "content": "A comforting and inspiring message (2-3 paragraphs).",
+                "prayer": "A short closing prayer."
             }
         `;
 
-        const response = await aiManager.generateContent(
-            'fluid_reading',
-            originalText,
-            systemInstruction,
-            'json_object'
-        );
+        let responseText;
+        try {
+            responseText = await aiManager.generateContent('chat', 'Generate today\'s devotional', systemInstruction, 'json_object');
+        } catch (genError) {
+            console.error("AI Generation Failed:", genError);
 
-        res.json({ text: response });
+            // FALLBACK: Try to find ANY recent devotional from DB
+            const recent = await Devotional.findOne({ language: targetLang }).sort({ date: -1 });
+            if (recent) {
+                console.log("[API] AI failed. Returning most recent saved devotional as fallback.");
+                return res.json({ text: JSON.stringify(recent) });
+            }
+            throw genError; // Re-throw if no fallback
+        }
+
+        // 2. Parse and Save to DB
+        try {
+            let jsonString = responseText;
+            // Clean markdown if present
+            jsonString = jsonString.replace(/```json\n?|\n?```/g, '').replace(/```/g, '').trim();
+            const parsed = JSON.parse(jsonString);
+
+            // Ensure date is set (AI might hallucinate a different date)
+            parsed.date = today;
+
+            // Map flat structure (if AI returns flat) to schema if necessary, 
+            // but prompt asks for nested 'verse'. 
+            // Let's trust the AI follows the prompt, but be safe.
+            const newDevotional = new Devotional({
+                date: today,
+                language: targetLang,
+                title: parsed.title || "Devocional Diário",
+                verse: {
+                    text: parsed.verse?.text || parsed.verseText || "",
+                    reference: parsed.verse?.reference || parsed.verseReference || ""
+                },
+                content: parsed.content || parsed.reflection || "",
+                prayer: parsed.prayer || "",
+                rawJson: jsonString
+            });
+
+            await newDevotional.save();
+            console.log(`[API] Saved new devotional for ${today}`);
+
+        } catch (saveError) {
+            console.error("[API] Failed to save devotional to DB:", saveError);
+            // Non-fatal: still return the generated text
+        }
+
+        res.json({ text: responseText });
 
     } catch (error) {
-        console.error("Fluid Gen Error:", error);
-        res.status(500).json({ error: 'Failed to generate fluid content' });
+        console.error("Devotional Error:", error);
+        res.status(500).json({ error: 'Failed to generate devotional' });
+    }
+});
+
+// --- BLOG POST GENERATION ENDPOINT ---
+app.post('/api/ai/blog-post', async (req, res) => {
+    try {
+        const { topic, title, language } = req.body;
+        const systemInstruction = `
+            You are a professional Christian blog writer. Write a comprehensive, SEO-optimized blog post.
+            Topic: ${topic}
+            Title: ${title || 'Auto-generated'}
+            Language: ${language || 'pt'}
+            
+            Include:
+            - Engaging Introduction
+            - Clear Headings (Markdown ##)
+            - Biblical References
+            - Practical Applications
+            - Conclusion
+            
+            Return ONLY a valid JSON object:
+            {
+                "content": {
+                    "title": "Final Title",
+                    "markdownContent": "The full blog post in Markdown format...",
+                    "excerpt": "Short summary for preview..."
+                }
+            }
+        `;
+
+        // Using 'blog_post' feature config (likely OpenRouter/Claude or Gemini)
+        const response = await aiManager.generateContent('blog_post', `Write a post about: ${topic}`, systemInstruction, 'json_object');
+        res.json({ content: response });
+    } catch (error) {
+        console.error("Blog Gen Error:", error);
+        res.status(500).json({ error: 'Failed to generate blog post' });
+    }
+});
+
+// --- SEO METADATA GENERATION ENDPOINT ---
+app.post('/api/ai/seo-metadata', async (req, res) => {
+    try {
+        const { content, keyword, language } = req.body;
+        const systemInstruction = `
+            Generate SEO metadata for the provided content.
+            Keyword: ${keyword}
+            Language: ${language || 'pt'}
+            
+            Return JSON:
+            {
+                "seoTitle": "Optimized Title (max 60 chars)",
+                "metaDescription": "Optimized Description (max 160 chars)"
+            }
+        `;
+        const response = await aiManager.generateContent('seo_metadata', `Content: ${content.substring(0, 500)}...`, systemInstruction, 'json_object');
+        res.json(JSON.parse(response));
+    } catch (error) {
+        console.error("SEO Error:", error);
+        res.status(500).json({ error: 'Failed to generate SEO metadata' });
+    }
+});
+
+// --- AUDIO GENERATION ENDPOINT (Edge TTS) ---
+app.post('/api/audio/edge', async (req, res) => {
+    const debugFile = process.env.NODE_ENV === 'production'
+        ? path.join('/tmp', 'server_debug.txt')
+        : path.join(__dirname, 'server_debug.txt');
+    const log = (msg) => {
+        try {
+            const time = new Date().toLocaleTimeString();
+            fs.appendFileSync(debugFile, `[${time}] ${msg}\n`);
+            console.log(`[AudioDebug] ${msg}`);
+        } catch (e) { console.error("Log failed", e); }
+    };
+
+    try {
+        log("--- New Audio Request ---");
+        const { text, voice } = req.body;
+        if (!text) return res.status(400).json({ error: 'Text is required' });
+
+
+        log(`Voice: ${voice}, Text Length: ${text.length}`);
+
+        // 1. Setup TTS
+        const tts = new MsEdgeTTS();
+        const voiceId = voice === 'female' ? "pt-BR-FranciscaNeural" : "pt-BR-AntonioNeural";
+
+        // Switch to WebM Opus (Proven to work on PC with Web Audio API)
+        await tts.setMetadata(voiceId, OUTPUT_FORMAT.WEBM_24KHZ_16BIT_MONO_OPUS);
+
+        // 2. Generate
+        log("Generating stream (96kbps)...");
+        let stream = null;
+        let result = null;
+
+        try {
+            result = await tts.toStream(text);
+            if (result && result.audioStream) {
+                stream = result.audioStream;
+            } else if (result) {
+                // Fallback if toStream returns the stream directly (Library version diff?)
+                stream = result;
+            }
+            log(`Stream generated: ${!!stream}`);
+        } catch (genErr) {
+            console.error("TTS Generation Critical Error:", genErr);
+            // Don't crash, return explicit error
+            return res.status(500).json({ error: `TTS Gen Failed: ${genErr.message}` });
+        }
+
+        if (!stream) {
+            const debugKeys = result ? Object.keys(result).join(',') : 'null';
+            console.error(`Stream is null. Result keys: ${debugKeys}`);
+            return res.status(500).json({ error: "Stream unavailable from TTS provider" });
+        }
+
+        // 3. Collect Data
+        const chunks = [];
+        stream.on('data', (c) => chunks.push(c));
+
+        stream.on('end', () => {
+            try {
+                const buffer = Buffer.concat(chunks);
+                log(`Success! Buffer size: ${buffer.length} bytes`);
+                const base64 = buffer.toString('base64');
+                res.json({ base64 });
+            } catch (err) {
+                log(`Buffer error: ${err.message}`);
+                res.status(500).json({ error: 'Buffer conversion failed' });
+            }
+        });
+
+        stream.on('error', (err) => {
+            log(`Stream error: ${err.message}`);
+            res.status(500).json({ error: 'Stream error', details: err.message });
+        });
+
+    } catch (e) {
+        log(`CRITICAL ERROR: ${e.message}`);
+        log(`Stack: ${e.stack}`);
+        res.status(500).json({ error: e.message, stack: e.stack });
     }
 });
 
@@ -607,83 +925,7 @@ app.post('/api/upload', async (req, res) => {
     }
 });
 
-app.post('/api/audio/edge', async (req, res) => {
-    const debugFile = process.env.NODE_ENV === 'production'
-        ? path.join('/tmp', 'server_debug.txt')
-        : path.join(__dirname, 'server_debug.txt');
-    const log = (msg) => {
-        try {
-            const time = new Date().toLocaleTimeString();
-            fs.appendFileSync(debugFile, `[${time}] ${msg}\n`);
-            console.log(`[AudioDebug] ${msg}`);
-        } catch (e) { console.error("Log failed", e); }
-    };
 
-    try {
-        log("--- New Audio Request ---");
-        const { text, voice } = req.body;
-        if (!text) return res.status(400).json({ error: 'Text is required' });
-
-
-        log(`Voice: ${voice}, Text Length: ${text.length}`);
-
-        // 1. Setup TTS
-        const tts = new MsEdgeTTS();
-        const voiceId = voice === 'female' ? "pt-BR-FranciscaNeural" : "pt-BR-AntonioNeural";
-
-        // Switch to WebM Opus (Proven to work on PC with Web Audio API)
-        await tts.setMetadata(voiceId, OUTPUT_FORMAT.WEBM_24KHZ_16BIT_MONO_OPUS);
-
-        // 2. Generate
-        log("Generating stream (96kbps)...");
-        let stream = null;
-        let result = null;
-
-        try {
-            result = await tts.toStream(text);
-            if (result && result.audioStream) {
-                stream = result.audioStream;
-            }
-            log(`Stream generated: ${!!stream}`);
-        } catch (genErr) {
-            console.error("TTS Generation Critical Error:", genErr);
-            // Don't crash, return explicit error
-            return res.status(500).json({ error: `TTS Gen Failed: ${genErr.message}` });
-        }
-
-        if (!stream) {
-            const debugKeys = result ? Object.keys(result).join(',') : 'null';
-            console.error(`Stream is null. Result keys: ${debugKeys}`);
-            return res.status(500).json({ error: "Stream unavailable from TTS provider" });
-        }
-
-        // 3. Collect Data
-        const chunks = [];
-        stream.on('data', (c) => chunks.push(c));
-
-        stream.on('end', () => {
-            try {
-                const buffer = Buffer.concat(chunks);
-                log(`Success! Buffer size: ${buffer.length} bytes`);
-                const base64 = buffer.toString('base64');
-                res.json({ base64 });
-            } catch (err) {
-                log(`Buffer error: ${err.message}`);
-                res.status(500).json({ error: 'Buffer conversion failed' });
-            }
-        });
-
-        stream.on('error', (err) => {
-            log(`Stream error: ${err.message}`);
-            res.status(500).json({ error: 'Stream error', details: err.message });
-        });
-
-    } catch (e) {
-        log(`CRITICAL ERROR: ${e.message}`);
-        log(`Stack: ${e.stack}`);
-        res.status(500).json({ error: e.message, stack: e.stack });
-    }
-});
 
 // Deprecated in favor of Pollinations.ai
 export const generateSVGImage = async (prompt) => {
@@ -909,38 +1151,7 @@ app.delete('/api/blog/posts/:slug', async (req, res) => {
 });
 
 // --- AI CONFIG ENDPOINTS ---
-console.log('Registering AI Config Endpoints...'); // DEBUG LOG
 
-app.get('/api/ai/config', (req, res) => {
-    console.log('GET /api/ai/config called'); // DEBUG LOG
-    try {
-        const config = aiManager.getConfig();
-        console.log('Config fetched:', config); // DEBUG LOG
-        res.json(config);
-    } catch (error) {
-        console.error('Error in GET /api/ai/config:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.post('/api/ai/config', (req, res) => {
-
-    try {
-        aiManager.saveConfig(req.body);
-        res.json({ success: true });
-    } catch (e) {
-        res.status(500).json({ error: 'Failed to save config' });
-    }
-});
-
-app.get('/api/ai/models', async (req, res) => {
-    try {
-        const models = await aiManager.getAvailableModels();
-        res.json(models);
-    } catch (e) {
-        res.status(500).json({ error: 'Failed to fetch models' });
-    }
-});
 
 app.post('/api/ai/test-key', async (req, res) => {
     try {
@@ -1057,133 +1268,7 @@ app.post('/api/ai/search', async (req, res) => {
     }
 });
 
-app.post('/api/ai/devotional', async (req, res) => {
-    try {
-        const { language } = req.body;
-        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
 
-        const systemInstruction = `You are a spiritual mentor.
-            CRITICAL: Follow this format STRICTLY.
-        === TITLE ===
-                (Title)
-                === VERSE ===
-                (Reference - Text)
-                === REFLECTION ===
-                (Body)
-                === PRAYER ===
-                (Prayer)
-                    `;
-
-        const prompt = `Generate a daily devotional in ${langName} focusing on hope and faith. Use exactly these headers: ===TITLE===, ===VERSE===, ===REFLECTION===, ===PRAYER===. Do NOT use ===SEPARATOR=== or any variation.`;
-
-        let rawText;
-        try {
-            // Using 'chat' config as it is more permissive with text formats
-            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction);
-        } catch (e) {
-            console.warn("Devotional model failed, retrying...");
-            rawText = await aiManager.generateContent('devotional', prompt, systemInstruction);
-        }
-
-        console.log("Devotional Raw Output:", rawText.substring(0, 100).replace(/\n/g, ' '));
-
-        // Normalize generic separators (Robust Regex)
-        // Matches ===SEPARATOR===, === SEPARATOR ===, etc.
-        rawText = rawText.replace(/={3,}\s*SEPARATOR\s*={3,}/gi, '\n===SECTION===\n');
-
-
-        // Strict Text Parser
-        const parts = {
-            title: "Devocional Diário",
-            verseReference: "Hoje",
-            verseText: "",
-            reflection: "",
-            prayer: ""
-        };
-
-        const sections = rawText.split('===');
-        for (let i = 0; i < sections.length; i++) {
-            const section = sections[i].trim().toUpperCase();
-            const content = sections[i + 1] ? sections[i + 1].trim() : "";
-
-            // Handle specific keys
-            if (section.includes('TITLE')) parts.title = content;
-            else if (section.includes('VERSE')) {
-                const split = content.split(/[-–—] \s*(?=")/);
-                if (split.length > 1) {
-                    parts.verseReference = split[0].trim();
-                    parts.verseText = split[1].replace(/^"/, '').replace(/"$/, '').trim();
-                } else {
-                    parts.verseText = content;
-                }
-            }
-            else if (section.includes('REFLECTION')) parts.reflection = content;
-            else if (section.includes('PRAYER')) parts.prayer = content;
-
-            // Handle generic sectioning (fallback if keys are missing but structure exists)
-            else if (section.includes('SECTION')) {
-                // Heuristic: Assign based on order or content
-                if (!parts.reflection && content.length > 50) parts.reflection = content;
-                else if (!parts.prayer && content.toLowerCase().includes('amém')) parts.prayer = content;
-            }
-        }
-
-
-        // Fallback: If strict parsing failed (e.g. AI ignored separators), try the fuzzy line parser one last time
-        if (!parts.reflection && !parts.prayer) {
-            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
-            let currentSection = 'reflection';
-            let reflectionParts = [];
-            let prayerParts = [];
-
-            const headerRegex = /^(?:[-*]|\d+\.)?\s*(?:\*\*|#+)?\s*/;
-
-            for (const line of lines) {
-                const lower = line.toLowerCase();
-
-                // Matches: "* Title", "- **Title**", "1. Tema", "## Title", "### Title"
-
-                // TITLE
-                if (lower.match(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|assunto|===title)"))) {
-                    parts.title = line.replace(new RegExp(headerRegex.source + "(?:tema|título|titulo|title|assunto|===title):?\\s*", "i"), '').replace(/\*+$/, '').trim();
-                    continue;
-                }
-
-                // VERSE - Expanded keywords
-                if (lower.match(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|leitura|texto|base|bíblica|biblica|escritura|===verse)"))) {
-                    parts.verseText = line.replace(new RegExp(headerRegex.source + "(?:versículo|versiculo|verse|leitura|texto|base|bíblica|biblica|escritura|===verse)(?:\\s+chave|\\s+bíblica|\\s+base)?\\s*:?\\s*", "i"), '').replace(/\*+$/, '').trim();
-                    continue;
-                }
-
-                // PRAYER - Expanded keywords
-                if (lower.match(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|clamor|reza|prece|===prayer)"))) {
-                    currentSection = 'prayer';
-                    parts.prayer = line.replace(new RegExp(headerRegex.source + "(?:oração|oracao|prayer|clamor|reza|prece|===prayer):?\\s*", "i"), '').replace(/\*+$/, '').trim();
-                    continue;
-                }
-
-                // REFLECTION (Body) - Explicit check
-                if (lower.match(new RegExp(headerRegex.source + "(?:reflexão|reflexao|reflection|mensagem|pensamento|===reflection)"))) {
-                    currentSection = 'reflection';
-                    const content = line.replace(new RegExp(headerRegex.source + "(?:reflexão|reflexao|reflection|mensagem|pensamento|===reflection):?\\s*", "i"), '').replace(/\*+$/, '').trim();
-                    if (content) reflectionParts.push(content);
-                    continue;
-                }
-
-                if (currentSection === 'reflection') reflectionParts.push(line);
-                else prayerParts.push(line);
-            }
-            parts.reflection = reflectionParts.join('\n\n');
-            parts.prayer = parts.prayer || prayerParts.join(' ');
-        }
-
-        const json = parts;
-        res.json({ text: JSON.stringify(json) });
-    } catch (error) {
-        console.error("Devotional API Error:", error);
-        res.status(500).json({ error: error.message });
-    }
-});
 
 app.post('/api/ai/explain', async (req, res) => {
     try {
@@ -1621,11 +1706,25 @@ if (fs.existsSync(distPath)) {
 
 // Start Server
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT} (0.0.0.0)`);
-    console.log(`Environment: ${process.env.NODE_ENV}`);
-    console.log(`Storage directory: ${DATA_DIR}`);
-});
+// --- START SERVER (After MongoDB Connection) ---
+(async () => {
+    try {
+        // Wait for MongoDB to connect before starting server
+        await connectDB();
+        console.log('[Server] MongoDB connected, starting Express server...');
+
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
+            console.log(`📡 API ready at http://localhost:${PORT}/api`);
+            console.log(`📊 MongoDB: Connected and ready`);
+            console.log(`Environment: ${process.env.NODE_ENV}`);
+            console.log(`Storage directory: ${DATA_DIR}`);
+        });
+    } catch (error) {
+        console.error('[Server] Failed to start:', error);
+        process.exit(1);
+    }
+})();
 
 // Keep the server alive
 const keepAliveInterval = setInterval(() => {

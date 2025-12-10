@@ -38,7 +38,9 @@ const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t })
         ? (isOld ? 'Antigo Testamento' : 'Novo Testamento')
         : (isOld ? 'Old Testament' : 'New Testament');
 
-    const seoTitle = `${displayTitle} - Bíblia Online Inteligente`;
+    const seoTitle = isOld
+        ? "Antigo Testamento – Livros, Capítulos e Versículos | Bíblia Online"
+        : "Novo Testamento – Livros, Capítulos e Versículos | Bíblia Online";
 
     const description = isOld
         ? "A fundação da fé, narrando a criação, a lei e a história do povo de Israel antes de Cristo."

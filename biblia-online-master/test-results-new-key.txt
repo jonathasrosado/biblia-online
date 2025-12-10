@@ -1,0 +1,3 @@
+[FAILED] black-forest-labs/flux-1-schnell: 400 - {"error":{"message":"black-forest-labs/flux-1-schnell is not a valid model ID","code":400},"user_id":"user_35lvugra0u3P5zHJyN4N4kmt34s"}
+[FAILED] midjourney/midjourney-6: 400 - {"error":{"message":"midjourney/midjourney-6 is not a valid model ID","code":400},"user_id":"user_35lvugra0u3P5zHJyN4N4kmt34s"}
+[FAILED] google/imagen-3: 400 - {"error":{"message":"google/imagen-3 is not a valid model ID","code":400},"user_id":"user_35lvugra0u3P5zHJyN4N4kmt34s"}

@@ -1,0 +1,49 @@
+[
+  {
+    "id": "1",
+    "name": "Versículos por Temas",
+    "slug": "versiculos",
+    "description": "Versículos mais famosos da Bíblia, Antigo e Novo Testamento, saiba os principais. "
+  },
+  {
+    "id": "2",
+    "name": "Histórias",
+    "slug": "historias",
+    "description": "Histórias bíblicas inspiradoras e lições de fé para sua jornada cristã. Descubra ensinamentos e reflexões transformadoras! #Bíblia #Fé #Histórias",
+    "parentId": null
+  },
+  {
+    "id": "1764645825777",
+    "name": "Dúvidas",
+    "slug": "duvidas",
+    "description": "Dúvidas sobre a Bíblia e a fé cristã? Encontre respostas claras e inspiradoras aqui! Fortaleça sua caminhada com Cristo!",
+    "parentId": null
+  },
+  {
+    "id": "1764684866815",
+    "name": "Orações",
+    "slug": "oracoes",
+    "description": "Orações: Fortaleça sua fé! Encontre orações poderosas, estudos bíblicos e aprenda a orar com propósito. Conecte-se com Deus!",
+    "parentId": null
+  },
+  {
+    "id": "1764684879521",
+    "name": "Amor e Relacionamento",
+    "slug": "amor-e-relacionamento",
+    "description": "Amor e Relacionamento: Explore a visão bíblica para um amor que edifica e relacionamentos saudáveis à luz da fé cristã.",
+    "parentId": null
+  },
+  {
+    "id": "1764684886488",
+    "name": "Ensinamentos",
+    "slug": "ensinamentos",
+    "description": "Ensinamentos Bíblicos que transformam! Explore estudos, reflexões e lições da fé para edificar sua vida em Cristo. Aprenda e cresça!",
+    "parentId": null
+  },
+  {
+    "id": "1764684902599",
+    "name": "Recursos para Compartilhar",
+    "slug": "recursos-para-compartilhar",
+    "description": ""
+  }
+]

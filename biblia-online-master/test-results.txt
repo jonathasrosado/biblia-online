@@ -1,0 +1,5 @@
+[FAILED] black-forest-labs/flux-1-schnell: 400 - {"error":{"message":"black-forest-labs/flux-1-schnell is not a valid model ID","code":400},"user_id":"user_35lvugra0u3P5zHJyN4N4kmt34s"}
+[FAILED] flux: 400 - {"error":{"message":"flux is not a valid model ID","code":400},"user_id":"user_35lvugra0u3P5zHJyN4N4kmt34s"}
+[FAILED] flux-schnell: 400 - {"error":{"message":"flux-schnell is not a valid model ID","code":400},"user_id":"user_35lvugra0u3P5zHJyN4N4kmt34s"}
+[SUCCESS] openai/gpt-3.5-turbo is valid.
+[SUCCESS] google/gemini-2.0-flash-exp:free is valid.

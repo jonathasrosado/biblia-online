@@ -1,0 +1,376 @@
+import React, { useState, useRef } from 'react';
+import { toPng } from 'html-to-image';
+import { Download, Share2, X, Image as ImageIcon, Palette, Type, BookOpen, Heart, Sun, Star, Flame, Anchor, Crown, Church, Sparkles, Square, Smartphone, RectangleHorizontal } from 'lucide-react';
+
+interface VerseImageGeneratorProps {
+    verseText: string;
+    verseReference: string;
+    onClose: () => void;
+}
+
+const THEMES = [
+    {
+        id: 'dawn',
+        name: 'Amanhecer',
+        bg: 'bg-gradient-to-br from-orange-100 via-orange-200 to-yellow-200',
+        text: 'text-orange-900',
+        accent: 'text-orange-700',
+        font: 'font-serif'
+    },
+    {
+        id: 'midnight',
+        name: 'Meia-noite',
+        bg: 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900',
+        text: 'text-white',
+        accent: 'text-purple-300',
+        font: 'font-serif'
+    },
+    {
+        id: 'nature',
+        name: 'Natureza',
+        bg: 'bg-gradient-to-br from-emerald-50 via-teal-100 to-emerald-200',
+        text: 'text-emerald-900',
+        accent: 'text-emerald-700',
+        font: 'font-sans'
+    },
+    {
+        id: 'minimal',
+        name: 'Minimalista',
+        bg: 'bg-white',
+        text: 'text-stone-800',
+        accent: 'text-stone-500',
+        font: 'font-serif'
+    },
+    {
+        id: 'royal',
+        name: 'Realeza',
+        bg: 'bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900',
+        text: 'text-bible-gold',
+        accent: 'text-white/80',
+        font: 'font-serif'
+    }
+];
+
+const ICONS = [
+    { id: 'book', icon: BookOpen, label: 'Bíblia' },
+    { id: 'heart', icon: Heart, label: 'Amor' },
+    { id: 'sun', icon: Sun, label: 'Luz' },
+    { id: 'star', icon: Star, label: 'Guia' },
+    { id: 'flame', icon: Flame, label: 'Espírito' },
+    { id: 'anchor', icon: Anchor, label: 'Esperança' },
+    { id: 'crown', icon: Crown, label: 'Reino' },
+    { id: 'church', icon: Church, label: 'Igreja' },
+    { id: 'sparkles', icon: Sparkles, label: 'Milagre' }
+];
+
+const FORMATS = [
+    { id: 'square', label: 'Post (1:1)', aspect: 'aspect-square', icon: Square },
+    { id: 'story', label: 'Story (9:16)', aspect: 'aspect-[9/16]', icon: Smartphone }
+];
+
+const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, verseReference, onClose }) => {
+    const [selectedTheme, setSelectedTheme] = useState(THEMES[0]);
+    const [selectedIcon, setSelectedIcon] = useState(ICONS[0]);
+    const [selectedFormat, setSelectedFormat] = useState(FORMATS[0]);
+    const [loading, setLoading] = useState(false);
+    const [scale, setScale] = useState(1);
+    const cardRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scale the card to fit the container
+    React.useEffect(() => {
+        const calculateScale = () => {
+            if (!cardRef.current || !containerRef.current) return;
+
+            const container = containerRef.current;
+            const card = cardRef.current;
+
+            // Add some padding/margin
+            const padding = 40;
+            const availableWidth = container.clientWidth - padding;
+            const availableHeight = container.clientHeight - padding;
+
+            const cardWidth = card.scrollWidth;
+            const cardHeight = card.scrollHeight;
+
+            const scaleX = availableWidth / cardWidth;
+            const scaleY = availableHeight / cardHeight;
+
+            // Use the smaller scale to ensure it fits both dimensions, max 1
+            const newScale = Math.min(Math.min(scaleX, scaleY), 1);
+            setScale(newScale);
+        };
+
+        calculateScale();
+        window.addEventListener('resize', calculateScale);
+        // Recalculate when format changes
+        setTimeout(calculateScale, 100);
+
+        return () => window.removeEventListener('resize', calculateScale);
+    }, [selectedFormat, verseText]);
+
+    // Helper to convert data URI to Blob without using fetch (avoids "Failed to fetch" errors)
+    const dataURItoBlob = (dataURI: string) => {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    };
+
+    const handleShare = async () => {
+        if (!cardRef.current) return;
+        setLoading(true);
+
+        try {
+            // STRATEGY: Create a clean clone in the DOM to avoid scaling/transform issues
+            // 1. Clone the node
+            const node = cardRef.current;
+            const clone = node.cloneNode(true) as HTMLElement;
+
+            // 2. Style the clone to be fixed size, invisible but rendered
+            clone.style.position = 'absolute';
+            clone.style.top = '0';
+            clone.style.left = '0';
+            clone.style.transform = 'none'; // Ensure no scale
+            clone.style.zIndex = '-50'; // Behind everything
+            clone.style.pointerEvents = 'none';
+            clone.style.visibility = 'visible'; // Crucial: must be visible to capture
+
+            // Explicitly set width/height matching the original UN-SCALED size
+            // The originals have classes like w-[320px] or w-[400px]
+            // We'll let the classes dictate, but ensure no parent constraints
+            // Attach to the containerRef (preview area) instead of body
+            // This ensures it inherits local styles and is "in view"
+            if (containerRef.current) {
+                containerRef.current.appendChild(clone);
+            } else {
+                document.body.appendChild(clone);
+            }
+
+            // 3. Wait a moment for images/fonts in clone to be ready (optional but safer)
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            try {
+                // 4. Capture the CLONE
+                const dataUrl = await toPng(clone, {
+                    cacheBust: true,
+                    pixelRatio: 2, // Retain 2x quality
+                    skipAutoScale: true
+                });
+
+                // 5. Cleanup Clone
+                if (clone.parentNode) {
+                    clone.parentNode.removeChild(clone);
+                }
+
+                // 6. Convert to Blob using HELPER (No fetch)
+                const blob = dataURItoBlob(dataUrl);
+                const file = new File([blob], 'versiculo.png', { type: 'image/png' });
+
+                // 7. Share or Download
+                let shared = false;
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Versículo do Dia',
+                            text: `${verseText} - ${verseReference}`
+                        });
+                        shared = true;
+                    } catch (shareError: any) {
+                        if (shareError.name !== 'AbortError') {
+                            console.warn("Share failed:", shareError);
+                        } else {
+                            shared = true; // Treated as handled
+                        }
+                    }
+                }
+
+                if (!shared) {
+                    const link = document.createElement('a');
+                    link.download = `versiculo-${verseReference.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.png`;
+                    link.href = dataUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+
+            } catch (captureError: any) {
+                // Determine parent from the clone itself
+                if (clone.parentNode) {
+                    clone.parentNode.removeChild(clone);
+                }
+                throw captureError;
+            }
+
+        } catch (err: any) {
+            console.error('Error generating image:', err);
+            // Show ACTUAL error to user for debugging
+            alert(`Erro ao criar imagem: ${err.message || err.toString()}. Tente novamente.`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const IconComponent = selectedIcon.icon;
+
+    return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-white dark:bg-stone-900 w-full md:max-w-5xl h-full md:h-auto md:max-h-[90vh] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+
+                {/* Preview Area - Fixed height on mobile to ensure visibility */}
+                <div
+                    ref={containerRef}
+                    className="h-[45%] md:h-auto md:flex-1 bg-stone-100 dark:bg-stone-950 p-4 md:p-8 flex items-center justify-center relative overflow-hidden"
+                >
+                    {/* Scalable Container */}
+                    <div
+                        style={{
+                            transform: `scale(${scale})`,
+                            transition: 'transform 0.3s ease-out'
+                        }}
+                    >
+                        <div
+                            ref={cardRef}
+                            className={`${selectedFormat.aspect} w-[320px] md:w-[400px] shadow-2xl rounded-xl p-8 md:p-10 flex flex-col justify-center items-center text-center relative overflow-hidden transition-colors duration-500 ${selectedTheme.bg}`}
+                        >
+                            {/* Decorative Elements */}
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-20"></div>
+
+                            <div className={`mb-6 md:mb-8 opacity-80 ${selectedTheme.accent}`}>
+                                <IconComponent size={36} strokeWidth={1.5} />
+                            </div>
+
+                            <p className={`text-xl md:text-2xl leading-relaxed mb-8 md:mb-10 font-medium ${selectedTheme.text} ${selectedTheme.font}`}>
+                                "{verseText}"
+                            </p>
+
+                            <div className={`w-16 h-px bg-current opacity-30 mb-6 md:mb-8 ${selectedTheme.text}`}></div>
+
+                            <p className={`text-sm font-bold tracking-widest uppercase ${selectedTheme.accent}`}>
+                                {verseReference}
+                            </p>
+
+                            <p className={`absolute bottom-6 text-[11px] font-bold opacity-50 tracking-[0.2em] uppercase ${selectedTheme.text}`}>
+                                BibliaOnline.me
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Controls Area - Scrollable */}
+                <div className="flex-1 md:flex-none md:w-80 bg-white dark:bg-stone-900 flex flex-col border-t md:border-t-0 md:border-l border-stone-200 dark:border-stone-800 overflow-hidden">
+                    {/* Header */}
+                    <div className="p-4 md:p-6 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center bg-white dark:bg-stone-900 sticky top-0 z-10">
+                        <h3 className="font-serif font-bold text-lg md:text-xl text-bible-accent dark:text-bible-gold">Criar Imagem</h3>
+                        <button onClick={onClose} className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors">
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    {/* Scrollable Options */}
+                    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+                        {/* Format Selection */}
+                        <div>
+                            <label className="flex items-center gap-2 text-xs font-bold text-stone-500 mb-3 uppercase tracking-wider">
+                                <ImageIcon size={14} /> Formato
+                            </label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {FORMATS.map(format => {
+                                    const FormatIcon = format.icon;
+                                    return (
+                                        <button
+                                            key={format.id}
+                                            onClick={() => setSelectedFormat(format)}
+                                            className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all
+                                                ${selectedFormat.id === format.id
+                                                    ? 'border-bible-gold bg-bible-gold text-white shadow-md'
+                                                    : 'border-stone-200 dark:border-stone-700 text-stone-500 hover:border-bible-gold/50 hover:text-bible-gold'}
+                                            `}
+                                        >
+                                            <FormatIcon size={18} />
+                                            <span className="text-[10px] font-bold">{format.label.split(' ')[0]}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Theme Selection */}
+                        <div>
+                            <label className="flex items-center gap-2 text-xs font-bold text-stone-500 mb-3 uppercase tracking-wider">
+                                <Palette size={14} /> Temas
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {THEMES.map(theme => (
+                                    <button
+                                        key={theme.id}
+                                        onClick={() => setSelectedTheme(theme)}
+                                        className={`p-2 rounded-xl border text-left transition-all flex items-center gap-3
+                                            ${selectedTheme.id === theme.id
+                                                ? 'border-bible-gold ring-1 ring-bible-gold bg-bible-gold/5'
+                                                : 'border-stone-200 dark:border-stone-700 hover:border-bible-gold/50'}
+                                        `}
+                                    >
+                                        <div className={`w-8 h-8 rounded-full shadow-sm ${theme.bg}`}></div>
+                                        <span className="text-xs font-bold text-stone-700 dark:text-stone-300">{theme.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Icon Selection */}
+                        <div>
+                            <label className="flex items-center gap-2 text-xs font-bold text-stone-500 mb-3 uppercase tracking-wider">
+                                <Sparkles size={14} /> Ícone
+                            </label>
+                            <div className="grid grid-cols-5 gap-2">
+                                {ICONS.map(item => {
+                                    const ItemIcon = item.icon;
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => setSelectedIcon(item)}
+                                            className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all aspect-square
+                                                ${selectedIcon.id === item.id
+                                                    ? 'border-bible-gold bg-bible-gold text-white shadow-md'
+                                                    : 'border-stone-200 dark:border-stone-700 text-stone-500 hover:border-bible-gold/50 hover:text-bible-gold'}
+                                            `}
+                                            title={item.label}
+                                        >
+                                            <ItemIcon size={18} />
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Footer Action */}
+                    <div className="p-4 md:p-6 border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+                        <button
+                            onClick={handleShare}
+                            disabled={loading}
+                            className="w-full py-3.5 rounded-xl bg-bible-gold text-white font-bold text-lg shadow-lg hover:bg-yellow-600 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {loading ? (
+                                <span className="animate-pulse">Gerando...</span>
+                            ) : (
+                                <>
+                                    <Share2 size={20} />
+                                    Compartilhar
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default VerseImageGenerator;

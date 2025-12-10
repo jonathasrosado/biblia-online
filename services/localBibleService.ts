@@ -1,6 +1,8 @@
-import bibleData from '../src/data/bible.json';
+import bibleAcfData from '../src/data/bible_acf.json';
+import bibleNviData from '../src/data/bible_nvi.json';
+import bibleNtlhData from '../src/data/bible_ntlh.json';
 import { bibleBooks } from '../constants';
-import { Verse, SearchResult } from '../types';
+import { Verse, SearchResult, BibleVersion } from '../types';
 
 // Type definition for the JSON structure
 interface BibleBookJson {
@@ -9,9 +11,11 @@ interface BibleBookJson {
 }
 
 // Cast the imported JSON to the correct type
-const bible: BibleBookJson[] = bibleData as BibleBookJson[];
+const bibleAcf: BibleBookJson[] = bibleAcfData as BibleBookJson[];
+const bibleNvi: BibleBookJson[] = bibleNviData as BibleBookJson[];
+const bibleNtlh: BibleBookJson[] = bibleNtlhData as BibleBookJson[];
 
-export const getChapterContentLocal = (bookName: string, chapterNumber: number): Verse[] | null => {
+export const getChapterContentLocal = (bookName: string, chapterNumber: number, version: BibleVersion = 'nvi'): Verse[] | null => {
     try {
         // 1. Find the book index
         const bookIndex = bibleBooks.findIndex(b => b.name === bookName);
@@ -21,10 +25,12 @@ export const getChapterContentLocal = (bookName: string, chapterNumber: number):
             return null;
         }
 
-        const bookData = bible[bookIndex];
+        // Select the correct bible version
+        const bibleData = version === 'nvi' ? bibleNvi : (version === 'ntlh' ? bibleNtlh : bibleAcf);
+        const bookData = bibleData[bookIndex];
 
         if (!bookData) {
-            console.warn(`Book data not found for index: ${bookIndex}`);
+            console.warn(`Book data not found for index: ${bookIndex} in version ${version}`);
             return null;
         }
 
@@ -50,17 +56,20 @@ export const getChapterContentLocal = (bookName: string, chapterNumber: number):
     }
 };
 
-export const searchBibleLocal = (query: string): SearchResult[] => {
+export const searchBibleLocal = (query: string, version: BibleVersion = 'nvi'): SearchResult[] => {
     if (!query || query.length < 3) return [];
 
     const results: SearchResult[] = [];
     const lowerQuery = query.toLowerCase();
     const limit = 20; // Limit local results to prevent UI lag
 
+    // Select the correct bible version
+    const bibleData = version === 'nvi' ? bibleNvi : (version === 'ntlh' ? bibleNtlh : bibleAcf);
+
     try {
         // Iterate through all books
-        for (let bIndex = 0; bIndex < bible.length; bIndex++) {
-            const book = bible[bIndex];
+        for (let bIndex = 0; bIndex < bibleData.length; bIndex++) {
+            const book = bibleData[bIndex];
             const bookName = bibleBooks[bIndex]?.name || book.abbrev;
 
             // Iterate through all chapters

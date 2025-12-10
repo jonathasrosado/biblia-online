@@ -37,10 +37,19 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
             <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-400 mb-6">
                 <Sun size={32} />
             </div>
-            <h1 className="text-4xl font-serif text-bible-accent dark:text-bible-gold mb-2 text-center transition-colors">
-                {t.dailyDevotionalTitle}
-            </h1>
-            <div className="w-24 h-1 bg-bible-gold mb-12"></div>
+            {/* Header / Eyebrow */}
+            <div className="text-center mb-8">
+                <span className="text-bible-gold font-bold uppercase tracking-widest text-sm">
+                    {t.dailyDevotionalTitle}
+                </span>
+
+                {/* If we have a title, show it here as H1 */}
+                {dailyDevotional && (
+                    <h1 className="text-3xl md:text-5xl font-serif text-bible-accent dark:text-stone-100 mt-4 leading-tight animate-slideUp">
+                        {dailyDevotional.title}
+                    </h1>
+                )}
+            </div>
 
             {!dailyDevotional ? (
                 <div className="space-y-6 animate-pulse w-full max-w-2xl">
@@ -52,11 +61,9 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
                 <div className={`w-full transition-colors font-serif
           ${preferences.theme === 'sepia' ? 'text-[#5c4b37]' : 'text-stone-800 dark:text-stone-200'}
         `}>
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-bible-accent dark:text-bible-gold">
-                        {dailyDevotional.title}
-                    </h2>
 
-                    <div className={`relative p-8 md:p-10 rounded-xl mb-10 border
+
+                    <div className={`relative p-8 md:p-10 rounded-xl mb-10 border mt-8
                ${preferences.theme === 'sepia'
                             ? 'bg-[#fcf9ee] border-[#e6dcc6]'
                             : 'bg-white dark:bg-stone-900 border-stone-100 dark:border-stone-800 shadow-sm'}

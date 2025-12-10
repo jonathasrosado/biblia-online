@@ -1,0 +1,5 @@
+- google/gemini-3-pro-image-preview (Google: Nano Banana Pro (Gemini 3 Pro Image Preview))
+- openai/gpt-5-image-mini (OpenAI: GPT-5 Image Mini)
+- openai/gpt-5-image (OpenAI: GPT-5 Image)
+- google/gemini-2.5-flash-image (Google: Gemini 2.5 Flash Image (Nano Banana))
+- google/gemini-2.5-flash-image-preview (Google: Gemini 2.5 Flash Image Preview (Nano Banana))

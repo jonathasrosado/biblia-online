@@ -4,6 +4,8 @@ export interface BibleBook {
   testament: 'Old' | 'New';
 }
 
+export type BibleVersion = 'nvi' | 'acf' | 'ntlh';
+
 export interface Verse {
   number: number;
   text: string;
@@ -44,9 +46,22 @@ export interface DevotionalContent {
   prayer: string;
 }
 
-export interface FluidChapterContent {
+export interface ChapterSummary {
   title: string;
-  paragraphs: string[];
+  summary: string;
+  structure: {
+    intro: string;
+    blocks: { verses: string; description: string }[];
+    centralMessage: string;
+  };
+  keyVerses: {
+    verses: string;
+    title: string;
+    explanation: string;
+  }[];
+  historicalContext: string;
+  practicalApplication: string[];
+  prayer: string;
 }
 
 export interface BlogPost {

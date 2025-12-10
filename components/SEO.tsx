@@ -26,7 +26,9 @@ const SEO: React.FC<SEOProps> = ({
 
     // Smart title generation: avoid duplicating the site title if it's already present
     let fullTitle = title;
-    if (title !== siteTitle && !title.endsWith(` - ${siteTitle}`) && !title.endsWith(` | ${siteTitle}`)) {
+    // Check if title is exactly the site title OR if it already contains the site title (to prevent "Title | Site Name | Site Name")
+    // Also explicitly checking for the long home page title format just in case
+    if (title !== siteTitle && !title.includes(siteTitle) && !title.includes('Bíblia Online')) {
         fullTitle = `${title} | ${siteTitle}`;
     }
 

@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { Book, Menu, MessageCircle, Search, Sun, Moon, X, BookOpen, Settings, ArrowUp, Minimize, ChevronLeft, ChevronRight, User as UserIcon } from 'lucide-react';
+import { Book, Menu, MessageCircle, Search, Sun, Moon, X, BookOpen, Settings, ArrowUp, Minimize, ChevronLeft, ChevronRight, ChevronDown, User as UserIcon } from 'lucide-react';
 import { bibleBooks, translations, findBookByNormalizedName, normalizeBookName } from './constants';
 
-import { BibleBook, ReadingPreferences, ReadingHistoryItem } from './types';
+import { BibleBook, ReadingPreferences, ReadingHistoryItem, BibleVersion } from './types';
 import BookSelector from './components/BookSelector';
 import { AdUnit } from './components/AdUnit';
 import { AppFooter, CookieBanner, LegalModal } from './components/LegalComponents';
 import SettingsModal from './components/SettingsModal';
 import LoginModal from './components/LoginModal';
-import LoginButton from './components/LoginButton';
 
 // Pages
-import HomePage from './components/HomePage'; // We'll use the component as the home page
+import HomePage from './components/HomePage';
 import ReadingPage from './pages/ReadingPage';
+import SummaryPage from './pages/SummaryPage';
 import BookIntroPage from './pages/BookIntroPage';
 import SearchPage from './pages/SearchPage';
 import DevotionalPage from './pages/DevotionalPage';
@@ -26,6 +26,18 @@ import TestamentPage from './pages/TestamentPage';
 import VersesPage from './pages/VersesPage';
 import HowToReadBiblePage from './pages/HowToReadBiblePage';
 import BibleFaqPage from './pages/BibleFaqPage';
+import AdminPage from './pages/AdminPage';
+
+// Admin Components
+import BlogManager from './components/admin/BlogManager';
+import BlogEditor from './components/admin/BlogEditor';
+import CategoryList from './components/admin/CategoryList';
+import UserManager from './components/admin/UserManager';
+import SettingsManager from './components/admin/SettingsManager';
+import AISettings from './components/admin/AISettings';
+import PromptsManager from './components/admin/PromptsManager';
+import MediaManager from './components/admin/MediaManager';
+import BibleManager from './components/admin/BibleManager';
 
 interface ViewWrapperProps {
   children: React.ReactNode;
@@ -48,41 +60,9 @@ const ViewWrapper: React.FC<ViewWrapperProps> = ({ children, onOpenPrivacy, onOp
   </div>
 );
 
-import AdminPage from './pages/AdminPage';
-import BlogManager from './components/admin/BlogManager';
-import BlogEditor from './components/admin/BlogEditor';
-import CategoryList from './components/admin/CategoryList';
-import UserManager from './components/admin/UserManager';
-import SettingsManager from './components/admin/SettingsManager';
-import AISettings from './components/admin/AISettings';
-import PromptsManager from './components/admin/PromptsManager';
-import MediaManager from './components/admin/MediaManager';
-import BibleManager from './components/admin/BibleManager';
-
 // Redirect Handler Component
 const RedirectHandler = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [links, setLinks] = useState<Record<string, string>>({});
-
-  // Link Shortener logic removed to prevent navigation issues
-  /*
-  useEffect(() => {
-    fetch('/api/admin/links')
-      .then(res => res.json())
-      .then(data => setLinks(data))
-      .catch(() => { });
-  }, []);
-
-  useEffect(() => {
-    // Check if current path matches a shortlink
-    const path = location.pathname.slice(1); // Remove leading slash
-    if (links[path]) {
-      window.location.href = links[path]; // Hard redirect to ensure clean state
-    }
-  }, [location, links]);
-  */
-
+  // Logic for redirects if any (kept minimal as per previous view)
   return null;
 };
 
@@ -96,7 +76,6 @@ function AppContent() {
   // Language State
   const [language, setLanguage] = useState<string>('pt');
 
-  // Initialize Language
   useEffect(() => {
     const browserLang = navigator.language.split('-')[0];
     if (['en', 'es'].includes(browserLang)) {
@@ -126,6 +105,22 @@ function AppContent() {
   });
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+
+  // Versions Dropdown State
+  const [isVersionsOpen, setIsVersionsOpen] = useState(false);
+
+  // Bible Version State (Global)
+  const [version, setVersion] = useState<BibleVersion>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('bibleVersion');
+      return (['acf', 'nvi', 'ntlh'].includes(saved || '') ? saved : 'nvi') as BibleVersion;
+    }
+    return 'nvi';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('bibleVersion', version);
+  }, [version]);
 
   // History State
   const [history, setHistory] = useState<ReadingHistoryItem[]>(() => {
@@ -159,15 +154,11 @@ function AppContent() {
     localStorage.setItem('readingHistory', JSON.stringify(history));
   }, [history]);
 
-  // Scroll Listener & Progress - REMOVED per user request
-  // const [scrollProgress, setScrollProgress] = useState(0);
-
   useEffect(() => {
     const mainContainer = mainScrollRef.current;
     if (!mainContainer) return;
 
     const handleScroll = () => {
-      // Show/Hide Scroll Top Button
       if (mainContainer.scrollTop > 300) {
         setShowScrollTop(true);
       } else {
@@ -182,7 +173,7 @@ function AppContent() {
   // Reset scroll on route change
   useEffect(() => {
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    setSidebarOpen(false); // Close sidebar on navigation
+    setSidebarOpen(false);
   }, [location.pathname]);
 
   const scrollToTop = () => {
@@ -207,16 +198,7 @@ function AppContent() {
 
     const query = searchQuery.trim();
 
-    // 1. Check for Question (Smart Chat Redirect) - REMOVED (Unified Search Strategy)
-    // const isQuestion = /^(quem|como|qual|quando|onde|por que|o que|\?)/i.test(query) || query.includes('?');
-    // if (isQuestion) {
-    //  navigate(`/chat?p=${encodeURIComponent(query)}`);
-    //  setSidebarOpen(false);
-    //  return;
-    // }
-
-    // 2. Check for "Book Chapter" pattern (e.g., "Salmos 91", "João 3")
-    // Regex matches: Name (chars/spaces) + number
+    // Check for "Book Chapter" pattern
     const match = query.match(/^([a-zA-Z\u00C0-\u00FF\s]+)\s+(\d+)$/);
     if (match) {
       const bookName = match[1].trim();
@@ -233,7 +215,6 @@ function AppContent() {
       }
     }
 
-    // 3. Default Search
     navigate(`/busca?q=${encodeURIComponent(query)}`);
     setSidebarOpen(false);
   };
@@ -269,12 +250,9 @@ function AppContent() {
     }
   };
 
-  // Determine current book/chapter for BookSelector based on URL or default
-  // This is a bit tricky since we are outside the Route. 
-  // We can just pass defaults or try to parse location, but defaults are fine for the selector.
   // Determine current book/chapter for BookSelector based on URL
   const match = location.pathname.match(/\/leitura\/([^\/]+)\/(\d+)/);
-  const introMatch = location.pathname.match(/\/leitura\/([^\/]+)$/); // Match /leitura/book-name
+  const introMatch = location.pathname.match(/\/leitura\/([^\/]+)$/);
 
   let currentBook = bibleBooks[0];
   let currentChapter = 1;
@@ -288,12 +266,11 @@ function AppContent() {
       currentChapter = chapter;
     }
   } else if (introMatch) {
-    // Case: Book Intro Page (no chapter)
     const bookName = decodeURIComponent(introMatch[1]);
     const foundBook = findBookByNormalizedName(bookName);
     if (foundBook) {
       currentBook = foundBook;
-      currentChapter = 0; // 0 indicates "Intro" or "No specific chapter"
+      currentChapter = 0;
     }
   }
 
@@ -301,7 +278,7 @@ function AppContent() {
     <div className={`min-h-screen font-sans flex flex-col md:flex-row overflow-hidden transition-colors duration-300 ${getMainBackgroundClass()}`}>
       <RedirectHandler />
 
-      {/* Desktop Open Sidebar Button (Top Left) */}
+      {/* Desktop Open Sidebar Button */}
       {!desktopSidebarOpen && !isFullScreen && (
         <button
           onClick={() => setDesktopSidebarOpen(true)}
@@ -312,7 +289,7 @@ function AppContent() {
         </button>
       )}
 
-      {/* User Login Button (Top Right - Desktop) */}
+      {/* User Login Button */}
       {!isFullScreen && (
         <button
           onClick={() => setIsLoginModalOpen(true)}
@@ -336,7 +313,6 @@ function AppContent() {
             <span className="font-serif font-bold text-xl text-bible-accent dark:text-bible-gold">{t.appTitle}</span>
           </div>
           <div className="flex items-center gap-2">
-            {/* User Login Button Removed per request */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
@@ -436,6 +412,21 @@ function AppContent() {
 
             <div className="h-px bg-stone-100 dark:bg-stone-800 my-2 mx-2" />
 
+
+
+            <div className="h-px bg-stone-100 dark:bg-stone-800 my-2 mx-2" />
+
+            <button
+              onClick={() => { navigate('/'); setSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
+                ${location.pathname === '/'
+                  ? 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium'
+                  : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
+            >
+              <BookOpen size={20} />
+              Início
+            </button>
+
             <button
               onClick={() => { navigate('/devocional'); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
@@ -446,7 +437,6 @@ function AppContent() {
               <Sun size={20} />
               {t.devotional}
             </button>
-
             <button
               onClick={() => { navigate('/chat'); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
@@ -458,6 +448,44 @@ function AppContent() {
               {t.chat}
             </button>
 
+            {/* Bible Versions Dropdown */}
+            <div className="w-full">
+              <button
+                onClick={() => setIsVersionsOpen(!isVersionsOpen)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors
+                  ${isVersionsOpen ? 'bg-black/5 dark:bg-white/5' : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Book size={20} />
+                  <span>Versões da Bíblia</span>
+                </div>
+                <ChevronDown size={16} className={`transition-transform duration-200 ${isVersionsOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isVersionsOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="pl-11 pr-4 py-2 space-y-1">
+                  <button
+                    onClick={() => { setVersion('nvi'); setSidebarOpen(false); }}
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'nvi' ? 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium' : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                  >
+                    Nova Versão Internacional (NVI)
+                  </button>
+                  <button
+                    onClick={() => { setVersion('acf'); setSidebarOpen(false); }}
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'acf' ? 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium' : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                  >
+                    Almeida Corrigida Fiel (ACF)
+                  </button>
+                  <button
+                    onClick={() => { setVersion('ntlh'); setSidebarOpen(false); }}
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'ntlh' ? 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium' : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                  >
+                    Nova Tradução na Linguagem de Hoje (NTLH)
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <button
               onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
@@ -468,10 +496,6 @@ function AppContent() {
           </nav>
 
           <div className="px-4 pb-4 space-y-4">
-            {/* Removed direct LoginButton, now handled by Modal/Top Button. 
-                 But we can keep a "Minha Conta" button here too if we want. 
-                 Let's put a banner or something. */}
-            {/* Login Banner Removed per request */}
             <AdUnit className="mt-2 scale-90 origin-bottom" label="Publicidade" />
           </div>
         </aside>
@@ -482,12 +506,6 @@ function AppContent() {
         className={`flex-1 overflow-y-auto relative scroll-smooth ${getMainBackgroundClass()}
           ${isFullScreen ? 'h-screen' : 'h-[calc(100vh-65px)] md:h-screen'}`}
       >
-        {/* Reading Progress Bar - REMOVED per user request */}
-
-
-        {/* Reading Progress Bar (Book Level) - REMOVED per user request */}
-
-
         <Routes>
           <Route path="/" element={
             <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
@@ -538,10 +556,25 @@ function AppContent() {
                 language={language}
                 t={t}
                 preferences={preferences}
+                version={version}
                 isFullScreen={isFullScreen}
                 setIsFullScreen={setIsFullScreen}
                 addToHistory={addToHistory}
                 onUpdatePreferences={setPreferences}
+              />
+            </ViewWrapper>
+          } />
+
+          <Route path="/resumo/:bookAbbrev/:chapterNum" element={
+            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+              <SummaryPage
+                language={language}
+                t={t}
+                preferences={preferences}
+                onUpdatePreferences={setPreferences}
+                isFullScreen={isFullScreen}
+                setIsFullScreen={setIsFullScreen}
+                addToHistory={addToHistory}
               />
             </ViewWrapper>
           } />

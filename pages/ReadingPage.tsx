@@ -2,11 +2,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import SEO from '../components/SEO';
-import { ChevronRight, ChevronLeft, Volume2, Pause, Play, Share2, BookOpen, Mic, X, ChevronDown, Minimize, Maximize, List, AlignLeft, Type, Square, Loader2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Volume2, Pause, Play, Share2, BookOpen, Mic, X, ChevronDown, Minimize, Maximize, List, FileText, Type, Loader2 } from 'lucide-react';
 import { bibleBooks, normalizeBookName, findBookByNormalizedName } from '../constants';
 import { chapterTitles } from '../data/chapterTitles';
-import { getChapterContent, getFluidChapterContent, getDetailedAnswer, generateAudioFromText } from '../services/geminiService';
-import { Verse, FluidChapterContent, ReadingPreferences } from '../types';
+import { getChapterContent } from '../services/geminiService';
+import { Verse, ReadingPreferences, BibleVersion } from '../types';
 import BibleReader, { BibleReaderRef } from '../components/BibleReader';
 import { AdUnit } from '../components/AdUnit';
 
@@ -15,6 +15,7 @@ interface ReadingPageProps {
     t: any;
     preferences: ReadingPreferences;
     onUpdatePreferences: (newPrefs: ReadingPreferences) => void;
+    version: BibleVersion;
     isFullScreen: boolean;
     setIsFullScreen: (v: boolean) => void;
     addToHistory: (book: string, chapter: number) => void;
@@ -25,6 +26,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     t,
     preferences,
     onUpdatePreferences,
+    version,
     isFullScreen,
     setIsFullScreen,
     addToHistory
@@ -36,12 +38,9 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
 
     // State Declarations
     const [chapterContent, setChapterContent] = useState<Verse[]>([]);
-    const [fluidContent, setFluidContent] = useState<FluidChapterContent | null>(null);
-    const [fluidError, setFluidError] = useState<string | null>(null);
     const [loadingContent, setLoadingContent] = useState(false);
 
-    // Get mode from URL, default to 'verse'
-    const readingMode = (searchParams.get('mode') as 'verse' | 'fluid') || 'verse';
+    // Version State removed (now passed via props)
 
     // Parse selected verses from URL
     const versesParam = searchParams.get('verses');
@@ -95,10 +94,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
         }
     }, [loadingContent, initialSelectedVerses]);
 
-    const setReadingMode = (mode: 'verse' | 'fluid') => {
-        setSearchParams({ mode });
-    };
-
     // Find book
     const currentBook = findBookByNormalizedName(bookAbbrev || '') || bibleBooks[0];
     const currentChapter = parseInt(chapterNum || '1', 10);
@@ -106,37 +101,23 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     useEffect(() => {
         const loadChapter = async () => {
             setLoadingContent(true);
-            setFluidContent(null);
-            setFluidError(null);
             try {
                 addToHistory(currentBook.name, currentChapter);
-                const verses = await getChapterContent(currentBook.name, currentChapter, language);
+                const verses = await getChapterContent(currentBook.name, currentChapter, language, version);
                 setChapterContent(verses);
-
-                if (readingMode === 'fluid') {
-                    const fluid = await getFluidChapterContent(currentBook.name, currentChapter, language);
-                    if (fluid && 'error' in fluid) {
-                        setFluidError(fluid.error);
-                    } else if (fluid) {
-                        setFluidContent(fluid as FluidChapterContent);
-                    } else {
-                        setFluidError("Erro desconhecido.");
-                    }
-                }
             } catch (error) {
                 console.error("Failed to load chapter", error);
-                setFluidError("Erro ao carregar conteúdo.");
             } finally {
                 setLoadingContent(false);
             }
         };
 
         loadChapter();
-    }, [currentBook.name, currentChapter, language, readingMode]);
+    }, [currentBook.name, currentChapter, language, version]);
 
     const navigateTo = (bookName: string, chapter: number) => {
         const normalizedBook = normalizeBookName(bookName);
-        navigate(`/leitura/${normalizedBook}/${chapter}?mode=${readingMode}`);
+        navigate(`/leitura/${normalizedBook}/${chapter}`);
     };
 
     const staticTitle = chapterTitles[currentBook.name]?.[currentChapter];
@@ -168,45 +149,22 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     const prevChapter = getPrevChapter();
 
     let pageTitle = "";
-    if (readingMode === 'fluid') {
-        const titleText = staticTitle || fluidContent?.title;
-        if (titleText) {
-            pageTitle = `${currentBook.name} ${currentChapter} - ${titleText}`;
+    if (versesParam) {
+        let versePart = "";
+        if (/^\d+-\d+$/.test(versesParam)) {
+            const [start, end] = versesParam.split('-');
+            versePart = `Versículo ${start} ao ${end}`;
+        } else if (/^\d+$/.test(versesParam)) {
+            versePart = `Versículo ${versesParam}`;
         } else {
-            pageTitle = `${currentBook.name} ${currentChapter} - Leitura`;
+            versePart = `Versículos ${versesParam}`;
         }
+        pageTitle = `${currentBook.name} ${currentChapter} – ${versePart}`;
     } else {
-        if (versesParam) {
-            let versePart = "";
-            if (/^\d+-\d+$/.test(versesParam)) {
-                const [start, end] = versesParam.split('-');
-                versePart = `Versículo ${start} ao ${end}`;
-            } else if (/^\d+$/.test(versesParam)) {
-                versePart = `Versículo ${versesParam}`;
-            } else {
-                versePart = `Versículos ${versesParam}`;
-            }
-            pageTitle = `${currentBook.name} ${currentChapter} – ${versePart}`;
-        } else {
-            pageTitle = `${currentBook.name} ${currentChapter} – Versículos`;
-        }
+        pageTitle = `${currentBook.name} ${currentChapter} – Versículos`;
     }
 
-    // Audio State
-    const [isAudioLoading, setIsAudioLoading] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
-    const [currentPlayingChunk, setCurrentPlayingChunk] = useState<number>(0);
-    const [totalChunks, setTotalChunks] = useState<number>(0);
-
-    // Refs for audio management
-    const audioContextRef = React.useRef<AudioContext | null>(null);
-    const sourceNodeRef = React.useRef<AudioBufferSourceNode | null>(null);
-    const isPlayingRef = React.useRef<boolean>(false);
-    const audioCacheRef = React.useRef<Map<number, AudioBuffer>>(new Map());
-    const activeFetchRef = React.useRef<Set<number>>(new Set());
-
-    // Verse Mode Audio State
+    // Audio State (Verse only now)
     const bibleReaderRef = React.useRef<BibleReaderRef>(null);
     const [isVerseAudioPlaying, setIsVerseAudioPlaying] = useState(false);
     const [isVerseAudioLoading, setIsVerseAudioLoading] = useState(false);
@@ -214,246 +172,12 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     // UI State
     const [isChapterGridOpen, setIsChapterGridOpen] = useState(false);
 
-    // --- Audio Functions Defined Before Use ---
-
-    const pauseAudio = () => {
-        isPlayingRef.current = false;
-        if (sourceNodeRef.current) {
-            try {
-                sourceNodeRef.current.stop();
-            } catch (e) { }
-            sourceNodeRef.current = null;
-        }
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-        }
-        setIsPlaying(false);
-        setIsPaused(true);
-        setIsAudioLoading(false);
-    };
-
-    const stopAudio = () => {
-        pauseAudio();
-        // Reset state
-        audioCacheRef.current.clear();
-        activeFetchRef.current.clear();
-        setCurrentPlayingChunk(0);
-        setIsPaused(false);
-        if (audioContextRef.current) {
-            audioContextRef.current.close().catch(console.error);
-            audioContextRef.current = null;
-        }
-    };
-
-    // Stop audio when component unmounts or book/chapter changes
-    useEffect(() => {
-        return () => stopAudio();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [bookAbbrev, chapterNum, readingMode]);
-
-    const playFluidAudio = async () => {
-        if (isPlaying) {
-            pauseAudio();
-            return;
-        }
-
-        if (!fluidContent?.paragraphs) return;
-
-        // iOS requires AudioContext to be created/resumed synchronously within a user gesture
-        if (!audioContextRef.current) {
-            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-        }
-
-        if (audioContextRef.current.state === 'suspended') {
-            await audioContextRef.current.resume();
-        }
-
-        setIsPlaying(true);
-        setIsPaused(false);
-        isPlayingRef.current = true;
-        setIsAudioLoading(true);
-
-        try {
-            // Strip markdown (asterisks, etc) for clean reading
-            const chunks = fluidContent.paragraphs.map(p =>
-                p.replace(/[*#_`\[\]]/g, '')
-            );
-            setTotalChunks(chunks.length);
-
-            let startIndex = currentPlayingChunk;
-            if (startIndex >= chunks.length) {
-                startIndex = 0;
-                setCurrentPlayingChunk(0);
-            }
-
-            processAudioQueue(chunks, startIndex);
-        } catch (error) {
-            console.error("Audio Init Error", error);
-            stopAudio();
-        }
-    };
-
-    const processAudioQueue = async (chunks: string[], startIndex: number = 0) => {
-        let chunkIndex = startIndex;
-        const MAX_RETRIES = 2;
-        const retryCounts = new Map<number, number>();
-        let useWebSpeech = false;
-
-        // Helper for Web Speech API
-        const speakWithWebSpeech = (text: string): Promise<void> => {
-            return new Promise((resolve, reject) => {
-                if (!window.speechSynthesis) {
-                    reject("Web Speech API not supported");
-                    return;
-                }
-
-                window.speechSynthesis.cancel();
-
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = language === 'en' ? 'en-US' : language === 'es' ? 'es-ES' : 'pt-BR';
-                utterance.rate = 1.0;
-
-                const voices = window.speechSynthesis.getVoices();
-                const preferredGender = preferences.voice || 'male';
-
-                const selectedVoice = voices.find(v =>
-                    v.lang.startsWith(utterance.lang.split('-')[0]) &&
-                    (preferredGender === 'female' ? v.name.includes('Female') || v.name.includes('Maria') : v.name.includes('Male') || v.name.includes('David'))
-                ) || voices.find(v => v.lang.startsWith(utterance.lang.split('-')[0]));
-
-                if (selectedVoice) {
-                    utterance.voice = selectedVoice;
-                }
-
-                utterance.onend = () => resolve();
-                utterance.onerror = (e) => reject(e);
-
-                window.speechSynthesis.speak(utterance);
-            });
-        };
-
-        const fetchChunk = async (index: number) => {
-            if (useWebSpeech) return;
-            if (activeFetchRef.current.has(index) || audioCacheRef.current.has(index)) return;
-            if (index >= chunks.length) return;
-
-            const currentRetries = retryCounts.get(index) || 0;
-            if (currentRetries >= MAX_RETRIES) {
-                console.warn(`Max retries reached for chunk ${index}. Switching to Web Speech API.`);
-                useWebSpeech = true;
-                return;
-            }
-
-            activeFetchRef.current.add(index);
-
-            try {
-                // geminiService returns Base64 string now
-                const base64Data: any = await generateAudioFromText(chunks[index], preferences.voice || 'male');
-
-                if (base64Data && typeof base64Data === 'string' && audioContextRef.current) {
-                    const ctx = audioContextRef.current;
-                    const binaryString = atob(base64Data);
-                    const len = binaryString.length;
-                    const bytes = new Uint8Array(len);
-                    for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
-
-                    const audioBuffer = await ctx.decodeAudioData(bytes.buffer);
-                    audioCacheRef.current.set(index, audioBuffer);
-                } else if (!audioContextRef.current) {
-                    console.error("AudioContext missing during fetch");
-                    useWebSpeech = true;
-                } else {
-                    throw new Error("No audio data returned or invalid format");
-                }
-            } catch (err) {
-                console.error(`Error fetching chunk ${index}`, err);
-                retryCounts.set(index, currentRetries + 1);
-                if (index === 0) useWebSpeech = true;
-            } finally {
-                activeFetchRef.current.delete(index);
-            }
-        };
-
-        // Initial pre-fetch
-        if (chunkIndex < chunks.length) fetchChunk(chunkIndex);
-        if (chunkIndex + 1 < chunks.length) fetchChunk(chunkIndex + 1);
-
-        const playNextChunk = async () => {
-            if (!isPlayingRef.current) return;
-
-            if (chunkIndex >= chunks.length) {
-                stopAudio();
-                return;
-            }
-
-            setCurrentPlayingChunk(chunkIndex);
-
-            if (useWebSpeech) {
-                setIsAudioLoading(false);
-                try {
-                    await speakWithWebSpeech(chunks[chunkIndex]);
-                    chunkIndex++;
-                    playNextChunk();
-                } catch (e) {
-                    console.error("Web Speech API failed", e);
-                    stopAudio();
-                }
-                return;
-            }
-
-            // Ensure current chunk is ready
-            let attempts = 0;
-            while (!audioCacheRef.current.has(chunkIndex) && isPlayingRef.current && !useWebSpeech) {
-                await new Promise(r => setTimeout(r, 200));
-                attempts++;
-
-                if (useWebSpeech) break;
-
-                if (attempts > 30) {
-                    console.warn("Timeout waiting for audio. Switching to fallback.");
-                    useWebSpeech = true;
-                    break;
-                }
-
-                if (!activeFetchRef.current.has(chunkIndex) && !audioCacheRef.current.has(chunkIndex)) {
-                    fetchChunk(chunkIndex);
-                }
-            }
-
-            if (!isPlayingRef.current) return;
-
-            if (useWebSpeech) {
-                playNextChunk();
-                return;
-            }
-
-            const buffer = audioCacheRef.current.get(chunkIndex);
-            if (buffer) {
-                setIsAudioLoading(false);
-
-                const source = audioContextRef.current!.createBufferSource();
-                source.buffer = buffer;
-                source.connect(audioContextRef.current!.destination);
-                source.onended = () => {
-                    chunkIndex++;
-                    playNextChunk();
-                };
-                sourceNodeRef.current = source;
-                source.start();
-
-                if (chunkIndex + 2 < chunks.length) fetchChunk(chunkIndex + 2);
-                if (chunkIndex > 2) audioCacheRef.current.delete(chunkIndex - 2);
-            }
-        };
-
-        playNextChunk();
-    };
 
     return (
         <div className="max-w-4xl mx-auto p-4 md:p-8 lg:p-12 pb-8">
             <SEO
                 title={pageTitle}
-                description={`Leia ${currentBook.name} ${currentChapter} na Bíblia Sagrada. ${readingMode === 'fluid' ? 'Leitura fluida e moderna.' : 'Versículo por versículo.'}`}
+                description={`Leia ${currentBook.name} ${currentChapter} na Bíblia Sagrada.`}
                 url={window.location.href}
                 schema={{
                     "@context": "https://schema.org",
@@ -550,37 +274,28 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                     ) : <div className="w-10" />}
                 </div>
 
-                {/* Controls Row: Mode Toggle + Font Slider + Audio (Fluid Only) */}
-                <div className="flex flex-col md:flex-row items-center justify-center gap-6 mt-6">
-                    {/* Mode Toggle */}
-                    <div className={`flex items-center p-1 rounded-lg border transition-colors
-            ${preferences.theme === 'sepia' ? 'bg-[#e6dcc6]/50 border-[#d6cba6]' : 'bg-stone-100 dark:bg-stone-800 border-stone-200 dark:border-stone-700'}`}>
-                        <button
-                            onClick={() => setReadingMode('verse')}
-                            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-2
-                ${readingMode === 'verse'
-                                    ? (preferences.theme === 'sepia' ? 'bg-[#f4ecd8] shadow-sm text-[#5c4b37]' : 'bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-stone-100')
-                                    : 'opacity-50 hover:opacity-100'}`}
-                        >
-                            <List size={14} />
-                            Versículos
-                        </button>
-                        <button
-                            onClick={() => setReadingMode('fluid')}
-                            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-2
-                ${readingMode === 'fluid'
-                                    ? (preferences.theme === 'sepia' ? 'bg-[#f4ecd8] shadow-sm text-[#5c4b37]' : 'bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-stone-100')
-                                    : 'opacity-50 hover:opacity-100'}`}
-                        >
-                            <AlignLeft size={14} />
-                            Leitura Fluida
-                        </button>
-                    </div>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-6 mb-2">
+                    {/* Centered Group containing all 4 elements */}
+                    <div className="flex flex-wrap items-center justify-center gap-4">
+                        {/* Tab Navigation (Verses vs Summary) */}
+                        <div className="bg-stone-100 dark:bg-stone-800 p-1 rounded-xl flex gap-1 shadow-inner">
+                            <button
+                                className="px-6 py-2 rounded-lg text-sm font-medium bg-white dark:bg-stone-700 text-bible-accent dark:text-bible-gold shadow-sm transition-all"
+                            >
+                                <List size={16} className="inline mr-2 mb-0.5" />
+                                Versículos
+                            </button>
+                            <button
+                                onClick={() => navigate(`/resumo/${normalizeBookName(currentBook.name)}/${currentChapter}`)}
+                                className="px-6 py-2 rounded-lg text-sm font-medium text-stone-400 dark:text-stone-500 hover:text-bible-gold hover:bg-white/50 dark:hover:bg-stone-600/50 transition-all"
+                            >
+                                <FileText size={16} className="inline mr-2 mb-0.5" />
+                                Resumo
+                            </button>
+                        </div>
 
-                    {/* Controls Group: Font Slider + Audio */}
-                    <div className="flex flex-row items-center gap-4 overflow-x-auto max-w-full pb-2 md:pb-0 scrollbar-hide">
                         {/* Font Size Slider */}
-                        <div className="flex items-center gap-3 bg-stone-100 dark:bg-stone-800 px-4 py-2 rounded-lg shrink-0">
+                        <div className="flex items-center gap-3 bg-stone-100 dark:bg-stone-800 px-4 py-2 rounded-lg shrink-0 h-10">
                             <Type size={14} className="opacity-50" />
                             <input
                                 type="range"
@@ -595,31 +310,27 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             <Type size={18} className="opacity-80" />
                         </div>
 
-                        {/* Audio Button (Fluid & Verse) */}
+                        {/* Audio Button */}
                         <button
                             onClick={() => {
-                                if (readingMode === 'fluid') {
-                                    playFluidAudio();
-                                } else {
-                                    bibleReaderRef.current?.toggleAudio();
-                                }
+                                bibleReaderRef.current?.toggleAudio();
                             }}
-                            className={`px-4 py-2 rounded-lg transition-all shadow-sm flex items-center gap-2 shrink-0
-                                ${(readingMode === 'fluid' ? isPlaying : isVerseAudioPlaying)
+                            className={`px-4 py-2 rounded-lg transition-all shadow-sm flex items-center gap-2 shrink-0 h-10
+                                    ${isVerseAudioPlaying
                                     ? 'bg-bible-gold/20 text-bible-gold hover:bg-bible-gold/30'
                                     : 'bg-bible-gold text-white hover:bg-yellow-600'}`}
                         >
-                            {(readingMode === 'fluid' ? isAudioLoading : isVerseAudioLoading) ? (
+                            {isVerseAudioLoading ? (
                                 <Loader2 size={16} className="animate-spin" />
-                            ) : (readingMode === 'fluid' ? isPlaying : isVerseAudioPlaying) ? (
+                            ) : isVerseAudioPlaying ? (
                                 <>
                                     <Pause size={16} fill="currentColor" />
-                                    <span className="text-sm font-bold">Pausar</span>
+                                    <span className="text-sm font-medium">Pausar</span>
                                 </>
                             ) : (
                                 <>
-                                    {(readingMode === 'fluid' && (isPaused || currentPlayingChunk > 0)) ? <Play size={16} /> : <Volume2 size={16} />}
-                                    <span className="text-sm font-bold">{(readingMode === 'fluid' && (isPaused || currentPlayingChunk > 0)) ? "Continuar" : "Ouvir"}</span>
+                                    <Volume2 size={16} />
+                                    <span className="text-sm font-medium">Ouvir</span>
                                 </>
                             )}
                         </button>
@@ -628,155 +339,71 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             </header>
 
             {/* Floating Audio Indicator for Fluid Mode */}
-            {(isPlaying || isPaused) && readingMode === 'fluid' && (
-                <div className="fixed bottom-20 right-6 z-40 animate-slideUp">
-                    <div className={`p-4 rounded-full shadow-lg flex items-center gap-3 pr-6
-                      ${preferences.theme === 'sepia' ? 'bg-[#5c4b37] text-[#f4ecd8]' : 'bg-stone-900 text-white'}`}>
-                        <div className="flex gap-1 h-4 items-end">
-                            <span className={`w-1 bg-bible-gold ${(!isAudioLoading && isPlaying) ? 'animate-[bounce_1s_infinite]' : 'h-1'}`}></span>
-                            <span className={`w-1 bg-bible-gold ${(!isAudioLoading && isPlaying) ? 'animate-[bounce_1.2s_infinite]' : 'h-1'}`}></span>
-                            <span className={`w-1 bg-bible-gold ${(!isAudioLoading && isPlaying) ? 'animate-[bounce_0.8s_infinite]' : 'h-1'}`}></span>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm font-medium">Ouvindo {currentBook.name} {currentChapter}</span>
-                            {totalChunks > 0 && (
-                                <span className="text-[10px] opacity-70">
-                                    Parágrafo {currentPlayingChunk + 1} / {totalChunks}
-                                </span>
-                            )}
-                        </div>
 
-                        <div className="flex items-center gap-2 ml-2">
-                            <button onClick={isPlaying ? pauseAudio : playFluidAudio} className="w-8 h-8 flex items-center justify-center rounded-full bg-bible-gold/20 hover:bg-bible-gold/30 text-bible-gold transition-colors" title={isPlaying ? "Pausar" : "Continuar"}>
-                                {isPlaying ? <Pause size={16} className="fill-current" /> : <Play size={16} className="fill-current" />}
-                            </button>
-                            <button onClick={stopAudio} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/10 hover:text-red-500 transition-colors" title="Parar">
-                                <Square size={16} className="fill-current" />
-                            </button>
+
+            {
+                loadingContent ? (
+                    <div className="space-y-4 animate-pulse max-w-2xl mx-auto">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className={`h-4 rounded w-full ${preferences.theme === 'sepia' ? 'bg-[#e6dcc6]' : 'bg-stone-200 dark:bg-stone-800'}`}></div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="transition-all duration-200">
+                        <div style={{ fontSize: `${preferences.fontSize}%` }}>
+                            <BibleReader
+                                key={`${currentBook.name}-${currentChapter}`}
+                                ref={bibleReaderRef}
+                                book={currentBook.name}
+                                chapter={currentChapter}
+                                verses={chapterContent}
+                                preferences={preferences}
+                                language={language}
+                                t={t}
+                                initialSelectedVerses={initialSelectedVerses}
+                                onSelectionChange={handleSelectionChange}
+                                onAudioStateChange={(playing, loading) => {
+                                    setIsVerseAudioPlaying(playing);
+                                    setIsVerseAudioLoading(loading);
+                                }}
+                            />
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            {loadingContent ? (
-                <div className="space-y-4 animate-pulse max-w-2xl mx-auto">
-                    {[...Array(6)].map((_, i) => (
-                        <div key={i} className={`h-4 rounded w-full ${preferences.theme === 'sepia' ? 'bg-[#e6dcc6]' : 'bg-stone-200 dark:bg-stone-800'}`}></div>
-                    ))}
-                </div>
-            ) : (
-                <>
-                    {readingMode === 'fluid' ? (
-                        fluidError ? (
-                            <div className="p-8 text-center text-red-500 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
-                                <p className="font-bold mb-2 text-lg">Limite de Leitura Atingido</p>
-                                <p className="mb-4 opacity-80">
-                                    {fluidError.includes('429') || fluidError.includes('Quota')
-                                        ? "O sistema de IA está sobrecarregado no momento (Muitas requisições). Por favor, aguarde alguns instantes e tente novamente."
-                                        : "Ocorreu um erro ao gerar a leitura fluida."}
-                                </p>
-                                {process.env.NODE_ENV === 'development' && (
-                                    <details className="text-xs text-left bg-black/5 p-2 rounded mb-4 overflow-auto max-h-32">
-                                        <summary className="cursor-pointer mb-1 font-bold">Detalhes Técnicos</summary>
-                                        {fluidError}
-                                    </details>
-                                )}
-                                <button
-                                    onClick={() => setReadingMode('verse')}
-                                    className="px-6 py-2 bg-red-100 dark:bg-red-900/40 rounded-lg hover:bg-red-200 transition-colors font-medium"
-                                >
-                                    Voltar para Versículos
-                                </button>
-                            </div>
-                        ) : fluidContent ? (
-                            <div className="animate-fadeIn">
-                                <h2 className="text-2xl md:text-3xl font-serif font-bold mb-8 text-center text-bible-accent dark:text-bible-gold">
-                                    {fluidContent.title}
-                                </h2>
-                                <div
-                                    className={`prose max-w-none leading-relaxed transition-all duration-200
-                                        ${preferences.theme === 'dark' ? 'prose-invert' : ''}
-                                        ${preferences.theme === 'sepia' ? 'text-[#5c4b37]' : 'text-stone-800 dark:text-stone-200'}
-                                        ${preferences.fontFamily === 'serif' ? 'font-serif' : 'font-sans'}
-                                        ${preferences.textAlign === 'justify' ? 'text-justify' : 'text-left'}
-                                    `}
-                                >
-                                    {fluidContent.paragraphs.map((paragraph, i) => (
-                                        <p
-                                            key={i}
-                                            className="mb-6"
-                                            style={{ fontSize: `${preferences.fontSize}%` }}
-                                            dangerouslySetInnerHTML={{
-                                                __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-                                <div className="mt-12 p-6 rounded-xl bg-bible-gold/10 border border-bible-gold/20 text-center">
-                                    <p className="text-sm opacity-70 italic">
-                                        * Este texto foi adaptado por Inteligência Artificial para proporcionar uma leitura mais fluida e moderna.
-                                        Para estudo doutrinário preciso, recomendamos o modo "Versículos" que utiliza o texto original.
-                                    </p>
-                                </div>
-                            </div>
-                        ) : null
-                    ) : (
-                        <div className="transition-all duration-200">
-                            <div style={{ fontSize: `${preferences.fontSize}%` }}>
-                                <BibleReader
-                                    key={`${currentBook.name}-${currentChapter}`}
-                                    ref={bibleReaderRef}
-                                    book={currentBook.name}
-                                    chapter={currentChapter}
-                                    verses={chapterContent}
-                                    preferences={preferences}
-                                    language={language}
-                                    t={t}
-                                    initialSelectedVerses={initialSelectedVerses}
-                                    onSelectionChange={handleSelectionChange}
-                                    onAudioStateChange={(playing, loading) => {
-                                        setIsVerseAudioPlaying(playing);
-                                        setIsVerseAudioLoading(loading);
-                                    }}
-                                />
-                            </div>
+            {/* Bottom Navigation */}
+            <div className="flex justify-between items-center mt-12 pt-8 border-t border-stone-200 dark:border-stone-800">
+                {prevChapter ? (
+                    <button
+                        onClick={() => navigateTo(prevChapter.book, prevChapter.chapter)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all group text-stone-600 dark:text-stone-400 hover:text-bible-gold"
+                    >
+                        <ChevronRight className="rotate-180 transition-transform group-hover:-translate-x-1" size={20} />
+                        <div className="text-left">
+                            <span className="text-xs uppercase tracking-wider opacity-60 block mb-0.5">Anterior</span>
+                            <span className="font-serif font-bold text-lg">{prevChapter.book} {prevChapter.chapter}</span>
                         </div>
-                    )}
+                    </button>
+                ) : <div />}
 
-                    {/* Bottom Navigation */}
-                    <div className="flex justify-between items-center mt-12 pt-8 border-t border-stone-200 dark:border-stone-800">
-                        {prevChapter ? (
-                            <button
-                                onClick={() => navigateTo(prevChapter.book, prevChapter.chapter)}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all group text-stone-600 dark:text-stone-400 hover:text-bible-gold"
-                            >
-                                <ChevronRight className="rotate-180 transition-transform group-hover:-translate-x-1" size={20} />
-                                <div className="text-left">
-                                    <span className="text-xs uppercase tracking-wider opacity-60 block mb-0.5">Anterior</span>
-                                    <span className="font-serif font-bold text-lg">{prevChapter.book} {prevChapter.chapter}</span>
-                                </div>
-                            </button>
-                        ) : <div />}
-
-                        {nextChapter && (
-                            <button
-                                onClick={() => navigateTo(nextChapter.book, nextChapter.chapter)}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all group text-stone-600 dark:text-stone-400 hover:text-bible-gold"
-                            >
-                                <div className="text-right">
-                                    <span className="text-xs uppercase tracking-wider opacity-60 block mb-0.5">Próximo</span>
-                                    <span className="font-serif font-bold text-lg">{nextChapter.book} {nextChapter.chapter}</span>
-                                </div>
-                                <ChevronRight className="transition-transform group-hover:translate-x-1" size={20} />
-                            </button>
-                        )}
-                    </div>
+                {nextChapter && (
+                    <button
+                        onClick={() => navigateTo(nextChapter.book, nextChapter.chapter)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all group text-stone-600 dark:text-stone-400 hover:text-bible-gold"
+                    >
+                        <div className="text-right">
+                            <span className="text-xs uppercase tracking-wider opacity-60 block mb-0.5">Próximo</span>
+                            <span className="font-serif font-bold text-lg">{nextChapter.book} {nextChapter.chapter}</span>
+                        </div>
+                        <ChevronRight className="transition-transform group-hover:translate-x-1" size={20} />
+                    </button>
+                )}
+            </div>
 
 
 
-                    <AdUnit className="mt-12" />
-                </>
-            )}
+            <AdUnit className="mt-12" />
         </div>
     );
 };

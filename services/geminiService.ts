@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type, Chat, Modality } from "@google/genai";
-import { Verse, SearchResult, DevotionalContent, BlogPost } from '../types';
+import { Verse, SearchResult, DevotionalContent, BlogPost, BibleVersion } from '../types';
 import { getChapterContentLocal } from './localBibleService';
 import { bibleBooks, normalizeBookName } from '../constants';
 
@@ -58,13 +58,13 @@ const saveToCache = (key: string, data: any) => {
 };
 
 // Retrieve chapter content structured as JSON
-export const getChapterContent = async (book: string, chapter: number, language: string = 'pt'): Promise<Verse[]> => {
+export const getChapterContent = async (book: string, chapter: number, language: string = 'pt', version: BibleVersion = 'nvi'): Promise<Verse[]> => {
   // 1. Try Local JSON first (FAST & FREE)
   // Only for Portuguese for now, as the JSON is likely PT-BR based on filename
   if (language === 'pt') {
-    const localData = getChapterContentLocal(book, chapter);
+    const localData = getChapterContentLocal(book, chapter, version);
     if (localData) {
-      console.log(`Loaded ${book} ${chapter} from local JSON.`);
+      console.log(`Loaded ${book} ${chapter} (${version}) from local JSON.`);
       return localData;
     }
   }
@@ -213,6 +213,41 @@ export const getFluidChapterContent = async (book: string, chapter: number, lang
   return data;
 };
 
+// Get Chapter Summary (Structured Study)
+export const getChapterSummary = async (book: string, chapter: number, language: string = 'pt'): Promise<any> => {
+  try {
+    const response = await fetch('/api/ai/chapter-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ book, chapter, language })
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch summary");
+
+    const data = await response.json();
+
+    // The API returns { text: "...JSON string..." }, we need to parse it
+    if (data && typeof data === 'object' && 'text' in data) {
+      try {
+        return JSON.parse(data.text);
+      } catch (parseError) {
+        console.error("Failed to parse summary text:", parseError);
+        return { error: "Erro ao processar o resumo." };
+      }
+    }
+
+    // If data is already the correct format (direct object), return it
+    if (data && data.title) {
+      return data;
+    }
+
+    return { error: "Formato de resposta inválido." };
+  } catch (error) {
+    console.error("Error fetching chapter summary:", error);
+    return { error: "Não foi possível carregar o resumo." };
+  }
+};
+
 // Get a devotional
 // Get a devotional
 export const getDevotional = async (language: string = 'pt'): Promise<DevotionalContent | null> => {
@@ -234,13 +269,32 @@ export const getDevotional = async (language: string = 'pt'): Promise<Devotional
     const data = await response.json();
 
     if (data.text) {
-      const content = JSON.parse(data.text) as DevotionalContent;
-      saveToCache(cacheKey, content);
-      return content;
+      let jsonString = data.text;
+      // Clean up markdown code blocks if present
+      jsonString = jsonString.replace(/```json\n?|\n?```/g, '').replace(/```/g, '').trim();
+
+      try {
+        const rawContent = JSON.parse(jsonString) as any;
+
+        // Map API response to DevotionalContent type
+        const content: DevotionalContent = {
+          title: rawContent.title || "Devocional Diário",
+          verseText: rawContent.verse?.text || rawContent.verseText || "",
+          verseReference: rawContent.verse?.reference || rawContent.verseReference || "",
+          reflection: rawContent.content || rawContent.reflection || "",
+          prayer: rawContent.prayer || ""
+        };
+
+        saveToCache(cacheKey, content);
+        return content;
+      } catch (parseError) {
+        console.error("Devotional JSON Parse Error:", parseError, "Raw text:", data.text);
+        return null;
+      }
     }
     return null;
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("Gemini Devotional Error:", error);
     return null;
   }
 };

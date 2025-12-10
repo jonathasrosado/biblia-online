@@ -185,7 +185,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, isDark, history = [] }
     return (
         <div className="min-h-full animate-fadeIn pb-20">
             <SEO
-                title={settings.siteTitle || t.appTitle || "Início"}
+                title={settings.siteTitle || "Bíblia Online – Leia a Bíblia Sagrada Completa em Português"}
                 description={settings.siteDescription || "Sua plataforma de estudo bíblico com Inteligência Artificial. Leia a Bíblia, faça devocionais e tire dúvidas com IA."}
                 schema={{
                     "@context": "https://schema.org",

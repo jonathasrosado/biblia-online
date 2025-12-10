@@ -121,6 +121,7 @@ export class AIManager {
     }
 
     async generateContent(feature, prompt, systemInstruction = '', responseFormat = null, modelOverride = null) {
+        fs.appendFileSync(path.join(process.cwd(), 'debug_ai.log'), `[${new Date().toISOString()}] generateContent called for ${feature}\n`);
         this.config = this.loadConfig(); // Force reload to ensure latest config
         const featureConfig = this.config.features[feature];
 
@@ -130,6 +131,7 @@ export class AIManager {
         const model = modelOverride || featureConfig?.model || 'gemini-2.0-flash-exp';
 
         console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
+        fs.appendFileSync(path.join(process.cwd(), 'debug_ai.log'), `[${new Date().toISOString()}] Provider: ${provider}, Model: ${model}\n`);
 
 
 
@@ -630,6 +632,139 @@ export class AIManager {
         throw new Error(`Falha ao gerar resumo após tentativas: ${lastError?.message}`);
     }
 
+    async generateChapterSummary(book, chapter, language = 'pt') {
+        // Normalize book name for consistent lookups
+        const normalizedBook = book.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        console.log(`[AIManager] Requested chapter summary for '${book}' ${chapter} (Normalized: '${normalizedBook}')`);
+
+        // --- 1. Check MongoDB Cache ---
+        try {
+            const ChapterSummary = (await import('../models/ChapterSummary.js')).default;
+
+            const cachedSummary = await ChapterSummary.findOne({
+                normalizedBook: normalizedBook,
+                chapter: chapter,
+                language: language
+            });
+
+            if (cachedSummary) {
+                console.log(`[AIManager] CACHE HIT: Found MongoDB summary for ${book} ${chapter} (ID: ${cachedSummary._id})`);
+                return {
+                    title: cachedSummary.title,
+                    summary: cachedSummary.summary,
+                    structure: cachedSummary.structure,
+                    keyVerses: cachedSummary.keyVerses,
+                    historicalContext: cachedSummary.historicalContext,
+                    practicalApplication: cachedSummary.practicalApplication,
+                    prayer: cachedSummary.prayer
+                };
+            } else {
+                console.log(`[AIManager] CACHE MISS: No MongoDB summary found for ${book} ${chapter}`);
+            }
+        } catch (e) {
+            console.error("[AIManager] MongoDB read error, will generate new:", e);
+        }
+
+        // --- 2. Generate NEW summary with AI ---
+        console.log(`[AIManager] Generating NEW chapter summary for ${book} ${chapter}...`);
+
+        const prompt = `
+            Atue como um teólogo erudito e devocional. Crie um estudo rico e estruturado para o capítulo ${chapter} do livro de ${book}.
+            Idioma de Saída: ${language === 'pt' ? 'Português Brasileiro' : 'English'}.
+            
+            Retorne APENAS um objeto JSON com esta estrutura exata:
+            {
+                "title": "Título Temático do Capítulo",
+                "summary": "Resumo conciso de 3-4 linhas sobre o conteúdo do capítulo.",
+                "structure": {
+                    "intro": "Breve introdução ao fluxo do capítulo.",
+                    "blocks": [
+                        { "verses": "1-5", "description": "Descrição desta seção" },
+                        { "verses": "6-10", "description": "Descrição desta seção" }
+                    ],
+                    "centralMessage": "A mensagem teológica central do capítulo."
+                },
+                "keyVerses": [
+                    { "verses": "v.3", "title": "Título do Versículo", "explanation": "Explicação teológica breve." }
+                ],
+                "historicalContext": "Contexto histórico e cultural relevante para este capítulo.",
+                "practicalApplication": [
+                    "Aplicação prática 1",
+                    "Aplicação prática 2",
+                    "Aplicação prática 3"
+                ],
+                "prayer": "Uma oração curta (2-3 frases) baseada no capítulo."
+            }
+        `;
+
+        const systemInstruction = "You are a biblical scholar assistant. Provide accurate, orthodox Christian studies. Return strict JSON.";
+
+        const jsonText = await this.generateContent('chapter_summary', prompt, systemInstruction, 'json_object');
+
+        // Validate JSON
+        const data = JSON.parse(jsonText);
+
+        // --- 3. Save to MongoDB ---
+        console.log('\n' + '='.repeat(60));
+        console.log('💾 ATTEMPTING TO SAVE TO MONGODB');
+        console.log('='.repeat(60));
+
+        try {
+            // Check if mongoose is connected
+            const mongoose = (await import('mongoose')).default;
+            console.log(`📊 Mongoose ReadyState: ${mongoose.connection.readyState}`);
+            console.log(`   0=disconnected, 1=connected, 2=connecting, 3=disconnecting`);
+
+            if (mongoose.connection.readyState !== 1) {
+                console.error(`❌ MongoDB NOT CONNECTED! ReadyState: ${mongoose.connection.readyState}`);
+                console.log(`⚠️ Skipping MongoDB save, returning generated data`);
+                console.log('='.repeat(60) + '\n');
+                return data;
+            }
+
+            console.log(`✅ MongoDB IS CONNECTED!`);
+            console.log(`📝 Importing ChapterSummary model...`);
+            const ChapterSummary = (await import('../models/ChapterSummary.js')).default;
+            console.log(`✅ Model imported successfully`);
+
+            console.log(`💾 Calling findOneAndUpdate...`);
+            console.log(`   Book: "${book}" (normalized: "${normalizedBook}")`);
+            console.log(`   Chapter: ${chapter}`);
+            console.log(`   Language: ${language}`);
+
+            const result = await ChapterSummary.findOneAndUpdate(
+                { normalizedBook: normalizedBook, chapter: chapter, language: language },
+                {
+                    book: book,
+                    normalizedBook: normalizedBook,
+                    chapter: chapter,
+                    language: language,
+                    ...data,
+                    updatedAt: new Date()
+                },
+                { upsert: true, new: true }
+            );
+
+            console.log(`✅✅✅ SAVE SUCCESSFUL! ✅✅✅`);
+            console.log(`   Document ID: ${result._id}`);
+            console.log(`   Title: ${result.title}`);
+            console.log('='.repeat(60) + '\n');
+
+        } catch (dbError) {
+            console.error('\n' + '='.repeat(60));
+            console.error(`❌❌❌ MONGODB SAVE FAILED! ❌❌❌`);
+            console.error('='.repeat(60));
+            console.error(`Error name: ${dbError.name}`);
+            console.error(`Error message: ${dbError.message}`);
+            console.error(`Stack trace:`);
+            console.error(dbError.stack);
+            console.error('='.repeat(60) + '\n');
+        }
+
+        return data;
+    }
+
     async testConnection(provider, apiKey) {
         console.log(`[AIManager] Testing connection for ${provider}...`);
         try {
@@ -667,16 +802,16 @@ export class AIManager {
                 const response = await fetch("https://openrouter.ai/api/v1/auth/key", {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${apiKey}`
+                        "Authorization": `Bearer ${apiKey} `
                     }
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    result = { success: true, message: `Conexão com OpenRouter bem-sucedida! (Limite: ${data.data?.limit || 'N/A'})` };
+                    result = { success: true, message: `Conexão com OpenRouter bem - sucedida!(Limite: ${data.data?.limit || 'N/A'})` };
                 } else {
                     const err = await response.text();
-                    throw new Error(`Erro OpenRouter: ${response.status} - ${err}`);
+                    throw new Error(`Erro OpenRouter: ${response.status} - ${err} `);
                 }
             } else {
                 throw new Error("Provedor desconhecido para teste.");
@@ -687,7 +822,7 @@ export class AIManager {
             return result;
 
         } catch (error) {
-            console.error(`[AIManager] Test failed for ${provider}:`, error);
+            console.error(`[AIManager] Test failed for ${provider}: `, error);
             this.saveStatus(provider, { valid: false, message: error.message });
             return { success: false, message: error.message };
         }

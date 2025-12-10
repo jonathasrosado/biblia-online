@@ -73,6 +73,9 @@ export const bibleBooks: BibleBook[] = [
 
 export const translations = {
   pt: {
+    acf: "Almeida Corrigida Fiel",
+    nvi: "Nova Versão Internacional",
+    ntlh: "Nova Tradução na Linguagem de Hoje",
     appTitle: "Bíblia Online",
     devotional: "Devocional Diário",
     chat: "Chat Teológico",
