@@ -245,39 +245,65 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
          ${preferences.theme === 'bw' ? 'border-stone-200' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-200 dark:border-stone-800'}`}>
 
                 {/* Chapter Title & Navigation */}
-                <div className="flex items-center justify-between max-w-xl mx-auto mb-8">
-                    {prevChapter ? (
-                        <button
-                            onClick={() => navigateTo(prevChapter.book, prevChapter.chapter)}
-                            className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
-                                ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black' : 'text-stone-400 hover:text-bible-gold'}`}
-                            title="Capítulo Anterior"
-                        >
-                            <ChevronRight className="rotate-180" size={24} />
-                        </button>
-                    ) : <div className="w-10" />}
+                <div className="relative flex items-center justify-center max-w-xl mx-auto mb-8 min-h-[48px]">
+                    {/* Left - Previous Chapter (Absolute) */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
+                        {prevChapter && (
+                            <button
+                                onClick={() => navigateTo(prevChapter.book, prevChapter.chapter)}
+                                className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
+                                    ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black' : 'text-stone-400 hover:text-bible-gold'}`}
+                                title="Capítulo Anterior"
+                            >
+                                <ChevronRight className="rotate-180" size={24} />
+                            </button>
+                        )}
+                    </div>
 
-                    <div className="text-center relative">
+                    {/* Center - Title Button */}
+                    <div className="relative z-10">
                         <button
                             onClick={() => setIsChapterGridOpen(!isChapterGridOpen)}
-                            className="group flex flex-col items-center mx-auto"
+                            className="group flex flex-col items-center justify-center p-2 rounded-xl transition-all"
                         >
-                            <h1 className={`flex items-center gap-3 text-2xl md:text-3xl font-serif font-bold transition-colors
+                            <h1 className={`flex items-center gap-2 text-2xl md:text-3xl font-serif font-bold transition-colors text-center
                                 ${preferences.theme === 'bw' ? 'text-black hover:text-stone-600' : 'text-bible-accent dark:text-bible-gold hover:text-bible-gold'}`}>
-                                {currentBook.name} {currentChapter}
-                                <ChevronDown size={24} className={`transition-transform duration-300 ${isChapterGridOpen ? 'rotate-180' : ''}`} />
+                                <span>{currentBook.name} {currentChapter}</span>
+                                <ChevronDown size={24} className={`transition-transform duration-300 opacity-50 group-hover:opacity-100 ${isChapterGridOpen ? 'rotate-180' : ''}`} />
                             </h1>
+                            {staticTitle && (
+                                <p className="text-sm text-stone-500 dark:text-stone-400 font-medium italic mt-1 text-center">
+                                    {staticTitle}
+                                </p>
+                            )}
                         </button>
+                    </div>
 
-                        {staticTitle && (
-                            <p className="text-sm text-stone-500 dark:text-stone-400 font-medium italic mt-1">
-                                {staticTitle}
-                            </p>
+                    {/* Right - Next Chapter (Absolute) */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
+                        {nextChapter && (
+                            <button
+                                onClick={() => navigateTo(nextChapter.book, nextChapter.chapter)}
+                                className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
+                                    ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black' : 'text-stone-400 hover:text-bible-gold'}`}
+                                title="Próximo Capítulo"
+                            >
+                                <ChevronRight size={24} />
+                            </button>
                         )}
+                    </div>
 
-                        {/* Expandable Chapter Grid */}
-                        {isChapterGridOpen && (
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[90vw] max-w-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-xl z-50 p-6 animate-slideUp">
+                    {/* Dropdown - Anchored to MAIN CONTAINER (Centered on Page) */}
+                    {isChapterGridOpen && (
+                        <>
+                            {/* Backdrop to close */}
+                            <div
+                                className="fixed inset-0 z-40 bg-black/5 dark:bg-black/20 backdrop-blur-[1px]"
+                                onClick={() => setIsChapterGridOpen(false)}
+                            />
+
+                            {/* The Menu */}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[90vw] max-w-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl z-50 p-6 animate-slideUp origin-top">
                                 <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
                                     {Array.from({ length: currentBook.chapters }, (_, i) => i + 1).map((chap) => (
                                         <button
@@ -290,7 +316,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                                                 h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all
                                                 ${currentChapter === chap
                                                     ? (preferences.theme === 'bw' ? 'bg-black text-white shadow-md' : 'bg-bible-gold text-white shadow-md')
-                                                    : (preferences.theme === 'bw' ? 'bg-stone-50 border border-transparent hover:border-black hover:text-black' : 'bg-stone-50 dark:bg-stone-800 border border-transparent hover:border-bible-gold hover:text-bible-gold')}
+                                                    : (preferences.theme === 'bw' ? 'bg-stone-50 border border-transparent hover:border-black hover:text-black' : 'bg-stone-50 dark:bg-stone-800 border border-stone-100 dark:border-stone-700/50 hover:border-bible-gold hover:text-bible-gold')}
                                             `}
                                         >
                                             {chap}
@@ -298,19 +324,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                                     ))}
                                 </div>
                             </div>
-                        )}
-                    </div>
-
-                    {nextChapter ? (
-                        <button
-                            onClick={() => navigateTo(nextChapter.book, nextChapter.chapter)}
-                            className={`p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors
-                                ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black' : 'text-stone-400 hover:text-bible-gold'}`}
-                            title="Próximo Capítulo"
-                        >
-                            <ChevronRight size={24} />
-                        </button>
-                    ) : <div className="w-10" />}
+                        </>
+                    )}
                 </div>
 
                 <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-6 mb-2">
