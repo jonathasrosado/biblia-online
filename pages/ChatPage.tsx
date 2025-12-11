@@ -3,12 +3,15 @@ import SEO from '../components/SEO';
 import { useSearchParams } from 'react-router-dom';
 import ChatBot from '../components/ChatBot';
 
+import { ReadingPreferences } from '../types';
+
 interface ChatPageProps {
     language: string;
     t: any;
+    preferences: ReadingPreferences;
 }
 
-const ChatPage: React.FC<ChatPageProps> = ({ language, t }) => {
+const ChatPage: React.FC<ChatPageProps> = ({ language, t, preferences }) => {
     const [searchParams] = useSearchParams();
     const initialQuery = searchParams.get('p') || undefined;
 
@@ -24,6 +27,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ language, t }) => {
                     language={language}
                     t={t}
                     initialMessage={initialQuery}
+                    preferences={preferences}
                 />
             </div>
         </div>

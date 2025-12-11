@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Bookmark, Clock, Trash2, History, Search, BookOpen, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { BibleBook, ReadingHistoryItem } from '../types';
+import { BibleBook, ReadingHistoryItem, Theme } from '../types';
 import { bibleBooks, normalizeBookName } from '../constants';
 
 interface BookSelectorProps {
@@ -12,9 +12,10 @@ interface BookSelectorProps {
   onClearHistory: () => void;
   t: any;
   customTrigger?: (toggle: () => void) => React.ReactNode;
+  theme: Theme;
 }
 
-const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter, history, onSelect, onClearHistory, t, customTrigger }) => {
+const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter, history, onSelect, onClearHistory, t, customTrigger, theme }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -97,7 +98,7 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
   };
 
   return (
-    <div className="w-full mb-0 md:mb-2 relative">
+    <div className="w-full md:w-auto mb-0 md:mb-0 relative">
       {/* Main Trigger Button */}
       {customTrigger ? (
         <div ref={triggerRef}>
@@ -110,12 +111,12 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
           className={`
             w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300
             ${isOpen
-              ? 'bg-bible-gold text-white shadow-lg ring-2 ring-bible-gold/50'
-              : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold hover:bg-bible-gold/20'}
+              ? (theme === 'bw' ? 'bg-black text-white shadow-lg ring-2 ring-black/10' : 'bg-bible-gold text-white shadow-lg ring-2 ring-bible-gold/50')
+              : (theme === 'bw' ? 'bg-stone-100 text-black hover:bg-stone-200' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold hover:bg-bible-gold/20')}
           `}
         >
           <div className="flex items-center gap-3">
-            <div className={`p-1.5 rounded-full ${isOpen ? 'bg-white/20' : 'bg-bible-gold/20'}`}>
+            <div className={`p-1.5 rounded-full ${isOpen ? 'bg-white/20' : (theme === 'bw' ? 'bg-black/10' : 'bg-bible-gold/20')}`}>
               <BookOpen size={20} />
             </div>
             <div className="flex flex-col items-start">
@@ -134,8 +135,8 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
         <div
           ref={dropdownRef}
           className={`
-            fixed top-[60px] md:top-auto z-[100] mt-2 bg-white dark:bg-stone-900 rounded-xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden flex flex-col max-h-[80vh] animate-fadeIn
-            ${customTrigger ? 'right-4 w-[90vw] md:w-96 md:right-auto md:absolute' : 'left-0 md:left-auto md:w-80 w-full'}
+            fixed top-[60px] md:top-full z-[100] mt-2 bg-white dark:bg-stone-900 rounded-xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden flex flex-col max-h-[80vh] animate-fadeIn
+            ${customTrigger ? 'right-4 w-[90vw] md:w-96 md:absolute md:right-0' : 'left-0 md:left-auto md:w-80 w-full'}
           `}
         >
           {/* Search Header */}
@@ -147,7 +148,8 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
                 placeholder="Buscar livro..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-8 py-2.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-sm focus:ring-2 focus:ring-bible-gold/50 outline-none transition-all"
+                className={`w-full pl-9 pr-8 py-2.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-sm outline-none transition-all
+                  ${theme === 'bw' ? 'focus:ring-2 focus:ring-black/20 text-black placeholder-stone-500' : 'focus:ring-2 focus:ring-bible-gold/50'}`}
                 autoFocus
               />
               {searchTerm && (
@@ -166,8 +168,8 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
                   key={f}
                   onClick={() => setFilter(f)}
                   className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${filter === f
-                    ? 'bg-white dark:bg-stone-700 text-bible-gold shadow-sm'
-                    : 'text-stone-500 hover:text-stone-700 dark:hover:text-stone-300'
+                    ? (theme === 'bw' ? 'bg-black text-white shadow-sm' : 'bg-white dark:bg-stone-700 text-bible-gold shadow-sm')
+                    : (theme === 'bw' ? 'text-stone-400 hover:text-black' : 'text-stone-500 hover:text-stone-700 dark:hover:text-stone-300')
                     }`}
                 >
                   {f === 'All' ? t.all : f === 'Old' ? 'Antigo' : 'Novo'}
@@ -192,7 +194,10 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
                     <button
                       key={idx}
                       onClick={() => handleHistoryClick(item)}
-                      className="text-left p-2 rounded-lg bg-stone-50 dark:bg-stone-800/50 hover:bg-bible-gold/10 border border-transparent hover:border-bible-gold/20 transition-all"
+                      className={`text-left p-2 rounded-lg transition-all border border-transparent
+                        ${theme === 'bw'
+                          ? 'bg-stone-50 hover:bg-stone-100 hover:border-stone-300'
+                          : 'bg-stone-50 dark:bg-stone-800/50 hover:bg-bible-gold/10 hover:border-bible-gold/20'}`}
                     >
                       <div className="font-bold text-xs text-stone-700 dark:text-stone-300">{item.bookName}</div>
                       <div className="text-[10px] text-stone-500 flex justify-between">

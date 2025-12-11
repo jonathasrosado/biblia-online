@@ -8,6 +8,7 @@ interface TestamentPageProps {
     testament: 'Old' | 'New';
     language: string;
     t: any;
+    theme?: 'light' | 'dark' | 'sepia' | 'bw';
 }
 
 // Helper to define categories
@@ -27,8 +28,9 @@ const CATEGORIES: Record<string, string[]> = {
     'Profético': ['Apocalipse']
 };
 
-const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t }) => {
+const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t, theme }) => {
     const navigate = useNavigate();
+    const isBw = theme === 'bw';
     const isOld = testament === 'Old';
 
     const title = isOld ? t.oldTestament + ' Testamento' : t.newTestament + ' Testamento'; // Basic concat fail-safe
@@ -63,8 +65,14 @@ const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t })
             </Helmet>
 
             {/* Header */}
-            <div className="bg-bible-paper dark:bg-stone-900 pt-24 pb-16 px-6 relative overflow-hidden text-center border-b border-stone-200 dark:border-stone-800">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-bible-gold/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+            <div className={`pt-24 pb-16 px-6 relative overflow-hidden text-center border-b 
+              ${isBw
+                    ? 'bg-white border-black text-black'
+                    : 'bg-bible-paper dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
+            `}>
+                {!isBw && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-bible-gold/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+                )}
 
                 <button
                     onClick={() => navigate('/')}
@@ -73,12 +81,18 @@ const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t })
                     <ArrowLeft size={24} />
                 </button>
 
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bible-gold/10 text-bible-gold font-bold text-[10px] uppercase tracking-widest mb-6">
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] uppercase tracking-widest mb-6
+                  ${isBw
+                        ? 'bg-black text-white'
+                        : 'bg-bible-gold/10 text-bible-gold font-bold'}
+                `}>
                     <Book size={12} className="fill-current" />
                     <span>{isOld ? '39 Livros' : '27 Livros'}</span>
                 </div>
 
-                <h1 className="text-4xl md:text-6xl font-serif font-bold text-bible-accent dark:text-bible-gold mb-6 tracking-tight">
+                <h1 className={`text-4xl md:text-6xl font-serif font-bold mb-6 tracking-tight
+                  ${isBw ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}
+                `}>
                     {displayTitle}
                 </h1>
 
@@ -101,11 +115,13 @@ const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t })
                     return (
                         <div key={category} className="mb-16 last:mb-0 animate-slideUp">
                             <div className="flex items-center gap-4 mb-8">
-                                <div className="h-px flex-1 bg-stone-200 dark:bg-stone-800"></div>
-                                <h2 className="text-xl font-serif font-bold text-bible-gold uppercase tracking-widest border px-4 py-1 rounded-full border-bible-gold/20">
+                                <div className={`h-px flex-1 ${isBw ? 'bg-black' : 'bg-stone-200 dark:bg-stone-800'}`}></div>
+                                <h2 className={`text-xl font-serif font-bold uppercase tracking-widest border px-4 py-1 rounded-full 
+                                  ${isBw ? 'text-black border-black' : 'text-bible-gold border-bible-gold/20'}
+                                `}>
                                     {category}
                                 </h2>
-                                <div className="h-px flex-1 bg-stone-200 dark:bg-stone-800"></div>
+                                <div className={`h-px flex-1 ${isBw ? 'bg-black' : 'bg-stone-200 dark:bg-stone-800'}`}></div>
                             </div>
 
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -113,18 +129,30 @@ const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t })
                                     <button
                                         key={book.name}
                                         onClick={() => navigate(`/leitura/${normalizeBookName(book.name)}`)}
-                                        className="group relative p-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-bible-gold dark:hover:border-bible-gold hover:shadow-lg transition-all text-left overflow-hidden"
+                                        className={`group relative p-6 rounded-2xl transition-all text-left overflow-hidden border
+                                          ${isBw
+                                                ? 'bg-white border-black hover:bg-black hover:text-white'
+                                                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 hover:border-bible-gold dark:hover:border-bible-gold hover:shadow-lg'}
+                                        `}
                                     >
-                                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                            <Scroll size={40} className="text-bible-gold" />
+                                        <div className={`absolute top-0 right-0 p-4 transition-opacity
+                                           ${isBw ? 'opacity-0' : 'opacity-10 group-hover:opacity-20'}
+                                        `}>
+                                            <Scroll size={40} className={isBw ? 'text-black' : 'text-bible-gold'} />
                                         </div>
 
                                         <div className="relative z-10">
-                                            <span className="block text-2xl font-bold font-serif mb-2 group-hover:text-bible-gold transition-colors">
+                                            <span className={`block text-2xl font-bold font-serif mb-2 transition-colors
+                                              ${isBw ? 'group-hover:text-white' : 'group-hover:text-bible-gold'}
+                                            `}>
                                                 {book.name}
                                             </span>
-                                            <div className="flex items-center gap-2 text-xs font-bold text-stone-400 uppercase tracking-wider">
-                                                <span className="bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded-md group-hover:bg-bible-gold/10 group-hover:text-bible-gold transition-colors">
+                                            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+                                                <span className={`px-2 py-1 rounded-md transition-colors
+                                                  ${isBw
+                                                        ? 'bg-black text-white group-hover:bg-white group-hover:text-black'
+                                                        : 'bg-stone-100 dark:bg-stone-800 text-stone-400 group-hover:bg-bible-gold/10 group-hover:text-bible-gold'}
+                                                `}>
                                                     {book.chapters} Caps
                                                 </span>
                                             </div>

@@ -4,6 +4,8 @@ export interface BibleBook {
   testament: 'Old' | 'New';
 }
 
+export type Theme = 'light' | 'dark' | 'bw' | 'sepia';
+
 export type BibleVersion = 'nvi' | 'acf' | 'ntlh';
 
 export interface Verse {

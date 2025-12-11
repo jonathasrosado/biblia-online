@@ -34,18 +34,26 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
                 url={window.location.href}
             />
 
-            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-400 mb-6">
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 transition-colors
+                ${preferences.theme === 'bw'
+                    ? 'bg-stone-100 text-black'
+                    : 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'}
+            `}>
                 <Sun size={32} />
             </div>
             {/* Header / Eyebrow */}
             <div className="text-center mb-8">
-                <span className="text-bible-gold font-bold uppercase tracking-widest text-sm">
+                <span className={`font-bold uppercase tracking-widest text-sm transition-colors
+                    ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}
+                `}>
                     {t.dailyDevotionalTitle}
                 </span>
 
                 {/* If we have a title, show it here as H1 */}
                 {dailyDevotional && (
-                    <h1 className="text-3xl md:text-5xl font-serif text-bible-accent dark:text-stone-100 mt-4 leading-tight animate-slideUp">
+                    <h1 className={`text-3xl md:text-5xl font-serif mt-4 leading-tight animate-slideUp transition-colors
+                        ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-stone-100'}
+                    `}>
                         {dailyDevotional.title}
                     </h1>
                 )}
@@ -83,10 +91,12 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
                         ))}
                     </div>
 
-                    <div className={`p-8 rounded-2xl border-l-4
+                    <div className={`p-8 rounded-2xl border-l-4 transition-colors
               ${preferences.theme === 'sepia'
                             ? 'bg-[#e6dcc6]/30 border-[#8c7b64]'
-                            : 'bg-stone-100 dark:bg-stone-800/50 border-bible-gold'}
+                            : preferences.theme === 'bw'
+                                ? 'bg-stone-50 border-black'
+                                : 'bg-stone-100 dark:bg-stone-800/50 border-bible-gold'}
             `}>
                         <h3 className="font-bold text-sm uppercase tracking-widest mb-4 opacity-70 flex items-center gap-2">
                             <span className="w-8 h-[1px] bg-current"></span>

@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { Book, Menu, MessageCircle, Search, Sun, Moon, X, BookOpen, Settings, ArrowUp, Minimize, ChevronLeft, ChevronRight, ChevronDown, User as UserIcon, Library } from 'lucide-react';
+import { ChevronDown, ChevronLeft, Menu, Search, X, BookOpen, Sun, Moon, ArrowUp, MessageCircle, Book, Settings, Loader2, Minimize, User as UserIcon, AlignJustify, Coffee } from 'lucide-react';
 import { bibleBooks, translations, findBookByNormalizedName, normalizeBookName } from './constants';
 
-import { BibleBook, ReadingPreferences, ReadingHistoryItem, BibleVersion } from './types';
+import { BibleBook, ReadingPreferences, ReadingHistoryItem, BibleVersion, Theme } from './types';
 import BookSelector from './components/BookSelector';
 import { AdUnit } from './components/AdUnit';
 import { AppFooter, CookieBanner, LegalModal } from './components/LegalComponents';
+import Footer from './components/Footer';
 import SettingsModal from './components/SettingsModal';
 import LoginModal from './components/LoginModal';
 
@@ -26,6 +27,10 @@ import TestamentPage from './pages/TestamentPage';
 import VersesPage from './pages/VersesPage';
 import HowToReadBiblePage from './pages/HowToReadBiblePage';
 import BibleFaqPage from './pages/BibleFaqPage';
+
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
+import ContactPage from './pages/ContactPage';
 import AdminPage from './pages/AdminPage';
 
 // Admin Components
@@ -41,20 +46,18 @@ import BibleManager from './components/admin/BibleManager';
 
 interface ViewWrapperProps {
   children: React.ReactNode;
-  onOpenPrivacy: () => void;
-  onOpenTerms: () => void;
   isFullScreen?: boolean;
+  theme: 'light' | 'dark' | 'sepia' | 'bw';
 }
 
-const ViewWrapper: React.FC<ViewWrapperProps> = ({ children, onOpenPrivacy, onOpenTerms, isFullScreen }) => (
+const ViewWrapper: React.FC<ViewWrapperProps> = ({ children, isFullScreen, theme }) => (
   <div className="flex flex-col min-h-full">
     <div className="flex-1 w-full">
       {children}
     </div>
     {!isFullScreen && (
-      <AppFooter
-        onOpenPrivacy={onOpenPrivacy}
-        onOpenTerms={onOpenTerms}
+      <Footer
+        theme={theme}
       />
     )}
   </div>
@@ -131,9 +134,6 @@ function AppContent() {
     return [];
   });
 
-  // Legal Modal State
-  const [legalModalOpen, setLegalModalOpen] = useState(false);
-  const [legalModalType, setLegalModalType] = useState<'privacy' | 'terms' | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState<any>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -181,16 +181,13 @@ function AppContent() {
   };
 
   const toggleTheme = () => {
-    setPreferences(prev => ({
-      ...prev,
-      theme: prev.theme === 'dark' ? 'light' : 'dark'
-    }));
+    setPreferences(prev => {
+      const nextTheme = prev.theme === 'light' ? 'dark' : prev.theme === 'dark' ? 'bw' : 'light';
+      return { ...prev, theme: nextTheme };
+    });
   };
 
-  const openLegalModal = (type: 'privacy' | 'terms') => {
-    setLegalModalType(type);
-    setLegalModalOpen(true);
-  };
+  /* Legal Modal Logic Removed - Using Routes Now */
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,45 +273,28 @@ function AppContent() {
   }
 
   return (
-    <div className={`min-h-screen font-sans flex flex-col md:flex-row overflow-hidden transition-colors duration-300 ${getMainBackgroundClass()}`}>
+    <div className={`min-h-screen font-sans flex flex-col overflow-hidden transition-colors duration-300 ${getMainBackgroundClass()}`}>
       <RedirectHandler />
 
-      {/* Desktop Open Sidebar Button */}
-      {!desktopSidebarOpen && !isFullScreen && (
-        <button
-          onClick={() => setDesktopSidebarOpen(true)}
-          className="hidden md:flex fixed top-4 left-4 z-30 p-2 bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:text-bible-gold rounded-full shadow-md transition-all duration-300 animate-fadeIn items-center justify-center border border-stone-200 dark:border-stone-700"
-          title="Expandir Menu"
-        >
-          <Menu size={20} />
-        </button>
-      )}
 
-      {/* User Login Button */}
-      {!isFullScreen && (
-        <button
-          onClick={() => setIsLoginModalOpen(true)}
-          className="hidden md:flex fixed top-4 right-4 z-30 p-2 bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:text-bible-gold rounded-full shadow-md transition-all duration-300 animate-fadeIn items-center justify-center border border-stone-200 dark:border-stone-700"
-          title={user ? "Minha Conta" : "Entrar"}
-        >
-          {user ? (
-            user.picture ? <img src={user.picture} alt={user.name} className="w-5 h-5 rounded-full" /> : <UserIcon size={20} />
-          ) : (
-            <UserIcon size={20} />
-          )}
-        </button>
-      )}
 
-      {/* Mobile Header */}
+      {/* Unified Main Header (Mobile & Desktop) */}
       {!isFullScreen && (
-        <div className={`md:hidden flex items-center justify-between px-4 py-3 border-b sticky top-0 z-30 transition-colors
+        <div className={`flex items-center justify-between px-4 py-3 border-b sticky top-0 z-30 transition-colors
           ${preferences.theme === 'sepia' ? 'bg-[#f4ecd8] border-[#e6dcc6]' : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}`}>
+          {/* Left: Menu */}
           {/* Left: Menu */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            className={`p-2 rounded-lg border shadow-sm transition-all
+              ${preferences.theme === 'bw'
+                ? 'bg-white border-stone-200 text-black hover:bg-stone-50'
+                : preferences.theme === 'sepia'
+                  ? 'bg-[#fffbf0] border-[#d6cba6] text-[#5c4b37]'
+                  : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300'
+              }`}
           >
-            <Menu size={24} className="text-stone-700 dark:text-stone-300" />
+            <Menu size={20} />
           </button>
 
           {/* Center: Logo */}
@@ -331,6 +311,7 @@ function AppContent() {
               onSelect={navigateToBook}
               onClearHistory={clearHistory}
               t={t}
+              theme={preferences.theme}
               customTrigger={(toggle) => (
                 <button
                   onClick={(e) => {
@@ -338,9 +319,15 @@ function AppContent() {
                     e.preventDefault();
                     toggle();
                   }}
-                  className="p-2 -mr-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-stone-700 dark:text-stone-300"
+                  className={`p-2 rounded-lg border shadow-sm transition-all
+                    ${preferences.theme === 'bw'
+                      ? 'bg-white border-stone-200 text-black hover:bg-stone-50'
+                      : preferences.theme === 'sepia'
+                        ? 'bg-[#fffbf0] border-[#d6cba6] text-[#5c4b37]'
+                        : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300'
+                    }`}
                 >
-                  <Book size={24} />
+                  <Book size={20} />
                 </button>
               )}
             />
@@ -349,37 +336,36 @@ function AppContent() {
       )}
 
       {/* Sidebar Navigation */}
-      {/* Mobile Backdrop */}
-      {sidebarOpen && !desktopSidebarOpen && (
+      {/* Mobile Backdrop - Now for All Screens */}
+      {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden animate-fadeIn"
+          className="fixed inset-0 z-40 bg-black/50 animate-fadeIn"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {!isFullScreen && (
         <aside className={`
-          fixed inset-y-0 left-0 z-50 border-r transform transition-all duration-300 ease-in-out flex flex-col
+          fixed inset-y-0 left-0 z-50 border-r transform transition-transform duration-300 ease-in-out flex flex-col
           ${preferences.theme === 'bw'
             ? 'bg-white border-stone-200 text-black'
             : preferences.theme === 'sepia'
               ? 'bg-[#efebd6] border-[#e6dcc6]'
               : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
-          ${sidebarOpen ? 'translate-x-0 w-80' : '-translate-x-full w-80'}
-          md:relative md:translate-x-0 
-          ${desktopSidebarOpen ? 'md:w-80' : 'md:w-0 md:overflow-hidden md:border-none'}
+          ${sidebarOpen ? 'translate-x-0 w-80 shadow-2xl' : '-translate-x-full w-80'}
         `}>
-          <div className={`p-6 border-b hidden md:flex items-center justify-between
+          {/* Sidebar Header (Unified) */}
+          <div className={`p-4 border-b flex items-center justify-between
             ${preferences.theme === 'bw' ? 'border-stone-200 bg-white' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-100 dark:border-stone-800'}`}>
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center
                 ${preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/20 text-bible-accent dark:text-bible-gold'}`}>
                 <BookOpen size={18} />
               </div>
-              <h1 className={`font-serif text-2xl font-bold
+              <h2 className={`font-serif text-xl font-bold
                 ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
                 {t.appTitle}
-              </h1>
+              </h2>
             </div>
             <div className="flex items-center gap-1">
               <button
@@ -387,28 +373,15 @@ function AppContent() {
                 className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 transition-colors"
                 title="Alternar Tema"
               >
-                {preferences.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                {preferences.theme === 'light' ? <Moon size={18} /> : preferences.theme === 'dark' ? <Sun size={18} /> : <Coffee size={18} />}
               </button>
               <button
-                onClick={() => setDesktopSidebarOpen(false)}
-                className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 transition-colors"
-                title="Recolher Menu"
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400"
               >
-                <ChevronLeft size={18} />
+                <X size={24} />
               </button>
             </div>
-          </div>
-
-          {/* Mobile Sidebar Header */}
-          <div className={`p-4 border-b flex md:hidden items-center justify-between
-            ${preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-100 dark:border-stone-800'}`}>
-            <h2 className="font-serif text-xl font-bold text-bible-accent dark:text-bible-gold">{t.appTitle}</h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400"
-            >
-              <X size={24} />
-            </button>
           </div>
 
           <div className="p-4">
@@ -416,10 +389,12 @@ function AppContent() {
               <input
                 type="text"
                 placeholder={t.searchPlaceholder}
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-gold/50 text-sm transition-colors
-                  ${preferences.theme === 'sepia'
-                    ? 'bg-white/60 border-[#d6cba6] placeholder-[#8c7b64]'
-                    : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 dark:placeholder-stone-500'}
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors
+                  ${preferences.theme === 'bw'
+                    ? 'bg-white border-stone-200 focus:ring-black/20 text-black placeholder-stone-500'
+                    : preferences.theme === 'sepia'
+                      ? 'bg-white/60 border-[#d6cba6] placeholder-[#8c7b64] focus:ring-bible-gold/50'
+                      : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 focus:ring-bible-gold/50'}
                 `}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -430,6 +405,18 @@ function AppContent() {
 
           <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-700">
 
+            {/* Book Selector (Dropdown) */}
+            <div className="px-4 mb-2">
+              <BookSelector
+                currentBook={findBookByNormalizedName(location.pathname.split('/')[2] || 'genesis') || bibleBooks[0]}
+                currentChapter={parseInt(location.pathname.split('/')[3] || '1')}
+                history={history}
+                onSelect={(book, chapter) => navigateToBook(book, chapter)}
+                onClearHistory={clearHistory}
+                t={t}
+                theme={preferences.theme}
+              />
+            </div>
 
             <div className="h-px bg-stone-100 dark:bg-stone-800 my-2 mx-2" />
 
@@ -441,35 +428,14 @@ function AppContent() {
               onClick={() => { navigate('/'); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
                 ${location.pathname === '/'
-                  ? 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium'
+                  ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
                   : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
             >
               <BookOpen size={20} />
               Início
             </button>
 
-            <button
-              onClick={() => { navigate('/devocional'); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                ${location.pathname === '/devocional'
-                  ? 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium'
-                  : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-            >
-              <Sun size={20} />
-              {t.devotional}
-            </button>
-            <button
-              onClick={() => { navigate('/chat'); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                ${location.pathname === '/chat'
-                  ? 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium'
-                  : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-            >
-              <MessageCircle size={20} />
-              {t.chat}
-            </button>
-
-            {/* Bible Versions Dropdown */}
+            {/* Bible Versions Dropdown - Moved Up */}
             <div className="w-full">
               <button
                 onClick={() => setIsVersionsOpen(!isVersionsOpen)}
@@ -487,19 +453,19 @@ function AppContent() {
                 <div className="pl-11 pr-4 py-2 space-y-1">
                   <button
                     onClick={() => { setVersion('nvi'); setSidebarOpen(false); }}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'nvi' ? 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium' : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'nvi' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
                   >
                     Nova Versão Internacional (NVI)
                   </button>
                   <button
                     onClick={() => { setVersion('acf'); setSidebarOpen(false); }}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'acf' ? 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium' : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'acf' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
                   >
                     Almeida Corrigida Fiel (ACF)
                   </button>
                   <button
                     onClick={() => { setVersion('ntlh'); setSidebarOpen(false); }}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'ntlh' ? 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium' : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'ntlh' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
                   >
                     Nova Tradução na Linguagem de Hoje (NTLH)
                   </button>
@@ -508,13 +474,28 @@ function AppContent() {
             </div>
 
             <button
-              onClick={() => { toggleTheme(); setSidebarOpen(false); }}
+              onClick={() => { navigate('/chat'); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100`}
+                ${location.pathname === '/chat'
+                  ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
+                  : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
             >
-              {preferences.theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-              {preferences.theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+              <MessageCircle size={20} />
+              {t.chat}
             </button>
+
+            <button
+              onClick={() => { navigate('/devocional'); setSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
+                ${location.pathname === '/devocional'
+                  ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
+                  : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
+            >
+              <Sun size={20} />
+              {t.devotional}
+            </button>
+
+            {/* Theme Toggle Removed from List per User Request */}
 
             <button
               onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
@@ -534,53 +515,71 @@ function AppContent() {
       <main
         ref={mainScrollRef}
         className={`flex-1 overflow-y-auto relative scroll-smooth ${getMainBackgroundClass()}
-          ${isFullScreen ? 'h-screen' : 'h-[calc(100vh-65px)] md:h-screen'}`}
+          ${isFullScreen ? 'h-screen' : 'h-[calc(100vh-65px)]'}`}
       >
         <Routes>
           <Route path="/" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
               <HomePage language={language} t={t} theme={preferences.theme} history={history} />
             </ViewWrapper>
           } />
 
           <Route path="/antigo-testamento" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
-              <TestamentPage testament="Old" language={language} t={t} />
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+              <TestamentPage testament="Old" language={language} t={t} theme={preferences.theme} />
             </ViewWrapper>
           } />
 
           <Route path="/versiculos" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
-              <VersesPage />
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+              <VersesPage theme={preferences.theme} />
             </ViewWrapper>
           } />
 
           <Route path="/como-ler-biblia" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
-              <HowToReadBiblePage />
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+              <HowToReadBiblePage theme={preferences.theme} />
             </ViewWrapper>
           } />
 
           <Route path="/faq-biblia" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
-              <BibleFaqPage />
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+              <BibleFaqPage theme={preferences.theme} />
+            </ViewWrapper>
+          } />
+
+          <Route path="/privacidade" element={
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+              <PrivacyPage theme={preferences.theme} />
+            </ViewWrapper>
+          } />
+
+          <Route path="/termos" element={
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+              <TermsPage theme={preferences.theme} />
+            </ViewWrapper>
+          } />
+
+          <Route path="/contato" element={
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+              <ContactPage theme={preferences.theme} />
             </ViewWrapper>
           } />
 
           <Route path="/novo-testamento" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
-              <TestamentPage testament="New" language={language} t={t} />
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+              <TestamentPage testament="New" language={language} t={t} theme={preferences.theme} />
             </ViewWrapper>
           } />
 
           <Route path="/leitura/:bookAbbrev" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
               <BookIntroPage language={language} t={t} />
             </ViewWrapper>
           } />
 
           <Route path="/leitura/:bookAbbrev/:chapterNum" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
               <ReadingPage
                 key={location.pathname}
                 language={language}
@@ -596,7 +595,7 @@ function AppContent() {
           } />
 
           <Route path="/resumo/:bookAbbrev/:chapterNum" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
               <SummaryPage
                 language={language}
                 t={t}
@@ -610,31 +609,31 @@ function AppContent() {
           } />
 
           <Route path="/busca" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
               <SearchPage language={language} t={t} preferences={preferences} />
             </ViewWrapper>
           } />
 
           <Route path="/devocional" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
               <DevotionalPage language={language} t={t} preferences={preferences} />
             </ViewWrapper>
           } />
 
           <Route path="/chat" element={
-            <div className="h-full flex flex-col overflow-hidden">
-              <ChatPage language={language} t={t} />
+            <div className="h-[calc(100vh-65px)] flex flex-col overflow-hidden">
+              <ChatPage language={language} t={t} preferences={preferences} />
             </div>
           } />
 
           <Route path="/blog" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
-              <BlogPage />
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+              <BlogPage theme={preferences.theme} />
             </ViewWrapper>
           } />
 
           <Route path="/blog/:slug" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
               <BlogPostPage />
             </ViewWrapper>
           } />
@@ -655,13 +654,13 @@ function AppContent() {
 
           {/* Dynamic Routes - MUST BE LAST */}
           <Route path="/:category" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen} theme={preferences.theme}>
               <CategoryPage />
             </ViewWrapper>
           } />
 
           <Route path="/:category/:slug" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen}>
+            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen} theme={preferences.theme}>
               <BlogPostPage />
             </ViewWrapper>
           } />
@@ -691,12 +690,7 @@ function AppContent() {
         </div>
       </main>
 
-      <CookieBanner onOpenPrivacy={() => openLegalModal('privacy')} />
-      <LegalModal
-        isOpen={legalModalOpen}
-        type={legalModalType}
-        onClose={() => setLegalModalOpen(false)}
-      />
+      <CookieBanner onOpenPrivacy={() => navigate('/privacidade')} />
       <SettingsModal
         isOpen={settingsModalOpen}
         onClose={() => setSettingsModalOpen(false)}

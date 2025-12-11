@@ -4,13 +4,16 @@ import { Link } from 'react-router-dom';
 import { ChatMessage } from '../types';
 import { sendChatMessage } from '../services/geminiService';
 
+import { ReadingPreferences } from '../types';
+
 interface ChatBotProps {
   language: string;
   t: any;
   initialMessage?: string;
+  preferences: ReadingPreferences;
 }
 
-const ChatBot: React.FC<ChatBotProps> = ({ language, t, initialMessage }) => {
+const ChatBot: React.FC<ChatBotProps> = ({ language, t, initialMessage, preferences }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -147,7 +150,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ language, t, initialMessage }) => {
 
         // Internal Link
         if (linkUrl.startsWith('/')) {
-          return <Link key={index} to={linkUrl} className="text-bible-gold hover:underline font-bold bg-bible-gold/10 px-1 rounded">{linkText}</Link>;
+          return <Link key={index} to={linkUrl} className={`${preferences.theme === 'bw' ? 'text-black bg-stone-100 hover:bg-stone-200' : 'text-bible-gold bg-bible-gold/10'} hover:underline font-bold px-1 rounded`}>{linkText}</Link>;
         }
         // External Link
         return (
@@ -187,10 +190,14 @@ const ChatBot: React.FC<ChatBotProps> = ({ language, t, initialMessage }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-stone-50/50 dark:bg-stone-950/50 transition-colors">
+    <div className={`flex flex-col h-full transition-colors
+      ${preferences.theme === 'bw'
+        ? 'bg-white text-black'
+        : 'bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100'}
+    `}>
 
       {/* Messages Area */}
-      <div className={`flex-1 overflow-y-auto p-4 md:p-6 space-y-6 flex flex-col ${messages.length <= 2 ? 'justify-center' : 'justify-start'}`}>
+      <div className={`flex-1 overflow-y-auto px-4 pt-4 pb-0 md:p-6 md:pb-0 space-y-6 flex flex-col justify-start`}>
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
 
@@ -200,18 +207,18 @@ const ChatBot: React.FC<ChatBotProps> = ({ language, t, initialMessage }) => {
               <div className={`
                     w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm
                     ${msg.role === 'user'
-                  ? 'bg-bible-gold text-white'
-                  : 'bg-white dark:bg-stone-800 text-bible-accent dark:text-bible-gold border border-stone-100 dark:border-stone-700'}
+                  ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold text-white')
+                  : (preferences.theme === 'bw' ? 'bg-white text-black border border-black' : 'bg-white dark:bg-stone-800 text-bible-accent dark:text-bible-gold border border-stone-100 dark:border-stone-700')}
                 `}>
                 {msg.role === 'user' ? <User size={18} /> : <BookOpen size={18} />}
               </div>
 
               {/* Bubble */}
               <div className={`
-                p-4 md:p-5 rounded-2xl shadow-sm text-sm md:text-base leading-relaxed relative group
+                p-4 md:p-5 rounded-xl shadow-sm text-sm md:text-base leading-relaxed relative group
                 ${msg.role === 'user'
-                  ? 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100 rounded-tr-none'
-                  : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-800 rounded-tl-none'}
+                  ? 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-100 rounded-tr-sm'
+                  : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-800 rounded-tl-sm'}
                 `}>
                 <div className="markdown-content">
                   {msg.role === 'user' ? msg.text : renderMarkdown(msg.text)}
@@ -252,57 +259,69 @@ const ChatBot: React.FC<ChatBotProps> = ({ language, t, initialMessage }) => {
 
         {/* Ice Breakers (Show only if standard welcome message is the only one) */}
         {/* Ice Breakers removed from here, now above input */}
+        {/* Ice Breakers / Suggestions (In-Chat) */}
+
+
         <div ref={bottomRef} />
       </div>
+
+      {/* Suggestions Carousel (Above Input Border) */}
+      {!isLoading && messages.length <= 1 && (
+        <div className="w-full overflow-x-auto px-4 pb-3 bg-stone-50/50 dark:bg-stone-950/50 flex gap-2 [&::-webkit-scrollbar]:hidden transition-colors" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {suggestions.map((suggestion, idx) => (
+            <button
+              key={idx}
+              onClick={() => sendMessage(undefined, suggestion)}
+              className={`flex-shrink-0 px-4 py-2 bg-white dark:bg-stone-800 border rounded-lg text-sm transition-all shadow-sm whitespace-nowrap active:scale-95
+                ${preferences.theme === 'bw'
+                  ? 'border-stone-200 text-black hover:bg-black hover:text-white hover:border-black'
+                  : 'border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-bible-gold hover:text-bible-gold dark:hover:border-bible-gold'}
+              `}
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Input Area with Suggestions */}
       <div className="bg-white dark:bg-stone-950 border-t border-stone-200 dark:border-stone-800 transition-colors z-10 flex flex-col">
 
-        {/* Suggestions Carousel */}
-        {!isLoading && messages.length <= 1 && (
-          <div
-            className="w-full overflow-x-auto px-4 py-3 flex gap-2 border-b border-stone-100 dark:border-stone-800 [&::-webkit-scrollbar]:hidden"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {suggestions.map((suggestion, idx) => (
-              <button
-                key={idx}
-                onClick={() => sendMessage(undefined, suggestion)}
-                className="flex-shrink-0 px-4 py-2 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-full text-sm text-stone-600 dark:text-stone-300 hover:border-bible-gold hover:text-bible-gold dark:hover:border-bible-gold transition-all shadow-sm whitespace-nowrap active:scale-95"
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Suggestions Carousel (Fixed in Footer) */}
 
-        <div className="p-3 md:p-4 pt-2 md:pt-3">
-          <form onSubmit={(e) => sendMessage(e)} className="flex gap-2 md:gap-3 max-w-4xl mx-auto items-end bg-stone-100 dark:bg-stone-900/50 p-2 md:p-0 rounded-3xl md:rounded-none md:bg-transparent">
-            <div className="flex-1 bg-white md:bg-stone-50 md:dark:bg-stone-900/50 border-none md:border border-stone-200 dark:border-stone-800 rounded-2xl focus-within:ring-0 md:focus-within:ring-2 focus-within:ring-bible-gold/50 transition-all shadow-none md:shadow-inner">
+
+        <div className="p-4 pt-2">
+          <form onSubmit={(e) => sendMessage(e)} className="flex gap-3 max-w-4xl mx-auto items-end">
+            <div className="flex-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg focus-within:ring-2 focus-within:ring-bible-gold/50 transition-all shadow-sm">
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={t.chatPlaceholder || "Digite sua pergunta teológica..."}
-                className="w-full p-3 md:p-4 bg-transparent border-none focus:outline-none text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 resize-none max-h-32 min-h-[48px] md:min-h-[56px] overflow-y-auto text-sm md:text-base"
+                placeholder="Faça uma pergunta..."
+                className="w-full px-4 py-3 bg-transparent border-none focus:outline-none text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 resize-none max-h-32 min-h-[48px] overflow-y-auto text-sm leading-relaxed"
                 rows={1}
               />
             </div>
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="p-3 md:p-4 bg-bible-gold hover:bg-yellow-600 text-white rounded-full md:rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl active:scale-95 flex-shrink-0"
+              className={`px-6 py-3 min-h-[48px] flex items-center justify-center rounded-lg transition-all shadow-md hover:shadow-xl active:scale-95 flex-shrink-0 text-white font-bold text-sm uppercase tracking-wider disabled:cursor-not-allowed
+                ${preferences.theme === 'bw'
+                  ? 'bg-black hover:bg-stone-800'
+                  : 'bg-bible-gold hover:bg-yellow-600'}
+              `}
             >
-              <Send size={20} />
+              ENVIAR
             </button>
           </form>
         </div>
+
         <div className="text-center mt-2 pb-2">
           <span className="text-[10px] text-stone-400">A IA pode cometer erros. Verifique sempre nas Escrituras.</span>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

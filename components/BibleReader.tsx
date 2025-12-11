@@ -397,10 +397,10 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
       {/* Verses List */}
       {/* Verses List */}
       <div className="space-y-4">
-        {verses.map((verse) => {
+        {verses.map((verse, idx) => {
           const isSelected = selectedVerses.has(verse.number);
-          const isPlayingThisVerse = isPlaying && currentPlayingChunk === verses.findIndex(v => v.number === verse.number);
-          const isAudioActive = verse.number === currentPlayingChunk; // Defined here
+          const isPlayingThisVerse = isPlaying && currentPlayingChunk === idx;
+          const isAudioActive = (isPlaying || isPaused) && idx === currentPlayingChunk; // Only highlight if audio is active
 
           // Determine if we should show the inline menu here
           // Logic: Show if this is the LAST selected verse
@@ -453,43 +453,51 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
               {/* Inline Action Menu (Mobile Optimized) - Shows ONLY after the last selected verse */}
               {isLastSelected && !activeAction && (
                 <div className="animate-slideDown overflow-hidden mt-2 mb-4">
-                  <div className="bg-stone-50/80 dark:bg-stone-800/80 backdrop-blur-md rounded-2xl p-2 flex items-center justify-between gap-2 shadow-sm border border-stone-200 dark:border-stone-700/50 mx-2">
+                  <div className={`backdrop-blur-md rounded-2xl p-2 flex items-center justify-between gap-2 shadow-sm border mx-2
+                      ${preferences.theme === 'bw'
+                      ? 'bg-white border-stone-200 shadow-md'
+                      : 'bg-stone-50/80 dark:bg-stone-800/80 border-stone-200 dark:border-stone-700/50'}`}>
 
                     <button
                       onClick={(e) => { e.stopPropagation(); handleExplain(); }}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl hover:bg-white dark:hover:bg-stone-700 transition-all active:scale-95 bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200"
+                      className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
+                          ${preferences.theme === 'bw'
+                          ? 'bg-stone-100 text-black hover:bg-stone-200'
+                          : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
-                      <span className="w-4 h-4 flex items-center justify-center rounded-full border border-bible-gold text-[10px] font-serif font-bold text-bible-gold">!</span>
+                      <span className={`w-4 h-4 flex items-center justify-center rounded-full border text-[10px] font-serif font-bold
+                          ${preferences.theme === 'bw' ? 'border-black text-black' : 'border-bible-gold text-bible-gold'}`}>!</span>
                       <span className="text-xs font-medium">Explicar</span>
                     </button>
 
                     <button
                       onClick={(e) => { e.stopPropagation(); handleAsk(); }}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl hover:bg-white dark:hover:bg-stone-700 transition-all active:scale-95 bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200"
+                      className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
+                          ${preferences.theme === 'bw'
+                          ? 'bg-stone-100 text-black hover:bg-stone-200'
+                          : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
-                      <MessageCircle size={16} className="text-bible-gold" />
+                      <MessageCircle size={16} className={preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'} />
                       <span className="text-xs font-medium">Perguntar</span>
                     </button>
 
                     <button
                       onClick={(e) => { e.stopPropagation(); setShowImageGenerator(true); }}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl hover:bg-white dark:hover:bg-stone-700 transition-all active:scale-95 bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200"
+                      className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
+                          ${preferences.theme === 'bw'
+                          ? 'bg-stone-100 text-black hover:bg-stone-200'
+                          : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
-                      <ImageIcon size={16} className="text-bible-gold" />
+                      <ImageIcon size={16} className={preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'} />
                       <span className="text-xs font-medium">Imagem</span>
                     </button>
 
                     <button
-                      onClick={(e) => { e.stopPropagation(); handleCopy(); }}
-                      className="flex items-center justify-center p-2 rounded-xl hover:bg-white dark:hover:bg-stone-700 transition-all active:scale-95 bg-white/50 dark:bg-stone-700/30 text-stone-500 dark:text-stone-400"
-                      title="Copiar"
-                    >
-                      <Copy size={16} />
-                    </button>
-
-                    <button
                       onClick={(e) => { e.stopPropagation(); clearSelection(); }}
-                      className="flex items-center justify-center p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95 text-stone-400 hover:text-red-500"
+                      className={`flex items-center justify-center p-2 rounded-xl transition-all active:scale-95
+                          ${preferences.theme === 'bw'
+                          ? 'text-stone-400 hover:text-red-600 hover:bg-red-50'
+                          : 'text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'}`}
                       title="Fechar"
                     >
                       <X size={16} />
@@ -550,11 +558,14 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             onClick={e => e.stopPropagation()}
           >
             {/* Drag Handle / Header */}
-            <div className="px-6 py-4 flex items-center justify-between border-b border-stone-100 dark:border-stone-800 shrink-0 bg-stone-50 dark:bg-stone-900 sticky top-0 z-10">
+            <div className={`px-6 py-4 flex items-center justify-between border-b shrink-0 sticky top-0 z-10
+                ${preferences.theme === 'bw' ? 'bg-white border-stone-200' : 'bg-stone-50 dark:bg-stone-900 border-stone-100 dark:border-stone-800'}`}>
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-xl bg-bible-gold/10 text-bible-gold flex items-center justify-center`}>
+                <div className={`p-2 rounded-xl flex items-center justify-center
+                    ${preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 text-bible-gold'}`}>
                   {activeAction === 'explain' ? (
-                    <span className="w-5 h-5 flex items-center justify-center rounded-full border border-current text-[12px] font-serif font-bold">!</span>
+                    <span className={`w-5 h-5 flex items-center justify-center rounded-full border text-[12px] font-serif font-bold
+                         ${preferences.theme === 'bw' ? 'border-white' : 'border-current'}`}>!</span>
                   ) : (
                     <MessageCircle size={20} />
                   )}
@@ -616,10 +627,16 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                     </div>
                   ) : (
                     <div className="group relative w-full">
-                      <div className="bg-stone-50 dark:bg-stone-800/60 px-6 py-5 rounded-2xl rounded-tl-sm text-[16px] leading-relaxed text-stone-800 dark:text-stone-200 w-full shadow-sm border border-stone-100 dark:border-stone-700/50">
-                        <div className="prose prose-stone dark:prose-invert max-w-none prose-p:my-3 prose-strong:text-bible-gold prose-a:text-bible-gold prose-headings:text-stone-900 dark:prose-headings:text-white">
+                      <div className={`px-6 py-5 rounded-2xl rounded-tl-sm text-[16px] leading-relaxed w-full shadow-sm border
+                        ${preferences.theme === 'bw'
+                          ? 'bg-white text-black border-stone-200'
+                          : 'bg-stone-50 dark:bg-stone-800/60 text-stone-800 dark:text-stone-200 border-stone-100 dark:border-stone-700/50'}`}>
+                        <div className={`prose max-w-none prose-p:my-3
+                          ${preferences.theme === 'bw'
+                            ? 'prose-strong:text-black prose-a:text-black prose-headings:text-black'
+                            : 'prose-stone dark:prose-invert prose-strong:text-bible-gold prose-a:text-bible-gold prose-headings:text-stone-900 dark:prose-headings:text-white'}`}>
                           {/* Decorative Quote Icon */}
-                          <div className="absolute -top-3 -left-2 text-bible-gold/20 pointer-events-none">
+                          <div className={`absolute -top-3 -left-2 pointer-events-none ${preferences.theme === 'bw' ? 'text-stone-200' : 'text-bible-gold/20'}`}>
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 8.44772 14.017 9V11C14.017 11.5523 13.5693 12 13.017 12H12.017V5H22.017V15C22.017 18.3137 19.3307 21 16.017 21H14.017ZM5.0166 21L5.0166 18C5.0166 16.8954 5.91203 16 7.0166 16H10.0166C10.5689 16 11.0166 15.5523 11.0166 15V9C11.0166 8.44772 10.5689 8 10.0166 8H6.0166C5.46432 8 5.0166 8.44772 5.0166 9V11C5.0166 11.5523 4.56889 12 4.0166 12H3.0166V5H13.0166V15C13.0166 18.3137 10.3303 21 7.0166 21H5.0166Z" /></svg>
                           </div>
 
@@ -629,7 +646,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                             }} />
                           ))}
                           {isTyping && (
-                            <span className="inline-block w-1.5 h-4 bg-bible-gold ml-1 animate-pulse align-middle"></span>
+                            <span className={`inline-block w-1.5 h-4 ml-1 animate-pulse align-middle ${preferences.theme === 'bw' ? 'bg-black' : 'bg-bible-gold'}`}></span>
                           )}
                         </div>
                       </div>

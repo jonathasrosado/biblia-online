@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { BookOpen, Map, Clock, MessageCircle, ArrowRight, CheckCircle2, Star, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import SEO from '../components/SEO';
 
-const HowToReadBiblePage: React.FC = () => {
+interface HowToReadBiblePageProps {
+    theme?: 'light' | 'dark' | 'sepia' | 'bw';
+}
+
+const HowToReadBiblePage: React.FC<HowToReadBiblePageProps> = ({ theme }) => {
+    const isBw = theme === 'bw';
     const navigate = useNavigate();
     const [openFaqIndex, setOpenFaqIndex] = React.useState<number | null>(null);
 
@@ -96,13 +101,23 @@ const HowToReadBiblePage: React.FC = () => {
             />
 
             {/* Hero Section */}
-            <div className="bg-white dark:bg-stone-900 pt-24 pb-20 px-4 border-b border-stone-200 dark:border-stone-800 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-bible-gold/10 to-transparent pointer-events-none"></div>
+            <div className={`pt-24 pb-20 px-4 border-b relative overflow-hidden
+              ${isBw
+                    ? 'bg-white border-black text-black'
+                    : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
+            `}>
+                {!isBw && (
+                    <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-bible-gold/10 to-transparent pointer-events-none"></div>
+                )}
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bible-gold/10 text-bible-accent dark:text-bible-gold text-xs font-bold uppercase tracking-widest mb-6">
+                    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6
+                      ${isBw ? 'bg-black text-white' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold'}
+                    `}>
                         <Star size={14} /> Guia Definitivo
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold text-bible-accent dark:text-bible-gold mb-6 leading-tight">
+                    <h1 className={`text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight
+                      ${isBw ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}
+                    `}>
                         Como Ler a Bíblia e<br />Entender Sua Mensagem
                     </h1>
                     <p className="text-lg md:text-xl text-stone-600 dark:text-stone-400 mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -111,7 +126,9 @@ const HowToReadBiblePage: React.FC = () => {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <button
                             onClick={() => navigate('/leitura/mateus/1')}
-                            className="bg-bible-gold hover:bg-yellow-600 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2"
+                            className={`px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2
+                              ${isBw ? 'bg-black text-white hover:bg-stone-800' : 'bg-bible-gold hover:bg-yellow-600 text-white'}
+                            `}
                         >
                             Começar por Mateus <ArrowRight size={20} />
                         </button>

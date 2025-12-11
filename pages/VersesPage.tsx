@@ -34,7 +34,12 @@ const faqs = [
     }
 ];
 
-const VersesPage: React.FC = () => {
+interface VersesPageProps {
+    theme?: 'light' | 'dark' | 'sepia' | 'bw';
+}
+
+const VersesPage: React.FC<VersesPageProps> = ({ theme }) => {
+    const isBw = theme === 'bw';
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
@@ -74,17 +79,31 @@ const VersesPage: React.FC = () => {
             />
 
             {/* Header / Hero */}
-            <div className="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 pt-20 pb-16 px-4 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-bible-gold via-yellow-400 to-bible-gold opacity-50"></div>
+            <div className={`pt-20 pb-16 px-4 shadow-sm relative overflow-hidden border-b
+              ${isBw
+                    ? 'bg-white border-black text-black'
+                    : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
+            `}>
+                {!isBw && (
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-bible-gold via-yellow-400 to-bible-gold opacity-50"></div>
+                )}
 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <span className="inline-block py-1 px-3 rounded-full bg-bible-gold/10 text-bible-accent dark:text-bible-gold text-xs font-bold uppercase tracking-widest mb-4">
+                    <span className={`inline-block py-1 px-3 rounded-full text-xs font-bold uppercase tracking-widest mb-4
+                      ${isBw
+                            ? 'bg-black text-white'
+                            : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold'}
+                    `}>
                         Biblioteca Sagrada
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold text-bible-accent dark:text-bible-gold mb-6 leading-tight">
+                    <h1 className={`text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight
+                      ${isBw ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}
+                    `}>
                         Encontre Inspiração na<br />Palavra de Deus
                     </h1>
-                    <p className="text-lg md:text-xl text-stone-600 dark:text-stone-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    <p className={`text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed
+                      ${isBw ? 'text-black/80' : 'text-stone-600 dark:text-stone-400'}
+                    `}>
                         Seja buscando conforto em momentos difíceis ou sabedoria para grandes decisões,
                         nossa coleção organizada de versículos está aqui para guiar sua jornada espiritual.
                     </p>
@@ -93,11 +112,15 @@ const VersesPage: React.FC = () => {
                         <input
                             type="text"
                             placeholder="O que você está buscando hoje? (ex: ansiedade, fé, Salmos 23)"
-                            className="w-full pl-14 pr-4 py-5 rounded-2xl border-2 border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-lg focus:outline-none focus:ring-4 focus:ring-bible-gold/20 focus:border-bible-gold transition-all shadow-lg placeholder-stone-400"
+                            className={`w-full pl-14 pr-4 py-5 rounded-2xl border-2 text-lg focus:outline-none transition-all shadow-lg
+                              ${isBw
+                                    ? 'bg-white border-black text-black placeholder-black/50 focus:ring-4 focus:ring-black/10'
+                                    : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 focus:ring-4 focus:ring-bible-gold/20 focus:border-bible-gold placeholder-stone-400 dark:text-stone-100'}
+                            `}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-bible-gold" size={24} />
+                        <Search className={`absolute left-5 top-1/2 -translate-y-1/2 ${isBw ? 'text-black' : 'text-bible-gold'}`} size={24} />
                     </form>
                 </div>
             </div>
@@ -134,13 +157,19 @@ const VersesPage: React.FC = () => {
                 </section>
 
                 {/* Why Read / Value Proposition */}
-                <section className="bg-bible-paper dark:bg-stone-900 rounded-3xl p-8 md:p-12 border border-stone-200 dark:border-stone-800 shadow-sm">
+                <section className={`rounded-3xl p-8 md:p-12 shadow-sm border
+                  ${isBw
+                        ? 'bg-white border-black'
+                        : 'bg-bible-paper dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
+                `}>
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6">
-                            <h2 className="text-3xl font-serif font-bold text-bible-accent dark:text-bible-gold">
+                            <h2 className={`text-3xl font-serif font-bold ${isBw ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
                                 Por que estudar os versículos bíblicos?
                             </h2>
-                            <div className="prose dark:prose-invert text-stone-600 dark:text-stone-400 text-lg leading-relaxed space-y-4">
+                            <div className={`prose dark:prose-invert text-lg leading-relaxed space-y-4
+                              ${isBw ? 'text-black/80' : 'text-stone-600 dark:text-stone-400'}
+                            `}>
                                 <p>
                                     A Bíblia não é apenas um livro antigo, mas uma fonte viva de sabedoria que atravessa gerações.
                                     Ler as escrituras diariamente pode transformar sua perspectiva, trazendo <strong>paz interior</strong> e
@@ -154,24 +183,22 @@ const VersesPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="grid gap-4">
-                            <div className="bg-white dark:bg-stone-800 p-6 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700">
-                                <h3 className="font-bold text-bible-accent dark:text-bible-gold mb-2 flex items-center gap-2">
-                                    <Shield size={20} /> Fortaleza Espiritual
-                                </h3>
-                                <p className="text-sm text-stone-600 dark:text-stone-400">Encontre força e coragem nas histórias de fé dos grandes heróis bíblicos.</p>
-                            </div>
-                            <div className="bg-white dark:bg-stone-800 p-6 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700">
-                                <h3 className="font-bold text-bible-accent dark:text-bible-gold mb-2 flex items-center gap-2">
-                                    <Sun size={20} /> Clareza e Direção
-                                </h3>
-                                <p className="text-sm text-stone-600 dark:text-stone-400">Versículos de sabedoria que iluminam o caminho para decisões sábias.</p>
-                            </div>
-                            <div className="bg-white dark:bg-stone-800 p-6 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700">
-                                <h3 className="font-bold text-bible-accent dark:text-bible-gold mb-2 flex items-center gap-2">
-                                    <Heart size={20} /> Consolo e Esperança
-                                </h3>
-                                <p className="text-sm text-stone-600 dark:text-stone-400">Palavras de conforto para os momentos de angústia e incerteza.</p>
-                            </div>
+                            {[
+                                { icon: Shield, title: 'Fortaleza Espiritual', desc: 'Encontre força e coragem nas histórias de fé dos grandes heróis bíblicos.' },
+                                { icon: Sun, title: 'Clareza e Direção', desc: 'Versículos de sabedoria que iluminam o caminho para decisões sábias.' },
+                                { icon: Heart, title: 'Consolo e Esperança', desc: 'Palavras de conforto para os momentos de angústia e incerteza.' }
+                            ].map((item, i) => (
+                                <div key={i} className={`p-6 rounded-xl shadow-sm border
+                                  ${isBw
+                                        ? 'bg-white border-black text-black'
+                                        : 'bg-white dark:bg-stone-800 border-stone-100 dark:border-stone-700'}
+                                `}>
+                                    <h3 className={`font-bold mb-2 flex items-center gap-2 ${isBw ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
+                                        <item.icon size={20} /> {item.title}
+                                    </h3>
+                                    <p className={`text-sm ${isBw ? 'text-black/70' : 'text-stone-600 dark:text-stone-400'}`}>{item.desc}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -205,20 +232,28 @@ const VersesPage: React.FC = () => {
 
                         <button
                             onClick={() => navigate('/devocional')}
-                            className="group relative overflow-hidden bg-gradient-to-br from-bible-gold to-yellow-600 rounded-2xl p-8 text-left shadow-lg"
+                            className={`group relative overflow-hidden rounded-2xl p-8 text-left shadow-lg border
+                              ${isBw
+                                    ? 'bg-white border-black text-black'
+                                    : 'bg-gradient-to-br from-bible-gold to-yellow-600 text-white border-transparent'}
+                            `}
                         >
                             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                                <Calendar size={120} className="text-white" />
+                                <Calendar size={120} className={isBw ? 'text-black' : 'text-white'} />
                             </div>
                             <div className="relative z-10">
-                                <div className="bg-white/10 w-fit p-3 rounded-lg mb-4 text-white backdrop-blur-sm">
+                                <div className={`w-fit p-3 rounded-lg mb-4 backdrop-blur-sm
+                                  ${isBw ? 'bg-black text-white' : 'bg-white/10 text-white'}
+                                `}>
                                     <Calendar size={24} />
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Devocional Diário</h3>
-                                <p className="text-white/90 mb-6 max-w-xs">
+                                <h3 className={`text-2xl font-bold mb-2 ${isBw ? 'text-black' : 'text-white'}`}>Devocional Diário</h3>
+                                <p className={`mb-6 max-w-xs ${isBw ? 'text-black/80' : 'text-white/90'}`}>
                                     Receba uma reflexão inspiradora todos os dias para começar sua manhã conectado com Deus.
                                 </p>
-                                <span className="inline-flex items-center text-white font-bold group-hover:translate-x-2 transition-transform">
+                                <span className={`inline-flex items-center font-bold group-hover:translate-x-2 transition-transform
+                                  ${isBw ? 'text-black' : 'text-white'}
+                                `}>
                                     Ler Devocional →
                                 </span>
                             </div>

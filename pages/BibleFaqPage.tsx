@@ -6,7 +6,12 @@ import { bibleFaqs } from '../src/data/bibleFaqData';
 
 const categories = ['Todas', 'Geral', 'Estudo', 'Personagens', 'Teologia', 'Curiosidades'];
 
-const BibleFaqPage: React.FC = () => {
+interface BibleFaqPageProps {
+    theme?: 'light' | 'dark' | 'sepia' | 'bw';
+}
+
+const BibleFaqPage: React.FC<BibleFaqPageProps> = ({ theme }) => {
+    const isBw = theme === 'bw';
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todas');
@@ -51,12 +56,20 @@ const BibleFaqPage: React.FC = () => {
             />
 
             {/* Hero Section */}
-            <div className="bg-white dark:bg-stone-900 pt-24 pb-16 px-4 border-b border-stone-200 dark:border-stone-800">
+            <div className={`pt-24 pb-16 px-4 border-b 
+              ${isBw
+                    ? 'bg-white border-black text-black'
+                    : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
+            `}>
                 <div className="max-w-4xl mx-auto text-center">
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bible-gold/10 text-bible-accent dark:text-bible-gold text-xs font-bold uppercase tracking-widest mb-6">
+                    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6
+                      ${isBw ? 'bg-black text-white' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold'}
+                    `}>
                         <HelpCircle size={14} /> Central de Dúvidas
                     </span>
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-bible-accent dark:text-bible-gold mb-6">
+                    <h1 className={`text-4xl md:text-5xl font-serif font-bold mb-6
+                      ${isBw ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}
+                    `}>
                         Perguntas Frequentes<br />sobre a Bíblia
                     </h1>
                     <p className="text-lg text-stone-600 dark:text-stone-400 mb-10 max-w-2xl mx-auto">
@@ -80,10 +93,10 @@ const BibleFaqPage: React.FC = () => {
                             <button
                                 key={cat}
                                 onClick={() => setSelectedCategory(cat)}
-                                className={`px-4 py-2 rounded-full text-sm font-bold transition-all
+                                className={`px-4 py-2 rounded-full text-sm font-bold transition-all border
                                     ${selectedCategory === cat
-                                        ? 'bg-bible-gold text-white shadow-md'
-                                        : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:border-bible-gold'}
+                                        ? (isBw ? 'bg-black text-white border-black' : 'bg-bible-gold text-white shadow-md border-bible-gold')
+                                        : (isBw ? 'bg-white text-black border-black hover:bg-black hover:text-white' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-700 hover:border-bible-gold')}
                                 `}
                             >
                                 {cat}

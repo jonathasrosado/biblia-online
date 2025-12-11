@@ -213,11 +213,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                 )}
 
                 <div className="max-w-3xl mx-auto relative z-10">
-                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-bold text-[10px] uppercase tracking-widest mb-6 animate-slideUp
-                        ${theme === 'bw' ? 'bg-stone-100 text-stone-900 border border-stone-200' : 'bg-bible-gold/10 text-bible-gold'}`}>
-                        <Star size={12} className="fill-current" />
-                        <span>Bíblia Online Inteligente</span>
-                    </div>
+
 
                     <h1 className={`text-4xl md:text-6xl font-serif font-bold mb-4 tracking-tight animate-slideUp
                         ${theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`} style={{ animationDelay: '0.1s' }}>
@@ -280,7 +276,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                 {/* 2. QUICK ACCESS BOOKS (Moved Up) */}
                 <div className="animate-slideUp" style={{ animationDelay: '0.4s' }}>
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-                        <h2 className="text-xl font-serif font-bold">Acesso Rápido</h2>
+
 
                         {/* Tabs Interface */}
                         <div className={`flex p-1 rounded-xl w-full md:w-auto
@@ -335,13 +331,15 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                             onClick={() => navigate(activeTestament === 'OT' ? '/antigo-testamento' : '/novo-testamento')}
                             className={`p-4 rounded-2xl text-center transition-all border group flex flex-col items-center justify-center gap-2
                                 ${theme === 'bw'
-                                    ? 'bg-stone-100 border-stone-200 text-stone-900 hover:bg-stone-200'
+                                    ? 'bg-black border-black text-white hover:bg-stone-800'
                                     : isDark
                                         ? 'bg-bible-gold/10 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/20'
                                         : 'bg-bible-gold/5 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/10'}
                             `}
                         >
-                            <div className="p-2 rounded-full bg-bible-gold/20 group-hover:bg-bible-gold/30 transition-colors">
+                            <div className={`p-2 rounded-full transition-colors
+                                ${theme === 'bw' ? 'bg-white/20 group-hover:bg-white/30' : 'bg-bible-gold/20 group-hover:bg-bible-gold/30'}
+                            `}>
                                 <ArrowRight size={20} />
                             </div>
                             <span className="text-xs font-bold uppercase tracking-wider">Ver Tudo</span>
@@ -515,20 +513,30 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                     {/* Chat Card */}
                     <button
                         onClick={() => navigate('/chat')}
-                        className="group relative overflow-hidden bg-[#1c1c1c] rounded-2xl p-8 text-left shadow-lg border border-stone-800"
+                        className={`group relative overflow-hidden rounded-2xl p-8 text-left shadow-lg border transition-colors
+                            ${theme === 'bw'
+                                ? 'bg-black border-black text-white'
+                                : 'bg-[#1c1c1c] border-stone-800 text-white'}
+                        `}
                     >
                         <div className="absolute top-1/2 -translate-y-1/2 right-4 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
-                            <MessageCircle size={140} className="text-white" />
+                            <MessageCircle size={140} className={theme === 'bw' ? 'text-white' : 'text-white'} />
                         </div>
                         <div className="relative z-10">
-                            <div className="bg-stone-800/50 w-fit p-3 rounded-xl mb-6 text-bible-gold border border-stone-700">
+                            <div className={`w-fit p-3 rounded-xl mb-6 border
+                                ${theme === 'bw'
+                                    ? 'bg-white text-black border-white'
+                                    : 'bg-stone-800/50 text-bible-gold border-stone-700'}
+                            `}>
                                 <MessageCircle size={24} />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-3">Chat Teológico</h3>
-                            <p className="text-stone-400 mb-8 max-w-sm text-sm leading-relaxed">
+                            <h3 className={`text-2xl font-bold mb-3 ${theme === 'bw' ? 'text-white' : 'text-white'}`}>Chat Teológico</h3>
+                            <p className={`mb-8 max-w-sm text-sm leading-relaxed ${theme === 'bw' ? 'text-stone-300' : 'text-stone-400'}`}>
                                 Tire suas dúvidas sobre passagens complexas com nossa Inteligência Artificial especializada em teologia.
                             </p>
-                            <span className="inline-flex items-center text-bible-gold font-bold text-sm tracking-wide group-hover:translate-x-2 transition-transform">
+                            <span className={`inline-flex items-center font-bold text-sm tracking-wide group-hover:translate-x-2 transition-transform
+                                ${theme === 'bw' ? 'text-white' : 'text-bible-gold'}
+                            `}>
                                 Começar Conversa <ArrowRight size={16} className="ml-2" />
                             </span>
                         </div>
@@ -537,20 +545,30 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                     {/* Devotional Card */}
                     <button
                         onClick={() => navigate('/devocional')}
-                        className="group relative overflow-hidden bg-[#d9a01c] rounded-2xl p-8 text-left shadow-lg border border-[#c28e18]"
+                        className={`group relative overflow-hidden rounded-2xl p-8 text-left shadow-lg border transition-colors
+                            ${theme === 'bw'
+                                ? 'bg-white border-stone-200 text-black'
+                                : 'bg-[#d9a01c] border-[#c28e18] text-white'}
+                        `}
                     >
                         <div className="absolute top-1/2 -translate-y-1/2 right-4 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
-                            <Calendar size={140} className="text-white" />
+                            <Calendar size={140} className={theme === 'bw' ? 'text-stone-200' : 'text-white'} />
                         </div>
                         <div className="relative z-10">
-                            <div className="bg-white/20 w-fit p-3 rounded-xl mb-6 text-white border border-white/10">
+                            <div className={`w-fit p-3 rounded-xl mb-6 border
+                                ${theme === 'bw'
+                                    ? 'bg-black text-white border-black'
+                                    : 'bg-white/20 text-white border-white/10'}
+                            `}>
                                 <Calendar size={24} />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-3">Devocional Diário</h3>
-                            <p className="text-white/90 mb-8 max-w-sm text-sm leading-relaxed">
+                            <h3 className={`text-2xl font-bold mb-3 ${theme === 'bw' ? 'text-black' : 'text-white'}`}>Devocional Diário</h3>
+                            <p className={`mb-8 max-w-sm text-sm leading-relaxed ${theme === 'bw' ? 'text-stone-600' : 'text-white/90'}`}>
                                 Receba uma reflexão inspiradora todos os dias para começar sua manhã conectado com Deus.
                             </p>
-                            <span className="inline-flex items-center text-white font-bold text-sm tracking-wide group-hover:translate-x-2 transition-transform">
+                            <span className={`inline-flex items-center font-bold text-sm tracking-wide group-hover:translate-x-2 transition-transform
+                                ${theme === 'bw' ? 'text-black' : 'text-white'}
+                            `}>
                                 Ler Devocional <ArrowRight size={16} className="ml-2" />
                             </span>
                         </div>

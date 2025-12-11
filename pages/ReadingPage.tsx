@@ -221,6 +221,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                         </button>
                     ) : <div className="w-10" />}
 
+                    {/* Audio Button Removed */}
+
                     <div className="text-center relative">
                         <button
                             onClick={() => setIsChapterGridOpen(!isChapterGridOpen)}
@@ -322,7 +324,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             className={`
                         h-10 px-6 rounded-lg font-bold text-sm transition-all flex items-center gap-2 active:scale-95
                         ${isVerseAudioPlaying
-                                    ? (preferences.theme === 'bw' ? 'bg-stone-200 text-stone-900 shadow-inner' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 shadow-inner')
+                                    ? (preferences.theme === 'bw' ? 'bg-white text-black border border-stone-200 shadow-inner' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 shadow-inner')
                                     : (preferences.theme === 'bw' ? 'bg-black text-white hover:bg-stone-800' : 'bg-bible-gold text-white hover:bg-yellow-600 shadow-lg shadow-bible-gold/30 hover:shadow-bible-gold/40')
                                 }
                     `}
@@ -334,7 +336,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             ) : (
                                 <Volume2 size={18} />
                             )}
-                            <span className="hidden sm:inline">{isVerseAudioPlaying ? 'Pausar' : 'Ouvir'}</span>
+                            <span>{isVerseAudioPlaying ? 'Pausar' : 'Ouvir'}</span>
                         </button>
                     </div>
                 </div>
