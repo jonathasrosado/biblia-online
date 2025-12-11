@@ -13,36 +13,37 @@ import SettingsModal from './components/SettingsModal';
 import LoginModal from './components/LoginModal';
 
 // Pages
-import HomePage from './components/HomePage';
-import ReadingPage from './pages/ReadingPage';
-import SummaryPage from './pages/SummaryPage';
-import BookIntroPage from './pages/BookIntroPage';
-import SearchPage from './pages/SearchPage';
-import DevotionalPage from './pages/DevotionalPage';
-import ChatPage from './pages/ChatPage';
-import BlogPage from './pages/BlogPage';
-import BlogPostPage from './pages/BlogPostPage';
-import CategoryPage from './pages/CategoryPage';
-import TestamentPage from './pages/TestamentPage';
-import VersesPage from './pages/VersesPage';
-import HowToReadBiblePage from './pages/HowToReadBiblePage';
-import BibleFaqPage from './pages/BibleFaqPage';
+// Pages (Lazy Loaded)
+const HomePage = React.lazy(() => import('./components/HomePage'));
+const ReadingPage = React.lazy(() => import('./pages/ReadingPage'));
+const SummaryPage = React.lazy(() => import('./pages/SummaryPage'));
+const BookIntroPage = React.lazy(() => import('./pages/BookIntroPage'));
+const SearchPage = React.lazy(() => import('./pages/SearchPage'));
+const DevotionalPage = React.lazy(() => import('./pages/DevotionalPage'));
+const ChatPage = React.lazy(() => import('./pages/ChatPage'));
+const BlogPage = React.lazy(() => import('./pages/BlogPage'));
+const BlogPostPage = React.lazy(() => import('./pages/BlogPostPage'));
+const CategoryPage = React.lazy(() => import('./pages/CategoryPage'));
+const TestamentPage = React.lazy(() => import('./pages/TestamentPage'));
+const VersesPage = React.lazy(() => import('./pages/VersesPage'));
+const HowToReadBiblePage = React.lazy(() => import('./pages/HowToReadBiblePage'));
+const BibleFaqPage = React.lazy(() => import('./pages/BibleFaqPage'));
 
-import PrivacyPage from './pages/PrivacyPage';
-import TermsPage from './pages/TermsPage';
-import ContactPage from './pages/ContactPage';
-import AdminPage from './pages/AdminPage';
+const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'));
+const TermsPage = React.lazy(() => import('./pages/TermsPage'));
+const ContactPage = React.lazy(() => import('./pages/ContactPage'));
+const AdminPage = React.lazy(() => import('./pages/AdminPage'));
 
-// Admin Components
-import BlogManager from './components/admin/BlogManager';
-import BlogEditor from './components/admin/BlogEditor';
-import CategoryList from './components/admin/CategoryList';
-import UserManager from './components/admin/UserManager';
-import SettingsManager from './components/admin/SettingsManager';
-import AISettings from './components/admin/AISettings';
-import PromptsManager from './components/admin/PromptsManager';
-import MediaManager from './components/admin/MediaManager';
-import BibleManager from './components/admin/BibleManager';
+// Admin Components (Lazy Loaded)
+const BlogManager = React.lazy(() => import('./components/admin/BlogManager'));
+const BlogEditor = React.lazy(() => import('./components/admin/BlogEditor'));
+const CategoryList = React.lazy(() => import('./components/admin/CategoryList'));
+const UserManager = React.lazy(() => import('./components/admin/UserManager'));
+const SettingsManager = React.lazy(() => import('./components/admin/SettingsManager'));
+const AISettings = React.lazy(() => import('./components/admin/AISettings'));
+const PromptsManager = React.lazy(() => import('./components/admin/PromptsManager'));
+const MediaManager = React.lazy(() => import('./components/admin/MediaManager'));
+const BibleManager = React.lazy(() => import('./components/admin/BibleManager'));
 
 interface ViewWrapperProps {
   children: React.ReactNode;
@@ -115,10 +116,10 @@ function AppContent() {
   // Bible Version State (Global)
   const [version, setVersion] = useState<BibleVersion>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('bibleVersion');
-      return (['acf', 'nvi', 'ntlh'].includes(saved || '') ? saved : 'nvi') as BibleVersion;
+      const saved = localStorage.getItem('bibleVersion') as BibleVersion;
+      return (BIBLE_VERSIONS.includes(saved) ? saved : 'ntlh') as BibleVersion;
     }
-    return 'nvi';
+    return 'ntlh';
   });
 
   useEffect(() => {
@@ -518,154 +519,160 @@ function AppContent() {
         className={`flex-1 overflow-y-auto relative scroll-smooth ${getMainBackgroundClass()}
           ${isFullScreen ? 'h-full' : ''}`}
       >
-        <Routes>
-          <Route path="/" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <HomePage language={language} t={t} theme={preferences.theme} history={history} />
-            </ViewWrapper>
-          } />
+        <React.Suspense fallback={
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="animate-spin text-bible-gold" size={48} />
+          </div>
+        }>
+          <Routes>
+            <Route path="/" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <HomePage language={language} t={t} theme={preferences.theme} history={history} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/antigo-testamento" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <TestamentPage testament="Old" language={language} t={t} theme={preferences.theme} />
-            </ViewWrapper>
-          } />
+            <Route path="/antigo-testamento" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <TestamentPage testament="Old" language={language} t={t} theme={preferences.theme} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/versiculos" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <VersesPage theme={preferences.theme} />
-            </ViewWrapper>
-          } />
+            <Route path="/versiculos" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <VersesPage theme={preferences.theme} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/como-ler-biblia" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <HowToReadBiblePage theme={preferences.theme} />
-            </ViewWrapper>
-          } />
+            <Route path="/como-ler-biblia" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <HowToReadBiblePage theme={preferences.theme} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/faq-biblia" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <BibleFaqPage theme={preferences.theme} />
-            </ViewWrapper>
-          } />
+            <Route path="/faq-biblia" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <BibleFaqPage theme={preferences.theme} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/privacidade" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <PrivacyPage theme={preferences.theme} />
-            </ViewWrapper>
-          } />
+            <Route path="/privacidade" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <PrivacyPage theme={preferences.theme} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/termos" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <TermsPage theme={preferences.theme} />
-            </ViewWrapper>
-          } />
+            <Route path="/termos" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <TermsPage theme={preferences.theme} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/contato" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <ContactPage theme={preferences.theme} />
-            </ViewWrapper>
-          } />
+            <Route path="/contato" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <ContactPage theme={preferences.theme} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/novo-testamento" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <TestamentPage testament="New" language={language} t={t} theme={preferences.theme} />
-            </ViewWrapper>
-          } />
+            <Route path="/novo-testamento" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <TestamentPage testament="New" language={language} t={t} theme={preferences.theme} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/leitura/:bookAbbrev" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <BookIntroPage language={language} t={t} preferences={preferences} />
-            </ViewWrapper>
-          } />
+            <Route path="/leitura/:bookAbbrev" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <BookIntroPage language={language} t={t} preferences={preferences} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/leitura/:bookAbbrev/:chapterNum" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <ReadingPage
-                key={location.pathname}
-                language={language}
-                t={t}
-                preferences={preferences}
-                version={version}
-                isFullScreen={isFullScreen}
-                setIsFullScreen={setIsFullScreen}
-                addToHistory={addToHistory}
-                onUpdatePreferences={setPreferences}
-              />
-            </ViewWrapper>
-          } />
+            <Route path="/leitura/:bookAbbrev/:chapterNum" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <ReadingPage
+                  key={location.pathname}
+                  language={language}
+                  t={t}
+                  preferences={preferences}
+                  version={version}
+                  isFullScreen={isFullScreen}
+                  setIsFullScreen={setIsFullScreen}
+                  addToHistory={addToHistory}
+                  onUpdatePreferences={setPreferences}
+                />
+              </ViewWrapper>
+            } />
 
-          <Route path="/resumo/:bookAbbrev/:chapterNum" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <SummaryPage
-                language={language}
-                t={t}
-                preferences={preferences}
-                onUpdatePreferences={setPreferences}
-                isFullScreen={isFullScreen}
-                setIsFullScreen={setIsFullScreen}
-                addToHistory={addToHistory}
-              />
-            </ViewWrapper>
-          } />
+            <Route path="/resumo/:bookAbbrev/:chapterNum" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <SummaryPage
+                  language={language}
+                  t={t}
+                  preferences={preferences}
+                  onUpdatePreferences={setPreferences}
+                  isFullScreen={isFullScreen}
+                  setIsFullScreen={setIsFullScreen}
+                  addToHistory={addToHistory}
+                />
+              </ViewWrapper>
+            } />
 
-          <Route path="/busca" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <SearchPage language={language} t={t} preferences={preferences} />
-            </ViewWrapper>
-          } />
+            <Route path="/busca" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <SearchPage language={language} t={t} preferences={preferences} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/devocional" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <DevotionalPage language={language} t={t} preferences={preferences} />
-            </ViewWrapper>
-          } />
+            <Route path="/devocional" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <DevotionalPage language={language} t={t} preferences={preferences} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/chat" element={
-            <div className="h-full flex flex-col overflow-hidden">
-              <ChatPage language={language} t={t} preferences={preferences} />
-            </div>
-          } />
+            <Route path="/chat" element={
+              <div className="h-full flex flex-col overflow-hidden">
+                <ChatPage language={language} t={t} preferences={preferences} />
+              </div>
+            } />
 
-          <Route path="/blog" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <BlogPage theme={preferences.theme} />
-            </ViewWrapper>
-          } />
+            <Route path="/blog" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <BlogPage theme={preferences.theme} />
+              </ViewWrapper>
+            } />
 
-          <Route path="/blog/:slug" element={
-            <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <BlogPostPage />
-            </ViewWrapper>
-          } />
+            <Route path="/blog/:slug" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <BlogPostPage />
+              </ViewWrapper>
+            } />
 
-          <Route path="/admin" element={<AdminPage t={t} isDark={preferences.theme === 'dark'} />}>
-            <Route index element={<div className="p-8 text-center text-stone-500">Selecione uma opção no menu lateral.</div>} />
-            <Route path="posts" element={<BlogManager />} />
-            <Route path="posts/new" element={<BlogEditor />} />
-            <Route path="posts/edit/:slug" element={<BlogEditor />} />
-            <Route path="categories" element={<CategoryList />} />
-            <Route path="users" element={<UserManager />} />
-            <Route path="settings" element={<SettingsManager />} />
-            <Route path="ai-settings" element={<AISettings />} />
-            <Route path="prompts" element={<PromptsManager />} />
-            <Route path="media" element={<MediaManager />} />
-            <Route path="bible" element={<BibleManager />} />
-          </Route>
+            <Route path="/admin" element={<AdminPage t={t} isDark={preferences.theme === 'dark'} />}>
+              <Route index element={<div className="p-8 text-center text-stone-500">Selecione uma opção no menu lateral.</div>} />
+              <Route path="posts" element={<BlogManager />} />
+              <Route path="posts/new" element={<BlogEditor />} />
+              <Route path="posts/edit/:slug" element={<BlogEditor />} />
+              <Route path="categories" element={<CategoryList />} />
+              <Route path="users" element={<UserManager />} />
+              <Route path="settings" element={<SettingsManager />} />
+              <Route path="ai-settings" element={<AISettings />} />
+              <Route path="prompts" element={<PromptsManager />} />
+              <Route path="media" element={<MediaManager />} />
+              <Route path="bible" element={<BibleManager />} />
+            </Route>
 
-          {/* Dynamic Routes - MUST BE LAST */}
-          <Route path="/:category" element={
-            <ViewWrapper onOpenPrivacy={() => navigate('/privacidade')} onOpenTerms={() => navigate('/termos')} isFullScreen={isFullScreen} theme={preferences.theme}>
-              <CategoryPage />
-            </ViewWrapper>
-          } />
+            {/* Dynamic Routes - MUST BE LAST */}
+            <Route path="/:category" element={
+              <ViewWrapper onOpenPrivacy={() => navigate('/privacidade')} onOpenTerms={() => navigate('/termos')} isFullScreen={isFullScreen} theme={preferences.theme}>
+                <CategoryPage />
+              </ViewWrapper>
+            } />
 
-          <Route path="/:category/:slug" element={
-            <ViewWrapper onOpenPrivacy={() => navigate('/privacidade')} onOpenTerms={() => navigate('/termos')} isFullScreen={isFullScreen} theme={preferences.theme}>
-              <BlogPostPage />
-            </ViewWrapper>
-          } />
-        </Routes>
+            <Route path="/:category/:slug" element={
+              <ViewWrapper onOpenPrivacy={() => navigate('/privacidade')} onOpenTerms={() => navigate('/termos')} isFullScreen={isFullScreen} theme={preferences.theme}>
+                <BlogPostPage />
+              </ViewWrapper>
+            } />
+          </Routes>
+        </React.Suspense>
 
         {/* Floating Controls */}
         <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-40">

@@ -2,7 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Verse, ReadingPreferences } from '../types';
 import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause, MessageCircle, ArrowRight, MoreHorizontal, Minimize, Maximize2, ChevronDown, ChevronUp } from 'lucide-react';
 import { explainVerse, askVerse, generateAudioFromText } from '../services/geminiService';
-import VerseImageGenerator from './VerseImageGenerator';
+import VerseImageGenerator_ from './VerseImageGenerator'; // Keep strictly for types if needed, but usually we just use typeof or rely on lazy inference. 
+// Actually, better to just remove import and define lazy.
+// import VerseImageGenerator from './VerseImageGenerator';
+
+const VerseImageGenerator = React.lazy(() => import('./VerseImageGenerator'));
 
 export interface BibleReaderRef {
   toggleAudio: () => void;
@@ -201,7 +205,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     if (!verseNum) return;
 
     try {
-      const text = await explainVerse(book, chapter, verseNum, getSelectedText(), language);
+      const text = await explainVerse(book, chapter, verseNum as number, getSelectedText(), language);
       setAiResponse(text);
     } catch (e) {
       setAiResponse("Erro ao gerar explicação.");
@@ -227,7 +231,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     const verseNum = getPrimaryVerseNum();
 
     try {
-      const text = await askVerse(book, chapter, verseNum, getSelectedText(), askQuery, language);
+      const text = await askVerse(book, chapter, verseNum as number, getSelectedText(), askQuery, language);
       setAiResponse(text);
     } catch (e) {
       setAiResponse("Erro ao obter resposta.");
@@ -704,11 +708,17 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
       )}
 
       {showImageGenerator && (
-        <VerseImageGenerator
-          verseText={getSelectedText()}
-          verseReference={getSelectedRef()}
-          onClose={() => setShowImageGenerator(false)}
-        />
+        <React.Suspense fallback={
+          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <Loader2 size={48} className="animate-spin text-white" />
+          </div>
+        }>
+          <VerseImageGenerator
+            verseText={getSelectedText()}
+            verseReference={getSelectedRef()}
+            onClose={() => setShowImageGenerator(false)}
+          />
+        </React.Suspense>
       )}
 
     </div>

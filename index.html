@@ -14,32 +14,18 @@
   <!-- Google AdSense Placeholder - Adicione seu ID abaixo quando aprovado -->
   <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-SEU_ID_AQUI" crossorigin="anonymous"></script> -->
 
-  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-  <link
+  <!-- Google Fonts Optimized Loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Inter:wght@300;400;500;600&display=swap" />
+  <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Inter:wght@300;400;500;600&display=swap"
-    rel="stylesheet">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            serif: ['"Crimson Pro"', 'serif'],
-            sans: ['"Inter"', 'sans-serif'],
-          },
-          colors: {
-            bible: {
-              paper: '#fcfbf7',
-              gold: '#d4af37',
-              text: '#2c2c2c',
-              accent: '#8b4513',
-              soft: '#e8e6e1'
-            }
-          }
-        }
-      }
-    }
-  </script>
+    media="print" onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Inter:wght@300;400;500;600&display=swap" />
+  </noscript>
   <style>
     body {
       background-color: #fcfbf7;
@@ -86,18 +72,7 @@
       background: #57534e;
     }
   </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0"
-  }
-}
-</script>
+
   <link rel="stylesheet" href="/index.css">
 </head>
 

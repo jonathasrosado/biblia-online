@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { toPng } from 'html-to-image';
+// import { toPng } from 'html-to-image'; // Moved to dynamic import
 import { Download, Share2, X, Image as ImageIcon, Palette, Type, BookOpen, Heart, Sun, Star, Flame, Anchor, Crown, Church, Sparkles, Square, Smartphone, RectangleHorizontal } from 'lucide-react';
 
 interface VerseImageGeneratorProps {
@@ -140,23 +140,14 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
 
 
 
-    // Helper to convert data URI to Blob without using fetch (avoids "Failed to fetch" errors)
-    const dataURItoBlob = (dataURI: string) => {
-        const byteString = atob(dataURI.split(',')[1]);
-        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: mimeString });
-    };
-
     const handleShare = async () => {
         if (!cardRef.current) return;
         setLoading(true);
 
         try {
+            // Lazy load html-to-image only when sharing
+            const { toPng } = await import('html-to-image');
+
             // STRATEGY: Create a clean clone in the DOM to avoid scaling/transform issues
             // FIX: Enforce fixed dimensions to prevent mobile layout shifts (overlapping)
             const node = cardRef.current;
@@ -211,6 +202,17 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                 }
 
                 // 6. Convert to Blob using HELPER
+                const dataURItoBlob = (dataURI: string) => {
+                    const byteString = atob(dataURI.split(',')[1]);
+                    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+                    const ab = new ArrayBuffer(byteString.length);
+                    const ia = new Uint8Array(ab);
+                    for (let i = 0; i < byteString.length; i++) {
+                        ia[i] = byteString.charCodeAt(i);
+                    }
+                    return new Blob([ab], { type: mimeString });
+                };
+
                 const blob = dataURItoBlob(dataUrl);
                 const file = new File([blob], 'versiculo.png', { type: 'image/png' });
 

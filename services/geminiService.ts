@@ -1,7 +1,13 @@
-import { GoogleGenAI, Type, Chat, Modality } from "@google/genai";
+// Removed static import of @google/genai to optimize bundle size
+// import { GoogleGenAI, Type, Chat, Modality } from "@google/genai";
 import { Verse, SearchResult, DevotionalContent, BlogPost, BibleVersion } from '../types';
 import { getChapterContentLocal } from './localBibleService';
 import { bibleBooks, normalizeBookName } from '../constants';
+
+// Define types locally or import purely as type if possible (but we lazy load the sdk so we rely on 'any' or dynamic types for the instance)
+// To keep type safety without importing the library value, we can use `import type`
+import type { GoogleGenAI, Chat } from "@google/genai";
+// We need the enums (Type, Modality) at runtime, so we will extract them from the dynamic import
 
 // IMPORTANT: Handle both Vite (browser) and Node (server) environments
 const getApiKey = () => {
@@ -22,7 +28,24 @@ if (!apiKey) {
   console.error("Gemini API Key is missing! Please check .env.local");
 }
 
-const ai = new GoogleGenAI({ apiKey: apiKey || 'dummy_key_to_prevent_crash' });
+let aiInstance: GoogleGenAI | null = null;
+let GenAIType: any = null; // To hold the Type enum
+let GenAIModality: any = null; // To hold the Modality enum
+
+// Lazy load the AI SDK
+const getAI = async (): Promise<{ ai: GoogleGenAI, Type: any, Modality: any }> => {
+  if (aiInstance && GenAIType) {
+    return { ai: aiInstance, Type: GenAIType, Modality: GenAIModality };
+  }
+
+  // Dynamic import
+  const module = await import("@google/genai");
+  GenAIType = module.Type;
+  GenAIModality = module.Modality;
+
+  aiInstance = new module.GoogleGenAI({ apiKey: apiKey || 'dummy_key_to_prevent_crash' });
+  return { ai: aiInstance, Type: GenAIType, Modality: GenAIModality };
+};
 
 const modelName = 'gemini-1.5-flash';
 
@@ -79,7 +102,9 @@ export const getChapterContent = async (book: string, chapter: number, language:
   }
 
   try {
+    const { ai, Type } = await getAI(); // Lazy load here
     const langName = language === 'en' ? 'English (KJV or NIV)' : language === 'es' ? 'Spanish (Reina-Valera)' : 'Portuguese (Almeida)';
+
     const response = await ai.models.generateContent({
       model: modelName,
       contents: `Provide the full text of the Bible book of ${book} chapter ${chapter} in ${langName}. Return ONLY valid JSON.`,
@@ -538,7 +563,8 @@ export const getDetailedAnswer = async (query: string, language: string = 'pt'):
 };
 
 // Chat instance creator - DEPRECATED in favor of backend API
-export const createChat = (language: string = 'pt'): Chat => {
+export const createChat = async (language: string = 'pt'): Promise<Chat> => {
+  const { ai } = await getAI();
   const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
   return ai.chats.create({
     model: modelName,
@@ -669,6 +695,7 @@ export const generateSEOMetadata = async (content: string, keyword: string, lang
 // Generate Category Description
 export const generateCategoryDescription = async (categoryName: string, language: string = 'pt'): Promise<string> => {
   try {
+    const { ai } = await getAI();
     const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
     const response = await ai.models.generateContent({
       model: modelName,
@@ -694,6 +721,7 @@ export const generateCategoryDescription = async (categoryName: string, language
 // Generate Detailed Image Prompt
 export const generateImagePrompt = async (title: string): Promise<string> => {
   try {
+    const { ai } = await getAI();
     const response = await ai.models.generateContent({
       model: modelName,
       contents: `

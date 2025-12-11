@@ -1048,7 +1048,20 @@ app.get('/api/blog/posts', async (req, res) => {
             query.status = 'published';
         }
 
-        const posts = await BlogPost.find(query).sort({ date: -1 }); // Sort desc
+        // Optimize: Select only lightweight fields for listing
+        // Exclude heavy 'content', 'markdownContent', 'htmlContent'
+        const projection = {
+            title: 1,
+            slug: 1,
+            date: 1,
+            excerpt: 1,
+            coverImage: 1,
+            tags: 1,
+            category: 1,
+            status: 1
+        };
+
+        const posts = await BlogPost.find(query, projection).sort({ date: -1 }); // Sort desc
         res.json(posts);
     } catch (e) {
         console.error(e);
