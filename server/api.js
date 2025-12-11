@@ -87,8 +87,9 @@ app.use((req, res, next) => {
 
 let FORCED_KEY = "";
 try {
-    // Now require is defined!
-    const forced = require('./force_key.js');
+    // Dynamic import for ESM compatibility
+    const forcedModule = await import('./force_key.js'); 
+    const forced = forcedModule.default || forcedModule;
     if (forced && forced.GEMINI_KEY) {
         FORCED_KEY = forced.GEMINI_KEY;
         console.log("⚠️ EMERGENCY: Loaded Hardcoded API Key.");

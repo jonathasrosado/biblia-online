@@ -115,12 +115,16 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             let prev = sorted[0];
             for (let i = 1; i < sorted.length; i++) {
                 if (sorted[i] !== prev + 1) {
-                    ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
+                    const s = start.toString();
+                    const p = prev.toString();
+                    ranges.push(start === prev ? s : s + '-' + p);
                     start = sorted[i];
                 }
                 prev = sorted[i];
             }
-            ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
+            const s = start.toString();
+            const p = prev.toString();
+            ranges.push(start === prev ? s : s + '-' + p);
             newParams.set('verses', ranges.join(','));
         } else {
             newParams.delete('verses');
