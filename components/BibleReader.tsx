@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Verse, ReadingPreferences } from '../types';
 import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause, MessageCircle, ArrowRight, MoreHorizontal, Minimize, Maximize2, ChevronDown, ChevronUp } from 'lucide-react';
 import { explainVerse, askVerse, generateAudioFromText } from '../services/geminiService';
@@ -463,18 +464,18 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                 <div className="animate-slideDown mt-2 mb-4">
                   <div className={`relative backdrop-blur-md rounded-2xl p-2 flex flex-wrap items-center justify-between gap-2 shadow-sm border mx-2
                       ${preferences.theme === 'bw'
-                      ? 'bg-white border-stone-200 shadow-md'
+                      ? 'bg-stone-900 border-stone-800 shadow-md'
                       : 'bg-stone-50/80 dark:bg-stone-800/80 border-stone-200 dark:border-stone-700/50'}`}>
 
                     <button
                       onClick={(e) => { e.stopPropagation(); handleExplain(); }}
                       className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
                           ${preferences.theme === 'bw'
-                          ? 'bg-stone-100 text-black hover:bg-stone-200'
+                          ? 'bg-stone-800 text-white hover:bg-stone-700'
                           : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
                       <span className={`w-4 h-4 flex items-center justify-center rounded-full border text-[10px] font-serif font-bold
-                          ${preferences.theme === 'bw' ? 'border-black text-black' : 'border-bible-gold text-bible-gold'}`}>!</span>
+                          ${preferences.theme === 'bw' ? 'border-white text-white' : 'border-bible-gold text-bible-gold'}`}>!</span>
                       <span className="text-xs font-medium">Explicar</span>
                     </button>
 
@@ -482,10 +483,10 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                       onClick={(e) => { e.stopPropagation(); handleAsk(); }}
                       className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
                           ${preferences.theme === 'bw'
-                          ? 'bg-stone-100 text-black hover:bg-stone-200'
+                          ? 'bg-stone-800 text-white hover:bg-stone-700'
                           : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
-                      <MessageCircle size={16} className={preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'} />
+                      <MessageCircle size={16} className={preferences.theme === 'bw' ? 'text-white' : 'text-bible-gold'} />
                       <span className="text-xs font-medium">Perguntar</span>
                     </button>
 
@@ -493,10 +494,10 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                       onClick={(e) => { e.stopPropagation(); setShowImageGenerator(true); }}
                       className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
                           ${preferences.theme === 'bw'
-                          ? 'bg-stone-100 text-black hover:bg-stone-200'
+                          ? 'bg-stone-800 text-white hover:bg-stone-700'
                           : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
-                      <ImageIcon size={16} className={preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'} />
+                      <ImageIcon size={16} className={preferences.theme === 'bw' ? 'text-white' : 'text-bible-gold'} />
                       <span className="text-xs font-medium">Compartilhar</span>
                     </button>
 
@@ -505,7 +506,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                       onClick={(e) => { e.stopPropagation(); clearSelection(); }}
                       className={`absolute -top-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full shadow-md border transition-all active:scale-95 z-20
                           ${preferences.theme === 'bw'
-                          ? 'bg-white border-stone-200 text-stone-400 hover:text-red-600'
+                          ? 'bg-stone-900 border-stone-800 text-stone-400 hover:text-red-500'
                           : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-400 hover:text-red-500'}`}
                       title="Fechar"
                     >
@@ -559,9 +560,9 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
 
       {/* AI Action Modal (Bottom Sheet - Fixed) */}
-      {activeAction && (
+      {activeAction && createPortal(
         <div
-          className={`fixed inset-0 z-[60] flex items-end justify-center transition-all duration-300
+          className={`fixed inset-0 z-[100] flex items-end justify-center transition-all duration-300
             ${isMinimized ? 'pointer-events-none bg-transparent' : 'bg-black/40 backdrop-blur-sm'}`}
           onClick={!isMinimized ? closeAiModal : undefined}
         >
@@ -569,16 +570,18 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             ref={modalRef}
             className={`transition-all duration-300 flex flex-col shadow-2xl overflow-hidden
               ${isMinimized
-                ? 'pointer-events-auto absolute bottom-4 right-4 w-80 rounded-2xl border'
+                ? 'pointer-events-auto absolute bottom-20 right-4 w-80 rounded-2xl border'
                 : 'w-full max-w-4xl mx-auto rounded-t-3xl max-h-[85vh]'}
               ${preferences.theme === 'bw'
                 ? 'bg-white border-stone-200'
                 : 'bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800'}`}
             onClick={e => e.stopPropagation()}
+            style={{ marginBottom: isMinimized ? '0' : '0' }}
           >
             {/* Drag Handle (Visual & Clickable) - Improved Visuals */}
             <div
-              className="w-full flex justify-center py-4 cursor-pointer hover:bg-stone-50/50 dark:hover:bg-stone-800/50 active:opacity-60 transition-all touch-manipulation"
+              className={`w-full flex justify-center py-4 cursor-pointer hover:bg-stone-50/50 dark:hover:bg-stone-800/50 active:opacity-60 transition-all touch-manipulation
+                ${isMinimized ? 'hidden' : ''}`} // Hide handle when minimized
               onClick={() => setIsMinimized(!isMinimized)}
             >
               <div className={`w-32 h-1.5 rounded-full shadow-sm ${preferences.theme === 'bw' ? 'bg-stone-300' : 'bg-stone-300 dark:bg-stone-600'}`}></div>
@@ -704,10 +707,11 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {showImageGenerator && (
+      {showImageGenerator && createPortal(
         <React.Suspense fallback={
           <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <Loader2 size={48} className="animate-spin text-white" />
@@ -718,7 +722,8 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             verseReference={getSelectedRef()}
             onClose={() => setShowImageGenerator(false)}
           />
-        </React.Suspense>
+        </React.Suspense>,
+        document.body
       )}
 
     </div>
