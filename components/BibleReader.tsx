@@ -416,27 +416,27 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             <React.Fragment key={verse.number}>
               <div
                 onClick={() => handleVerseClick(verse)} // Click on wrapper, pass full object
-                className={`flex gap-3 p-2 rounded-lg transition-all cursor-pointer duration-300
+                className={`flex items-baseline gap-1 p-2 rounded-lg transition-all cursor-pointer duration-300
                         ${isSelected
                     ? (preferences.theme === 'bw' ? 'bg-stone-200/50 ring-1 ring-stone-300' : 'bg-yellow-200/50 dark:bg-yellow-900/30 ring-1 ring-yellow-400/50')
                     : isPlayingThisVerse
                       ? (preferences.theme === 'bw' ? 'bg-stone-100 ring-1 ring-stone-300' : 'bg-bible-gold/10 ring-1 ring-bible-gold/30')
                       : 'hover:bg-stone-100 dark:hover:bg-stone-800/50'}
                     `}
+                style={{
+                  fontSize: `${preferences.fontSize}%`,
+                  lineHeight: '1.6'
+                }}
               >
-                <span className={`text-xs font-bold select-none w-6 text-right pt-1.5 shrink-0
+                <span className={`text-[0.65em] font-bold select-none w-[1.4em] text-left shrink-0 leading-none
                   ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-bible-gold/70'}`}>
                   {verse.number}
                 </span>
                 <p
-                  className={`text-lg md:text-xl font-serif
+                  className={`flex-1
                             ${preferences.fontFamily === 'sans' ? 'font-sans' : 'font-serif'}
                             ${preferences.textAlign === 'justify' ? 'text-justify' : 'text-left'}
                         `}
-                  style={{
-                    fontSize: `${preferences.fontSize}%`,
-                    lineHeight: '1.6'
-                  }}
                 >
                   <span
                     id={`v${verse.number}`}

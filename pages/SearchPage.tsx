@@ -125,19 +125,26 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                                     <div className={`rounded-2xl p-8 border shadow-sm relative overflow-hidden
                                 ${preferences.theme === 'sepia'
                                             ? 'bg-gradient-to-br from-[#fcf9ee] to-[#f4ecd8] border-[#e6dcc6]'
-                                            : 'bg-gradient-to-br from-white to-stone-50 dark:from-stone-900 dark:to-stone-900 border-bible-gold/30 dark:border-bible-gold/20'}
+                                            : preferences.theme === 'bw'
+                                                ? 'bg-white border-2 border-black shadow-none'
+                                                : 'bg-gradient-to-br from-white to-stone-50 dark:from-stone-900 dark:to-stone-900 border-bible-gold/30 dark:border-bible-gold/20'}
                             `}>
                                         <div className="absolute top-0 right-0 p-4 opacity-10">
-                                            <Sparkles size={64} className="text-bible-gold" />
+                                            <Sparkles size={64} className={`
+                                                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}
+                                            `} />
                                         </div>
 
-                                        <div className="flex items-center gap-3 mb-4 text-bible-gold">
+                                        <div className={`flex items-center gap-3 mb-4
+                                            ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}
+                                        `}>
                                             <Sparkles size={20} className="animate-pulse" />
                                             <h3 className="font-bold uppercase tracking-widest text-xs">Resumo do Tema</h3>
                                         </div>
 
                                         <div className={`prose dark:prose-invert max-w-none leading-relaxed
                                     ${preferences.fontFamily === 'serif' ? 'font-serif' : 'font-sans'}
+                                    ${preferences.theme === 'bw' ? 'text-black prose-p:text-black prose-strong:text-black' : ''}
                                 `}>
                                             {aiAnswer.split('\n').map((para, i) => (
                                                 <p key={i} className="mb-3" dangerouslySetInnerHTML={{
@@ -153,8 +160,8 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                             {postResults.length > 0 && (
                                 <div className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
                                     <div className="flex items-center gap-3 mb-6 border-b border-stone-200 dark:border-stone-800 pb-2">
-                                        <FileText size={20} className="text-bible-gold" />
-                                        <h3 className="text-xl font-bold text-stone-700 dark:text-stone-300">Artigos e Estudos</h3>
+                                        <FileText size={20} className={`${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`} />
+                                        <h3 className={`text-xl font-bold ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-700 dark:text-stone-300'}`}>Artigos e Estudos</h3>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -163,10 +170,16 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                                                 className={`block p-5 rounded-xl border transition-all hover:-translate-y-1 hover:shadow-lg
                                         ${preferences.theme === 'sepia'
                                                         ? 'bg-white border-[#e6dcc6]'
-                                                        : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
+                                                        : preferences.theme === 'bw'
+                                                            ? 'bg-white border-black border-2 shadow-none hover:bg-stone-50'
+                                                            : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
                                     `}>
-                                                <h4 className="font-bold text-lg mb-2 text-bible-accent dark:text-bible-gold line-clamp-1">{post.title}</h4>
-                                                <p className="text-sm opacity-70 line-clamp-2">{post.excerpt}</p>
+                                                <h4 className={`font-bold text-lg mb-2 line-clamp-1
+                                                    ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}
+                                                `}>{post.title}</h4>
+                                                <p className={`text-sm opacity-70 line-clamp-2
+                                                    ${preferences.theme === 'bw' ? 'text-black' : ''}
+                                                `}>{post.excerpt}</p>
                                             </Link>
                                         ))}
                                     </div>
@@ -177,8 +190,8 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                             {verseResults.length > 0 && (
                                 <div className="animate-slideUp" style={{ animationDelay: '0.2s' }}>
                                     <div className="flex items-center gap-3 mb-6 border-b border-stone-200 dark:border-stone-800 pb-2">
-                                        <BookOpen size={20} className="text-bible-gold" />
-                                        <h3 className="text-xl font-bold text-stone-700 dark:text-stone-300">Versículos Bíblicos</h3>
+                                        <BookOpen size={20} className={`${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`} />
+                                        <h3 className={`text-xl font-bold ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-700 dark:text-stone-300'}`}>Versículos Bíblicos</h3>
                                     </div>
 
                                     <div className="grid grid-cols-1 gap-4">
@@ -221,22 +234,35 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                                                     className={`block p-6 rounded-xl border group transition-all
                                                 ${preferences.theme === 'sepia'
                                                             ? 'bg-[#fcf9ee] border-[#e6dcc6] hover:border-bible-gold' // Sepia
-                                                            : 'bg-white dark:bg-stone-900 border-stone-100 dark:border-stone-800 hover:border-bible-gold/50'} 
+                                                            : preferences.theme === 'bw'
+                                                                ? 'bg-white border-black border-2 shadow-none hover:bg-stone-50' // BW
+                                                                : 'bg-white dark:bg-stone-900 border-stone-100 dark:border-stone-800 hover:border-bible-gold/50'} 
                                             `}
                                                 >
                                                     <div className="flex justify-between items-start mb-3">
-                                                        <h4 className="font-serif font-bold text-lg text-bible-accent dark:text-bible-gold group-hover:underline decoration-bible-gold/50 underline-offset-4">
+                                                        <h4 className={`font-serif font-bold text-lg group-hover:underline underline-offset-4
+                                                            ${preferences.theme === 'bw'
+                                                                ? 'text-black decoration-black'
+                                                                : 'text-bible-accent dark:text-bible-gold decoration-bible-gold/50'}
+                                                        `}>
                                                             {res.reference}
                                                         </h4>
-                                                        <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity text-bible-gold" />
+                                                        <ArrowRight size={16} className={`opacity-0 group-hover:opacity-100 transition-opacity
+                                                            ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}
+                                                        `} />
                                                     </div>
                                                     <p className={`text-lg leading-relaxed mb-3
                                                 ${preferences.fontFamily === 'serif' ? 'font-serif' : 'font-sans'}
+                                                ${preferences.theme === 'bw' ? 'text-black' : ''}
                                             `}>
                                                         "{res.text}"
                                                     </p>
                                                     {res.context && (
-                                                        <div className="text-xs bg-stone-100 dark:bg-stone-800 inline-block px-2 py-1 rounded text-stone-500">
+                                                        <div className={`text-xs inline-block px-2 py-1 rounded
+                                                            ${preferences.theme === 'bw'
+                                                                ? 'bg-black text-white'
+                                                                : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}
+                                                        `}>
                                                             <span className="font-bold mr-1">Contexto:</span> {res.context}
                                                         </div>
                                                     )}

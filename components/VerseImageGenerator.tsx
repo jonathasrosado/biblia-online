@@ -5,7 +5,7 @@ import { Download, Share2, X, Image as ImageIcon, Palette, Type, BookOpen, Heart
 interface VerseImageGeneratorProps {
     verseText: string;
     verseReference: string;
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 const THEMES = [
@@ -17,14 +17,7 @@ const THEMES = [
         accent: 'text-orange-700',
         font: 'font-serif'
     },
-    {
-        id: 'midnight',
-        name: 'Meia-noite',
-        bg: 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900',
-        text: 'text-white',
-        accent: 'text-purple-300',
-        font: 'font-serif'
-    },
+
     {
         id: 'nature',
         name: 'Natureza',
@@ -145,6 +138,8 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
         return () => window.removeEventListener('resize', calculateScale);
     }, [selectedFormat, verseText]);
 
+
+
     // Helper to convert data URI to Blob without using fetch (avoids "Failed to fetch" errors)
     const dataURItoBlob = (dataURI: string) => {
         const byteString = atob(dataURI.split(',')[1]);
@@ -163,38 +158,50 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
 
         try {
             // STRATEGY: Create a clean clone in the DOM to avoid scaling/transform issues
-            // 1. Clone the node
+            // FIX: Enforce fixed dimensions to prevent mobile layout shifts (overlapping)
             const node = cardRef.current;
             const clone = node.cloneNode(true) as HTMLElement;
 
-            // 2. Style the clone to be fixed size, invisible but rendered
+            // Determine fixed export dimensions (Standardized width: 600px)
+            // This ensures the layout is always calculated at this size, avoiding mobile cramping
+            const EXPORT_WIDTH = 600;
+            let exportHeight = 600; // Default square
+
+            // Calculate height based on current aspect ratio class
+            if (currentAspect.includes('aspect-[9/16]')) {
+                exportHeight = Math.round(EXPORT_WIDTH * (16 / 9)); // Story
+            } else if (currentAspect.includes('aspect-[4/5]')) {
+                exportHeight = Math.round(EXPORT_WIDTH * (5 / 4)); // Portrait
+            }
+
+            // 2. Style the clone to be fixed size
             clone.style.position = 'absolute';
             clone.style.top = '0';
             clone.style.left = '0';
-            clone.style.transform = 'none'; // Ensure no scale
-            clone.style.zIndex = '-50'; // Behind everything
+            clone.style.width = `${EXPORT_WIDTH}px`;   // FORCE WIDTH
+            clone.style.height = `${exportHeight}px`; // FORCE HEIGHT
+            clone.style.maxWidth = 'none';            // Override tailwind constraints
+            clone.style.maxHeight = 'none';           // Override tailwind constraints
+            clone.style.transform = 'none';
+            clone.style.zIndex = '-50';
             clone.style.pointerEvents = 'none';
-            clone.style.visibility = 'visible'; // Crucial: must be visible to capture
+            clone.style.visibility = 'visible';
 
-            // Explicitly set width/height matching the original UN-SCALED size
-            // The originals have classes like w-[320px] or w-[400px]
-            // We'll let the classes dictate, but ensure no parent constraints
-            // Attach to the containerRef (preview area) instead of body
-            // This ensures it inherits local styles and is "in view"
-            if (containerRef.current) {
-                containerRef.current.appendChild(clone);
-            } else {
-                document.body.appendChild(clone);
-            }
+            // Attach to body but keep hidden from view
+            document.body.appendChild(clone);
 
-            // 3. Wait a moment for images/fonts in clone to be ready (optional but safer)
+            // 3. Wait for fonts to be strictly ready
+            await document.fonts.ready;
+            // Small buffer to ensure layout settlement
             await new Promise(resolve => setTimeout(resolve, 100));
 
             try {
-                // 4. Capture the CLONE
+                // 4. Capture the CLONE with explicit dimensions
                 const dataUrl = await toPng(clone, {
                     cacheBust: true,
-                    pixelRatio: 2, // Retain 2x quality
+                    pixelRatio: 2, // High quality export
+                    width: EXPORT_WIDTH,
+                    height: exportHeight,
                     skipAutoScale: true
                 });
 
@@ -203,7 +210,7 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                     clone.parentNode.removeChild(clone);
                 }
 
-                // 6. Convert to Blob using HELPER (No fetch)
+                // 6. Convert to Blob using HELPER
                 const blob = dataURItoBlob(dataUrl);
                 const file = new File([blob], 'versiculo.png', { type: 'image/png' });
 
@@ -236,7 +243,6 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                 }
 
             } catch (captureError: any) {
-                // Determine parent from the clone itself
                 if (clone.parentNode) {
                     clone.parentNode.removeChild(clone);
                 }
@@ -245,7 +251,6 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
 
         } catch (err: any) {
             console.error('Error generating image:', err);
-            // Show ACTUAL error to user for debugging
             alert(`Erro ao criar imagem: ${err.message || err.toString()}. Tente novamente.`);
         } finally {
             setLoading(false);
@@ -260,14 +265,19 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
         ? 'aspect-[4/5]'
         : selectedFormat.aspect;
 
+    // Embedded Mode Logic
+    const wrapperClasses = "fixed inset-0 z-[60] flex items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-fadeIn";
+
+    const containerClasses = "bg-white dark:bg-stone-900 w-full md:max-w-5xl h-full md:h-auto md:max-h-[90vh] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row";
+
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-            <div className="bg-white dark:bg-stone-900 w-full md:max-w-5xl h-full md:h-auto md:max-h-[90vh] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+        <div className={wrapperClasses}>
+            <div className={containerClasses}>
 
                 {/* Preview Area - Fixed height on mobile to ensure visibility */}
                 <div
                     ref={containerRef}
-                    className="h-[45%] md:h-auto md:flex-1 bg-stone-100 dark:bg-stone-950 p-4 md:p-8 flex items-center justify-center relative overflow-hidden select-none"
+                    className="flex items-center justify-center relative select-none bg-stone-100 dark:bg-stone-950 overflow-hidden p-4 md:p-8 h-[45%] md:h-auto md:flex-1"
                 >
                     {/* Scalable Container */}
                     <div
@@ -278,7 +288,7 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                     >
                         <div
                             ref={cardRef}
-                            className={`${currentAspect} w-[320px] md:w-[400px] shadow-2xl rounded-xl p-8 md:p-10 flex flex-col justify-center items-center text-center relative overflow-hidden transition-colors duration-500 ${selectedTheme.bg}`}
+                            className={`${currentAspect} w-[320px] md:w-[400px] rounded-xl p-8 md:p-10 flex flex-col justify-center items-center text-center relative overflow-hidden transition-colors duration-500 ${selectedTheme.bg} shadow-2xl`}
                         >
                             {/* Decorative Elements (FIXED) */}
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 pointer-events-none"></div>
@@ -324,7 +334,7 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                     </div>
                 </div>
 
-                {/* Controls Area - Scrollable */}
+                {/* Controls Area - Scrollable / Sidebar */}
                 <div className="flex-1 md:flex-none md:w-80 bg-white dark:bg-stone-900 flex flex-col border-t md:border-t-0 md:border-l border-stone-200 dark:border-stone-800 overflow-hidden">
                     {/* Header */}
                     <div className="p-4 md:p-6 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center bg-white dark:bg-stone-900 sticky top-0 z-10">
@@ -356,7 +366,8 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                             </div>
                         </div>
 
-                        {/* Format Selection */}
+
+                        {/* Format Selection - Hide if Embedded to simplify? User only asked for colors. I'll keep it for now as it's useful. */}
                         <div>
                             <label className="flex items-center gap-2 text-xs font-bold text-stone-500 mb-3 uppercase tracking-wider">
                                 <ImageIcon size={14} /> Formato
@@ -381,6 +392,10 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                                 })}
                             </div>
                         </div>
+
+
+
+
 
                         {/* Theme Selection */}
                         <div>
@@ -437,7 +452,7 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                         <button
                             onClick={handleShare}
                             disabled={loading}
-                            className="w-full py-3.5 rounded-xl bg-bible-gold text-white font-bold text-lg shadow-lg hover:bg-yellow-600 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full py-3 rounded-xl bg-bible-gold text-white font-bold text-base shadow-lg hover:bg-yellow-600 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <span className="animate-pulse">Gerando...</span>

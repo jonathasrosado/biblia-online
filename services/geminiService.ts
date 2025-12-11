@@ -62,7 +62,7 @@ export const getChapterContent = async (book: string, chapter: number, language:
   // 1. Try Local JSON first (FAST & FREE)
   // Only for Portuguese for now, as the JSON is likely PT-BR based on filename
   if (language === 'pt') {
-    const localData = getChapterContentLocal(book, chapter, version);
+    const localData = await getChapterContentLocal(book, chapter, version);
     if (localData) {
       console.log(`Loaded ${book} ${chapter} (${version}) from local JSON.`);
       return localData;
@@ -432,7 +432,7 @@ export const searchBible = async (query: string, language: string = 'pt'): Promi
 
   // 1. Try Local Search first (Fast & Deterministic)
   if (language === 'pt') {
-    const localResults = searchBibleLocal(query);
+    const localResults = await searchBibleLocal(query);
     if (localResults.length > 0) {
       results = localResults;
       // If we have plenty of exact matches, we might not need AI, 

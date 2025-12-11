@@ -1,6 +1,3 @@
-import bibleAcfData from '../src/data/bible_acf.json';
-import bibleNviData from '../src/data/bible_nvi.json';
-import bibleNtlhData from '../src/data/bible_ntlh.json';
 import { bibleBooks } from '../constants';
 import { Verse, SearchResult, BibleVersion } from '../types';
 
@@ -10,12 +7,32 @@ interface BibleBookJson {
     chapters: string[][];
 }
 
-// Cast the imported JSON to the correct type
-const bibleAcf: BibleBookJson[] = bibleAcfData as BibleBookJson[];
-const bibleNvi: BibleBookJson[] = bibleNviData as BibleBookJson[];
-const bibleNtlh: BibleBookJson[] = bibleNtlhData as BibleBookJson[];
+// Helper to load data dynamically
+const loadBibleData = async (version: BibleVersion): Promise<BibleBookJson[]> => {
+    try {
+        switch (version) {
+            case 'nvi': return (await import('../src/data/bible_nvi.json')).default as BibleBookJson[];
+            case 'acf': return (await import('../src/data/bible_acf.json')).default as BibleBookJson[];
+            case 'ntlh': return (await import('../src/data/bible_ntlh.json')).default as BibleBookJson[];
+            case 'ara': return (await import('../versoes/ARA.json')).default as BibleBookJson[];
+            case 'arc': return (await import('../versoes/ARC.json')).default as BibleBookJson[];
+            case 'as21': return (await import('../versoes/AS21.json')).default as BibleBookJson[];
+            case 'jfaa': return (await import('../versoes/JFAA.json')).default as BibleBookJson[];
+            case 'kja': return (await import('../versoes/KJA.json')).default as BibleBookJson[];
+            case 'kjf': return (await import('../versoes/KJF.json')).default as BibleBookJson[];
+            case 'naa': return (await import('../versoes/NAA.json')).default as BibleBookJson[];
+            case 'nbv': return (await import('../versoes/NBV.json')).default as BibleBookJson[];
+            case 'nvt': return (await import('../versoes/NVT.json')).default as BibleBookJson[];
+            case 'tb': return (await import('../versoes/TB.json')).default as BibleBookJson[];
+            default: return (await import('../src/data/bible_nvi.json')).default as BibleBookJson[];
+        }
+    } catch (error) {
+        console.error(`Failed to load bible version: ${version}`, error);
+        return (await import('../src/data/bible_nvi.json')).default as BibleBookJson[];
+    }
+}
 
-export const getChapterContentLocal = (bookName: string, chapterNumber: number, version: BibleVersion = 'nvi'): Verse[] | null => {
+export const getChapterContentLocal = async (bookName: string, chapterNumber: number, version: BibleVersion = 'nvi'): Promise<Verse[] | null> => {
     try {
         // 1. Find the book index
         const bookIndex = bibleBooks.findIndex(b => b.name === bookName);
@@ -26,7 +43,7 @@ export const getChapterContentLocal = (bookName: string, chapterNumber: number, 
         }
 
         // Select the correct bible version
-        const bibleData = version === 'nvi' ? bibleNvi : (version === 'ntlh' ? bibleNtlh : bibleAcf);
+        const bibleData = await loadBibleData(version);
         const bookData = bibleData[bookIndex];
 
         if (!bookData) {
@@ -56,17 +73,17 @@ export const getChapterContentLocal = (bookName: string, chapterNumber: number, 
     }
 };
 
-export const searchBibleLocal = (query: string, version: BibleVersion = 'nvi'): SearchResult[] => {
+export const searchBibleLocal = async (query: string, version: BibleVersion = 'nvi'): Promise<SearchResult[]> => {
     if (!query || query.length < 3) return [];
 
     const results: SearchResult[] = [];
     const lowerQuery = query.toLowerCase();
     const limit = 20; // Limit local results to prevent UI lag
 
-    // Select the correct bible version
-    const bibleData = version === 'nvi' ? bibleNvi : (version === 'ntlh' ? bibleNtlh : bibleAcf);
-
     try {
+        // Select the correct bible version
+        const bibleData = await loadBibleData(version);
+
         // Iterate through all books
         for (let bIndex = 0; bIndex < bibleData.length; bIndex++) {
             const book = bibleData[bIndex];

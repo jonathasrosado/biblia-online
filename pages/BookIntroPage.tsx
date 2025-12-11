@@ -15,12 +15,15 @@ interface BookSummary {
     summary: string;
 }
 
+import { ReadingPreferences } from '../types';
+
 interface BookIntroPageProps {
     language: string;
     t: any;
+    preferences: ReadingPreferences;
 }
 
-const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t }) => {
+const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t, preferences }) => {
     const { bookAbbrev } = useParams<{ bookAbbrev: string }>();
     const navigate = useNavigate();
     const [summary, setSummary] = useState<BookSummary | null>(null);
@@ -116,7 +119,8 @@ const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t }) => {
             <div className="text-center mb-12">
                 <Link
                     to={currentBook.testament === 'Old' ? '/antigo-testamento' : '/novo-testamento'}
-                    className="inline-block px-3 py-1 bg-bible-gold/10 text-bible-accent dark:text-bible-gold rounded-full text-xs font-bold uppercase tracking-wider mb-4 hover:bg-bible-gold/20 transition-colors"
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 transition-colors
+                        ${preferences.theme === 'bw' ? 'bg-stone-100 text-stone-900 border border-stone-200' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold hover:bg-bible-gold/20'}`}
                 >
                     {testamentLabel}
                 </Link>
@@ -135,7 +139,7 @@ const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t }) => {
             <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-100 dark:border-stone-800 shadow-sm mb-12">
                 <h3 className="text-lg font-bold mb-6 flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                        <AlignLeft size={20} className="text-bible-gold" />
+                        <AlignLeft size={20} className={preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'} />
                         {t.chapter}s
                     </span>
                     <span className="text-xs font-normal text-stone-400 bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded-full">
@@ -148,7 +152,10 @@ const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t }) => {
                         <Link
                             key={num}
                             to={`/leitura/${normalizeBookName(currentBook.name)}/${num}`}
-                            className="aspect-square flex items-center justify-center rounded-lg border border-stone-200 dark:border-stone-700 hover:border-bible-gold hover:bg-bible-gold/5 dark:hover:bg-bible-gold/10 text-stone-600 dark:text-stone-300 font-medium transition-all group"
+                            className={`aspect-square flex items-center justify-center rounded-lg border font-medium transition-all group
+                                ${preferences.theme === 'bw'
+                                    ? 'border-stone-200 text-black hover:bg-black hover:text-white'
+                                    : 'border-stone-200 dark:border-stone-700 hover:border-bible-gold hover:bg-bible-gold/5 dark:hover:bg-bible-gold/10 text-stone-600 dark:text-stone-300'}`}
                         >
                             <span className="group-hover:scale-110 transition-transform">{num}</span>
                         </Link>
@@ -205,7 +212,7 @@ const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t }) => {
                         {/* Summary Text */}
                         <div className="prose dark:prose-invert max-w-none mb-8">
                             <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
-                                <BookOpen size={20} className="text-bible-gold" />
+                                <BookOpen size={20} className={preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'} />
                                 {language === 'en' ? 'Overview' : 'Visão Geral'}
                             </h3>
                             <div className="text-stone-600 dark:text-stone-300 leading-relaxed space-y-4 text-justify">
@@ -216,14 +223,18 @@ const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t }) => {
                         </div>
 
                         {/* Key Verse */}
-                        <div className="bg-bible-gold/5 dark:bg-bible-gold/10 rounded-xl p-6 border border-bible-gold/20">
+                        <div className={`rounded-xl p-6 border 
+                            ${preferences.theme === 'bw'
+                                ? 'bg-stone-50 border-stone-200'
+                                : 'bg-bible-gold/5 dark:bg-bible-gold/10 border-bible-gold/20'}`}>
                             <div className="flex gap-3">
-                                <Quote className="text-bible-gold flex-shrink-0" size={24} />
+                                <Quote className={`flex-shrink-0 ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`} size={24} />
                                 <div>
                                     <p className="font-serif italic text-lg text-stone-800 dark:text-stone-200 text-center md:text-left">
                                         "{getKeyVerse().replace(/"/g, '')}"
                                     </p>
-                                    <p className="text-xs font-bold text-bible-accent dark:text-bible-gold mt-2 text-right uppercase tracking-wider opacity-80">
+                                    <p className={`text-xs font-bold mt-2 text-right uppercase tracking-wider opacity-80 
+                                        ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
                                         Versículo Chave
                                     </p>
                                 </div>

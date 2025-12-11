@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { ChevronDown, ChevronLeft, Menu, Search, X, BookOpen, Sun, Moon, ArrowUp, MessageCircle, Book, Settings, Loader2, Minimize, User as UserIcon, AlignJustify, Coffee, Library, Scroll } from 'lucide-react';
-import { bibleBooks, translations, findBookByNormalizedName, normalizeBookName } from './constants';
+import { ChevronDown, ChevronLeft, Menu, Search, X, BookOpen, Sun, Moon, ArrowUp, MessageCircle, Book, Settings, Loader2, Minimize, Maximize, User as UserIcon, AlignJustify, Coffee, Library, Scroll } from 'lucide-react';
+import { bibleBooks, translations, findBookByNormalizedName, normalizeBookName, BIBLE_VERSIONS } from './constants';
 
 import { BibleBook, ReadingPreferences, ReadingHistoryItem, BibleVersion, Theme } from './types';
 import BookSelector from './components/BookSelector';
@@ -51,7 +51,7 @@ interface ViewWrapperProps {
 }
 
 const ViewWrapper: React.FC<ViewWrapperProps> = ({ children, isFullScreen, theme }) => (
-  <div className="flex flex-col min-h-full">
+  <div className="flex flex-col min-h-screen">
     <div className="flex-1 w-full">
       {children}
     </div>
@@ -280,7 +280,7 @@ function AppContent() {
   }
 
   return (
-    <div className={`min-h-screen font-sans flex flex-col overflow-hidden transition-colors duration-300 ${getMainBackgroundClass()}`}>
+    <div className={`h-[100dvh] font-sans flex flex-col overflow-hidden transition-colors duration-300 ${getMainBackgroundClass()}`}>
       <RedirectHandler />
 
 
@@ -449,26 +449,17 @@ function AppContent() {
                   <ChevronDown size={16} className={`transition-transform duration-200 ${isVersionsOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isVersionsOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isVersionsOpen ? 'max-h-[60vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}`}>
                   <div className="pl-11 pr-4 py-2 space-y-1">
-                    <button
-                      onClick={() => setVersion('nvi')}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'nvi' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                    >
-                      Nova Versão Internacional (NVI)
-                    </button>
-                    <button
-                      onClick={() => setVersion('acf')}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'acf' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                    >
-                      Almeida Corrigida Fiel (ACF)
-                    </button>
-                    <button
-                      onClick={() => setVersion('ntlh')}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'ntlh' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                    >
-                      Nova Tradução na Linguagem de Hoje (NTLH)
-                    </button>
+                    {BIBLE_VERSIONS.map((v) => (
+                      <button
+                        key={v}
+                        onClick={() => setVersion(v)}
+                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === v ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                      >
+                        {t[v] || v.toUpperCase()} ({v.toUpperCase()})
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -498,6 +489,17 @@ function AppContent() {
               {/* Theme Toggle Removed from List per User Request */}
 
               <button
+                onClick={() => { setIsFullScreen(!isFullScreen); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
+                ${isFullScreen
+                    ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
+                    : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
+              >
+                {isFullScreen ? <Minimize size={20} /> : <Maximize size={20} />}
+                {isFullScreen ? t.exitFullScreen : t.fullScreen}
+              </button>
+
+              <button
                 onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
               >
@@ -514,7 +516,7 @@ function AppContent() {
       <main
         ref={mainScrollRef}
         className={`flex-1 overflow-y-auto relative scroll-smooth ${getMainBackgroundClass()}
-          ${isFullScreen ? 'h-screen' : 'h-[calc(100vh-65px)]'}`}
+          ${isFullScreen ? 'h-full' : ''}`}
       >
         <Routes>
           <Route path="/" element={
@@ -573,7 +575,7 @@ function AppContent() {
 
           <Route path="/leitura/:bookAbbrev" element={
             <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-              <BookIntroPage language={language} t={t} />
+              <BookIntroPage language={language} t={t} preferences={preferences} />
             </ViewWrapper>
           } />
 
@@ -620,7 +622,7 @@ function AppContent() {
           } />
 
           <Route path="/chat" element={
-            <div className="h-[calc(100vh-65px)] flex flex-col overflow-hidden">
+            <div className="h-full flex flex-col overflow-hidden">
               <ChatPage language={language} t={t} preferences={preferences} />
             </div>
           } />
@@ -653,13 +655,13 @@ function AppContent() {
 
           {/* Dynamic Routes - MUST BE LAST */}
           <Route path="/:category" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen} theme={preferences.theme}>
+            <ViewWrapper onOpenPrivacy={() => navigate('/privacidade')} onOpenTerms={() => navigate('/termos')} isFullScreen={isFullScreen} theme={preferences.theme}>
               <CategoryPage />
             </ViewWrapper>
           } />
 
           <Route path="/:category/:slug" element={
-            <ViewWrapper onOpenPrivacy={() => openLegalModal('privacy')} onOpenTerms={() => openLegalModal('terms')} isFullScreen={isFullScreen} theme={preferences.theme}>
+            <ViewWrapper onOpenPrivacy={() => navigate('/privacidade')} onOpenTerms={() => navigate('/termos')} isFullScreen={isFullScreen} theme={preferences.theme}>
               <BlogPostPage />
             </ViewWrapper>
           } />

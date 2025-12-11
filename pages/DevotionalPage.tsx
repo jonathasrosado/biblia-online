@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SEO from '../components/SEO';
-import { Sun, Quote } from 'lucide-react';
 import { getDevotional } from '../services/geminiService';
 import { ReadingPreferences, DevotionalContent } from '../types';
-import { AdUnit } from '../components/AdUnit';
+
 
 interface DevotionalPageProps {
     language: string;
@@ -27,21 +26,14 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
     }, [language]);
 
     return (
-        <div className="max-w-3xl mx-auto p-6 md:p-12 flex flex-col items-center">
+        <div className="max-w-4xl mx-auto p-4 md:p-8 flex flex-col items-center">
             <SEO
                 title={dailyDevotional ? `${dailyDevotional.title} - ${t.t?.dailyDevotionalTitle || t.dailyDevotionalTitle || "Devocional"}` : `${t.t?.dailyDevotionalTitle || t.dailyDevotionalTitle || "Devocional"}`}
                 description="Devocional diário para inspiração e reflexão espiritual."
                 url={window.location.href}
             />
 
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 transition-colors
-                ${preferences.theme === 'bw'
-                    ? 'bg-stone-100 text-black'
-                    : 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'}
-            `}>
-                <Sun size={32} />
-            </div>
-            {/* Header / Eyebrow */}
+            {/* Header / Eyebrow (Sun Icon Removed) */}
             <div className="text-center mb-8">
                 <span className={`font-bold uppercase tracking-widest text-sm transition-colors
                     ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}
@@ -62,7 +54,7 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
             {!dailyDevotional ? (
                 <div className="space-y-6 animate-pulse w-full max-w-2xl">
                     <div className={`h-8 rounded w-3/4 mx-auto ${preferences.theme === 'sepia' ? 'bg-[#e6dcc6]' : 'bg-stone-200 dark:bg-stone-800'}`}></div>
-                    <div className={`h-32 rounded w-full mx-auto ${preferences.theme === 'sepia' ? 'bg-[#e6dcc6]' : 'bg-stone-200 dark:bg-stone-800'}`}></div>
+                    <div className={`h-64 rounded w-full mx-auto ${preferences.theme === 'sepia' ? 'bg-[#e6dcc6]' : 'bg-stone-200 dark:bg-stone-800'}`}></div>
                     <div className={`h-40 rounded w-full mx-auto ${preferences.theme === 'sepia' ? 'bg-[#e6dcc6]' : 'bg-stone-200 dark:bg-stone-800'}`}></div>
                 </div>
             ) : (
@@ -70,18 +62,35 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
           ${preferences.theme === 'sepia' ? 'text-[#5c4b37]' : 'text-stone-800 dark:text-stone-200'}
         `}>
 
+                    {/* Verse Text Display (Styled) */}
+                    <div className="text-center mb-10 animate-slideUp">
+                        <div className={`p-8 md:p-12 rounded-3xl relative overflow-hidden shadow-lg transition-all
+                            ${preferences.theme === 'sepia'
+                                ? 'bg-gradient-to-br from-[#fdf6e3] to-[#eee8d5] shadow-[#d2c9a5]/50'
+                                : preferences.theme === 'bw'
+                                    ? 'bg-white border-2 border-black shadow-none'
+                                    : 'bg-gradient-to-br from-white via-stone-50 to-stone-100 dark:from-stone-900 dark:via-stone-900 dark:to-stone-950 shadow-xl border border-white/50 dark:border-white/5'}
+                        `}>
+                            {/* Decorative Background Icon */}
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-10"></div>
 
-                    <div className={`relative p-8 md:p-10 rounded-xl mb-10 border mt-8
-               ${preferences.theme === 'sepia'
-                            ? 'bg-[#fcf9ee] border-[#e6dcc6]'
-                            : 'bg-white dark:bg-stone-900 border-stone-100 dark:border-stone-800 shadow-sm'}
-            `}>
-                        <Quote className="absolute top-6 left-6 opacity-10 w-12 h-12 text-bible-gold" />
-                        <blockquote className="relative z-10 text-xl md:text-2xl text-center leading-relaxed italic">
-                            "{dailyDevotional.verseText}"
-                        </blockquote>
-                        <div className="text-center mt-6 font-bold uppercase tracking-widest text-xs opacity-70">
-                            {dailyDevotional.verseReference}
+                            <p className={`text-2xl md:text-3xl italic font-serif leading-relaxed mb-6 relative z-10
+                                ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-100'}
+                            `}>
+                                "{dailyDevotional.verseText}"
+                            </p>
+
+                            <div className="flex items-center justify-center gap-4 mb-2 opacity-60">
+                                <div className="h-px w-12 bg-current"></div>
+                                <div className="h-1 w-1 rounded-full bg-current"></div>
+                                <div className="h-px w-12 bg-current"></div>
+                            </div>
+
+                            <p className={`text-sm font-bold uppercase tracking-[0.2em] relative z-10
+                                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}
+                            `}>
+                                {dailyDevotional.verseReference}
+                            </p>
                         </div>
                     </div>
 
@@ -107,7 +116,6 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
                         </p>
                     </div>
 
-                    <AdUnit className="mt-12 border-t border-stone-100 dark:border-stone-800 pt-8" />
                 </div>
             )}
         </div>
