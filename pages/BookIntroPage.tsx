@@ -243,7 +243,7 @@ const BookIntroPage: React.FC<BookIntroPageProps> = ({ language, t, preferences 
                     </div>
                 ) : null}
 
-                <AdUnit className="w-full mt-8" label="Publicidade" />
+
             </div>
         </div>
     );

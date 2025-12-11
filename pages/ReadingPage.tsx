@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import SEO from '../components/SEO';
-import { ChevronRight, ChevronLeft, Volume2, Pause, Play, Share2, BookOpen, Mic, X, ChevronDown, Minimize, Maximize, List, FileText, Type, Loader2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Volume2, Pause, Play, Share2, BookOpen, Mic, X, ChevronDown, Minimize, Maximize, List, FileText, Type, Loader2, CheckCircle } from 'lucide-react';
 import { bibleBooks, normalizeBookName, findBookByNormalizedName } from '../constants';
 import { chapterTitles } from '../data/chapterTitles';
 import { getChapterContent } from '../services/geminiService';
@@ -19,6 +18,8 @@ interface ReadingPageProps {
     isFullScreen: boolean;
     setIsFullScreen: (v: boolean) => void;
     addToHistory: (book: string, chapter: number) => void;
+    user?: any;
+    setUser?: (user: any) => void;
 }
 
 const ReadingPage: React.FC<ReadingPageProps> = ({
@@ -29,7 +30,9 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     version,
     isFullScreen,
     setIsFullScreen,
-    addToHistory
+    addToHistory,
+    user,
+    setUser
 }) => {
     // ... existing hooks ...
     const { bookAbbrev, chapterNum } = useParams<{ bookAbbrev: string; chapterNum: string }>();
@@ -39,8 +42,50 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     // State Declarations
     const [chapterContent, setChapterContent] = useState<Verse[]>([]);
     const [loadingContent, setLoadingContent] = useState(false);
+    const [togglingRead, setTogglingRead] = useState(false);
 
-    // Version State removed (now passed via props)
+    // Audio State
+    const bibleReaderRef = React.useRef<BibleReaderRef>(null);
+    const [isVerseAudioPlaying, setIsVerseAudioPlaying] = useState(false);
+    const [isVerseAudioLoading, setIsVerseAudioLoading] = useState(false);
+
+    // UI State
+    const [isChapterGridOpen, setIsChapterGridOpen] = useState(false);
+
+    // Check if chapter is completed
+    const currentBook = findBookByNormalizedName(bookAbbrev || '') || bibleBooks[0];
+    const currentChapter = parseInt(chapterNum || '1', 10);
+
+    const isCompleted = useMemo(() => {
+        if (!user || !user.completedChapters) return false;
+        return user.completedChapters.some((c: any) => c.book === currentBook.name && c.chapter === currentChapter);
+    }, [user, currentBook.name, currentChapter]);
+
+    const handleToggleRead = async () => {
+        if (!user || togglingRead) return;
+        setTogglingRead(true);
+        try {
+            const res = await fetch('/api/user/complete-chapter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: user.email,
+                    book: currentBook.name,
+                    chapter: currentChapter,
+                    completed: !isCompleted // Toggle
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (setUser) setUser(data.user);
+            }
+        } catch (error) {
+            console.error("Failed to toggle read status", error);
+        } finally {
+            setTogglingRead(false);
+        }
+    };
 
     // Parse selected verses from URL
     const versesParam = searchParams.get('verses');
@@ -93,10 +138,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             }
         }
     }, [loadingContent, initialSelectedVerses]);
-
-    // Find book
-    const currentBook = findBookByNormalizedName(bookAbbrev || '') || bibleBooks[0];
-    const currentChapter = parseInt(chapterNum || '1', 10);
 
     useEffect(() => {
         const loadChapter = async () => {
@@ -164,15 +205,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
         pageTitle = `${currentBook.name} ${currentChapter} – Versículos`;
     }
 
-    // Audio State (Verse only now)
-    const bibleReaderRef = React.useRef<BibleReaderRef>(null);
-    const [isVerseAudioPlaying, setIsVerseAudioPlaying] = useState(false);
-    const [isVerseAudioLoading, setIsVerseAudioLoading] = useState(false);
-
-    // UI State
-    const [isChapterGridOpen, setIsChapterGridOpen] = useState(false);
-
-
     return (
         <div className="max-w-4xl mx-auto p-4 md:p-8 lg:p-12 pb-8">
             <SEO
@@ -220,8 +252,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             <ChevronRight className="rotate-180" size={24} />
                         </button>
                     ) : <div className="w-10" />}
-
-                    {/* Audio Button Removed */}
 
                     <div className="text-center relative">
                         <button
@@ -280,9 +310,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                 </div>
 
                 <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-6 mb-2">
-                    {/* Centered Group containing all 4 elements */}
                     <div className="flex flex-wrap items-center justify-center gap-4">
-                        {/* Tab Navigation (Verses vs Summary) */}
                         <div className="bg-stone-100 dark:bg-stone-800 p-1 rounded-xl flex gap-1 shadow-inner">
                             <button
                                 className={`px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition-all
@@ -301,7 +329,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             </button>
                         </div>
 
-                        {/* Font Size Slider */}
                         <div className="flex items-center gap-3 bg-stone-100 dark:bg-stone-800 px-4 py-2 rounded-lg shrink-0 h-10">
                             <Type size={14} className="opacity-50" />
                             <input
@@ -317,7 +344,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             <Type size={18} className="opacity-80" />
                         </div>
 
-                        {/* Audio Button */}
                         <button
                             onClick={() => bibleReaderRef.current?.toggleAudio()}
                             disabled={isVerseAudioLoading} // Only disable if loading initial audio
@@ -341,9 +367,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                     </div>
                 </div>
             </header>
-
-            {/* Floating Audio Indicator for Fluid Mode */}
-
 
             {
                 loadingContent ? (
@@ -377,37 +400,69 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             }
 
             {/* Bottom Navigation */}
-            <div className="flex justify-between items-center mt-12 pt-8 border-t border-stone-200 dark:border-stone-800">
-                {prevChapter ? (
-                    <button
-                        onClick={() => navigateTo(prevChapter.book, prevChapter.chapter)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all group text-stone-600 dark:text-stone-400 hover:text-bible-gold"
-                    >
-                        <ChevronRight className="rotate-180 transition-transform group-hover:-translate-x-1" size={20} />
-                        <div className="text-left">
-                            <span className="text-xs uppercase tracking-wider opacity-60 block mb-0.5">Anterior</span>
-                            <span className="font-serif font-bold text-lg">{prevChapter.book} {prevChapter.chapter}</span>
-                        </div>
-                    </button>
-                ) : <div />}
+            <div className="mt-12 pt-8 border-t border-stone-200 dark:border-stone-800 space-y-6">
 
-                {nextChapter && (
+                {/* MARK AS READ BUTTON */}
+                {user && (
                     <button
-                        onClick={() => navigateTo(nextChapter.book, nextChapter.chapter)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all group text-stone-600 dark:text-stone-400 hover:text-bible-gold"
+                        onClick={handleToggleRead}
+                        disabled={togglingRead}
+                        className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.99]
+                            ${isCompleted
+                                ? (preferences.theme === 'bw'
+                                    ? 'bg-black text-white hover:bg-stone-800'
+                                    : 'bg-green-600 text-white hover:bg-green-700 shadow-green-200 dark:shadow-none')
+                                : (preferences.theme === 'bw'
+                                    ? 'bg-white border-2 border-black text-black hover:bg-stone-50'
+                                    : 'bg-white dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-bible-gold hover:text-bible-gold dark:hover:border-bible-gold dark:hover:text-bible-gold')
+                            }`}
                     >
-                        <div className="text-right">
-                            <span className="text-xs uppercase tracking-wider opacity-60 block mb-0.5">Próximo</span>
-                            <span className="font-serif font-bold text-lg">{nextChapter.book} {nextChapter.chapter}</span>
-                        </div>
-                        <ChevronRight className="transition-transform group-hover:translate-x-1" size={20} />
+                        {togglingRead ? (
+                            <Loader2 size={20} className="animate-spin" />
+                        ) : isCompleted ? (
+                            <>
+                                <CheckCircle size={20} />
+                                Lido
+                            </>
+                        ) : (
+                            <>
+                                <CheckCircle size={20} className="opacity-50" />
+                                Marcar como lido
+                            </>
+                        )}
                     </button>
                 )}
+
+                <div className="flex justify-between items-center">
+                    {prevChapter ? (
+                        <button
+                            onClick={() => navigateTo(prevChapter.book, prevChapter.chapter)}
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all group text-stone-600 dark:text-stone-400 hover:text-bible-gold"
+                        >
+                            <ChevronRight className="rotate-180 transition-transform group-hover:-translate-x-1" size={20} />
+                            <div className="text-left">
+                                <span className="text-xs uppercase tracking-wider opacity-60 block mb-0.5">Anterior</span>
+                                <span className="font-serif font-bold text-lg">{prevChapter.book} {prevChapter.chapter}</span>
+                            </div>
+                        </button>
+                    ) : <div />}
+
+                    {nextChapter && (
+                        <button
+                            onClick={() => navigateTo(nextChapter.book, nextChapter.chapter)}
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all group text-stone-600 dark:text-stone-400 hover:text-bible-gold"
+                        >
+                            <div className="text-right">
+                                <span className="text-xs uppercase tracking-wider opacity-60 block mb-0.5">Próximo</span>
+                                <span className="font-serif font-bold text-lg">{nextChapter.book} {nextChapter.chapter}</span>
+                            </div>
+                            <ChevronRight className="transition-transform group-hover:translate-x-1" size={20} />
+                        </button>
+                    )}
+                </div>
             </div>
 
 
-
-            <AdUnit className="mt-12" />
         </div>
     );
 };

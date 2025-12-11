@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { ChevronDown, ChevronLeft, Menu, Search, X, BookOpen, Sun, Moon, ArrowUp, MessageCircle, Book, Settings, Loader2, Minimize, Maximize, User as UserIcon, AlignJustify, Coffee, Library, Scroll } from 'lucide-react';
+import { ChevronDown, ChevronLeft, Menu, Search, X, BookOpen, Sun, Moon, ArrowUp, MessageCircle, Book, Settings, Loader2, Minimize, Maximize, User as UserIcon, AlignJustify, Coffee, Library, Scroll, LogIn, LogOut, UserPlus, Heart, BarChart2 } from 'lucide-react';
 import { bibleBooks, translations, findBookByNormalizedName, normalizeBookName, BIBLE_VERSIONS } from './constants';
 
 import { BibleBook, ReadingPreferences, ReadingHistoryItem, BibleVersion, Theme } from './types';
@@ -33,6 +33,7 @@ const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = React.lazy(() => import('./pages/TermsPage'));
 const ContactPage = React.lazy(() => import('./pages/ContactPage'));
 const AdminPage = React.lazy(() => import('./pages/AdminPage'));
+const SignUpPage = React.lazy(() => import('./pages/SignUpPage'));
 
 // Admin Components (Lazy Loaded)
 const BlogManager = React.lazy(() => import('./components/admin/BlogManager'));
@@ -182,7 +183,14 @@ function AppContent() {
   useEffect(() => {
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     setSidebarOpen(false); // Close sidebar on route change
-  }, [location.pathname]);
+
+    // Check for login request from state
+    if (location.state && (location.state as any).openLogin) {
+      setIsLoginModalOpen(true);
+      // Optional: Clear state
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.pathname, location.state]);
 
   const scrollToTop = () => {
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -370,12 +378,12 @@ function AppContent() {
             <div className={`p-4 border-b flex items-center justify-between
             ${preferences.theme === 'bw' ? 'border-stone-200 bg-white' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-100 dark:border-stone-800'}`}>
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-                <div className={`flex items-center justify-center
-                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>
-                  <BookOpen size={24} />
+                <div className={`p-1.5 rounded-lg flex items-center justify-center
+                ${preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold text-white'}`}>
+                  <BookOpen size={20} />
                 </div>
                 <h2 className={`font-serif text-xl font-bold
-                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
+                ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-100'}`}>
                   {t.appTitle}
                 </h2>
               </div>
@@ -415,99 +423,199 @@ function AppContent() {
               </form>
             </div>
 
-            <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-700">
+            <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-6 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-700">
 
+              {/* Section 1: Navigation */}
+              <div className="space-y-1">
+                <h3 className={`px-4 text-xs font-semibold uppercase tracking-wider mb-2 ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-stone-400'}`}>
+                  Principal
+                </h3>
 
-
-
-
-              <div className="h-px bg-stone-100 dark:bg-stone-800 my-2 mx-2" />
-
-              <button
-                onClick={() => { navigate('/'); setSidebarOpen(false); setIsVersionsOpen(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                ${location.pathname === '/' && !isVersionsOpen
-                    ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
-                    : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-              >
-                <BookOpen size={20} />
-                Início
-              </button>
-
-              {/* Bible Versions Dropdown - Moved Up */}
-              <div className="w-full">
                 <button
-                  onClick={() => setIsVersionsOpen(!isVersionsOpen)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors
-                  ${isVersionsOpen
-                      ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
-                      : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
+                  onClick={() => { navigate('/'); setSidebarOpen(false); setIsVersionsOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                  ${location.pathname === '/' && !isVersionsOpen
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <Book size={20} />
-                    <span>Versões da Bíblia</span>
-                  </div>
-                  <ChevronDown size={16} className={`transition-transform duration-200 ${isVersionsOpen ? 'rotate-180' : ''}`} />
+                  <BookOpen size={18} />
+                  Início
                 </button>
 
-                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isVersionsOpen ? 'max-h-[60vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}`}>
-                  <div className="pl-11 pr-4 py-2 space-y-1">
-                    {BIBLE_VERSIONS.map((v) => (
-                      <button
-                        key={v}
-                        onClick={() => setVersion(v)}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === v ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                      >
-                        {t[v] || v.toUpperCase()} ({v.toUpperCase()})
-                      </button>
-                    ))}
+                {/* Bible Versions Dropdown */}
+                <div className="w-full">
+                  <button
+                    onClick={() => setIsVersionsOpen(!isVersionsOpen)}
+                    className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                    ${isVersionsOpen
+                        ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
+                        : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Book size={18} />
+                      <span>Versões</span>
+                    </div>
+                    <ChevronDown size={14} className={`transition-transform duration-200 ${isVersionsOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isVersionsOpen ? 'max-h-[60vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}`}>
+                    <div className="pl-11 pr-4 py-1 space-y-1">
+                      {BIBLE_VERSIONS.map((v) => (
+                        <button
+                          key={v}
+                          onClick={() => setVersion(v)}
+                          className={`w-full text-left px-3 py-2 rounded-md text-xs transition-colors ${version === v ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-500 dark:text-stone-500 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                        >
+                          {t[v] || v.toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
+
+                <button
+                  onClick={() => { navigate('/chat'); setSidebarOpen(false); setIsVersionsOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                  ${location.pathname === '/chat' && !isVersionsOpen
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                >
+                  <MessageCircle size={18} />
+                  {t.chat}
+                </button>
+
+                <button
+                  onClick={() => { navigate('/devocional'); setSidebarOpen(false); setIsVersionsOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                  ${location.pathname === '/devocional' && !isVersionsOpen
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                >
+                  <Sun size={18} />
+                  {t.devotional}
+                </button>
               </div>
 
-              <button
-                onClick={() => { navigate('/chat'); setSidebarOpen(false); setIsVersionsOpen(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                ${location.pathname === '/chat' && !isVersionsOpen
-                    ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
-                    : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-              >
-                <MessageCircle size={20} />
-                {t.chat}
-              </button>
+              {/* Section 2: User Area */}
+              <div className="space-y-1">
+                <h3 className={`px-4 text-xs font-semibold uppercase tracking-wider mb-2 ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-stone-400'}`}>
+                  Sua Área
+                </h3>
 
-              <button
-                onClick={() => { navigate('/devocional'); setSidebarOpen(false); setIsVersionsOpen(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                ${location.pathname === '/devocional' && !isVersionsOpen
-                    ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
-                    : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-              >
-                <Sun size={20} />
-                {t.devotional}
-              </button>
+                {user ? (
+                  <>
+                    <button
+                      onClick={() => { /* Navigate to Favorites */ setSidebarOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
+                    >
+                      <Heart size={18} />
+                      Meus Favoritos
+                    </button>
+                    <button
+                      onClick={() => { /* Navigate to Progress */ setSidebarOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
+                    >
+                      <BarChart2 size={18} />
+                      Meu Progresso
+                    </button>
+                  </>
+                ) : (
+                  <div className="px-4 py-3 bg-stone-50 dark:bg-stone-800/50 rounded-lg border border-stone-100 dark:border-stone-800">
+                    <p className="text-xs text-stone-500 dark:text-stone-500 mb-2">Faça login para salvar seu progresso e favoritos.</p>
+                    <button
+                      onClick={() => { setIsLoginModalOpen(true); setSidebarOpen(false); }}
+                      className="text-xs font-bold text-bible-accent dark:text-bible-gold hover:underline"
+                    >
+                      Entrar agora
+                    </button>
+                  </div>
+                )}
+              </div>
 
-              {/* Theme Toggle Removed from List per User Request */}
+              {/* Section 3: Tools/Settings (Implicit) */}
+              <div className="pt-4 border-t border-stone-100 dark:border-stone-800 space-y-1">
+                <button
+                  onClick={() => { setIsFullScreen(!isFullScreen); setSidebarOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                  ${isFullScreen
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                >
+                  {isFullScreen ? <Minimize size={18} /> : <Maximize size={18} />}
+                  {isFullScreen ? t.exitFullScreen : t.fullScreen}
+                </button>
 
-              <button
-                onClick={() => { setIsFullScreen(!isFullScreen); setSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                ${isFullScreen
-                    ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
-                    : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-              >
-                {isFullScreen ? <Minimize size={20} /> : <Maximize size={20} />}
-                {isFullScreen ? t.exitFullScreen : t.fullScreen}
-              </button>
+                <button
+                  onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
+                >
+                  <Settings size={18} />
+                  {t.settings}
+                </button>
+              </div>
 
-              <button
-                onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
-              >
-                <Settings size={20} />
-                {t.settings}
-              </button>
             </nav>
+            {/* Sidebar Footer - Auth Actions */}
+            <div className={`p-4 border-t space-y-3
+              ${preferences.theme === 'bw' ? 'border-stone-200 bg-stone-50' : preferences.theme === 'sepia' ? 'border-[#d6cba6] bg-[#fdfbf6]' : 'border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50'}`}>
+
+              {user ? (
+                // LOGGED IN STATE
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700 shadow-sm">
+                  {user.picture ? (
+                    <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full border border-bible-gold/30" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-bible-gold/20 flex items-center justify-center text-bible-gold">
+                      <UserIcon size={20} />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className={`text-sm font-bold truncate ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-200'}`}>
+                      {user.name}
+                    </div>
+                    <button
+                      onClick={() => setUser(null)}
+                      className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mt-0.5"
+                    >
+                      <LogOut size={12} /> Sair
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // LOGGED OUT STATE
+                <>
+                  <button
+                    onClick={() => { setIsLoginModalOpen(true); setSidebarOpen(false); }}
+                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl border font-bold transition-all shadow-sm hover:shadow-md
+                      ${preferences.theme === 'bw'
+                        ? 'bg-white text-black border-stone-300 hover:bg-stone-50'
+                        : isFullScreen // Fallback logic for complex conditions if needed, essentially mimics "Light/Dark"
+                          ? 'bg-white text-stone-700 border-stone-200'
+                          : preferences.theme === 'dark'
+                            ? 'bg-transparent text-stone-200 border-stone-700 hover:border-bible-gold/50'
+                            : 'bg-white text-stone-700 border-stone-200 hover:border-bible-gold/50'
+                      }`}
+                  >
+                    <LogIn size={18} />
+                    Login
+                  </button>
+
+                  <button
+                    onClick={() => { navigate('/cadastro'); setSidebarOpen(false); }}
+                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all shadow-md hover:shadow-lg
+                      ${preferences.theme === 'bw'
+                        ? 'bg-black text-white hover:bg-stone-800'
+                        : preferences.theme === 'sepia'
+                          ? 'bg-[#5c4b37] text-[#f4ecd8] hover:bg-[#4a3b2a]'
+                          : 'bg-stone-900 dark:bg-bible-gold text-white hover:opacity-90'
+                      }`}
+                  >
+                    <UserPlus size={18} />
+                    Cadastre-se
+                  </button>
+                </>
+              )}
+            </div>
 
 
           </aside>
@@ -597,6 +705,8 @@ function AppContent() {
                   setIsFullScreen={setIsFullScreen}
                   addToHistory={addToHistory}
                   onUpdatePreferences={setPreferences}
+                  user={user}
+                  setUser={setUser}
                 />
               </ViewWrapper>
             } />
@@ -636,6 +746,12 @@ function AppContent() {
             <Route path="/blog" element={
               <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
                 <BlogPage theme={preferences.theme} />
+              </ViewWrapper>
+            } />
+
+            <Route path="/cadastro" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <SignUpPage theme={preferences.theme} t={t} onLoginSuccess={(u) => setUser(u)} />
               </ViewWrapper>
             } />
 
@@ -689,7 +805,13 @@ function AppContent() {
           {showScrollTop && (
             <button
               onClick={scrollToTop}
-              className="p-3 bg-bible-gold hover:bg-yellow-600 text-white rounded-full shadow-lg transition-all duration-300 animate-fadeIn"
+              className={`p-3 rounded-full shadow-lg transition-all duration-300 animate-fadeIn
+                ${preferences.theme === 'bw'
+                  ? 'bg-black text-white hover:bg-stone-800 border border-stone-700'
+                  : preferences.theme === 'sepia'
+                    ? 'bg-[#5c4b37] text-[#f4ecd8] hover:bg-[#4a3b2a] border border-[#4a3b2a]'
+                    : 'bg-bible-gold hover:bg-yellow-600 text-white shadow-bible-gold/30'
+                }`}
               aria-label="Voltar ao topo"
             >
               <ArrowUp size={24} />
