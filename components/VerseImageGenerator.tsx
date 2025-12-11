@@ -254,6 +254,12 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
 
     const IconComponent = selectedIcon.icon;
 
+    // Dynamic Aspect Ratio Logic
+    const isLongText = verseText.length > 130;
+    const currentAspect = (selectedFormat.id === 'square' && isLongText)
+        ? 'aspect-[4/5]'
+        : selectedFormat.aspect;
+
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
             <div className="bg-white dark:bg-stone-900 w-full md:max-w-5xl h-full md:h-auto md:max-h-[90vh] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
@@ -272,7 +278,7 @@ const VerseImageGenerator: React.FC<VerseImageGeneratorProps> = ({ verseText, ve
                     >
                         <div
                             ref={cardRef}
-                            className={`${selectedFormat.aspect} w-[320px] md:w-[400px] shadow-2xl rounded-xl p-8 md:p-10 flex flex-col justify-center items-center text-center relative overflow-hidden transition-colors duration-500 ${selectedTheme.bg}`}
+                            className={`${currentAspect} w-[320px] md:w-[400px] shadow-2xl rounded-xl p-8 md:p-10 flex flex-col justify-center items-center text-center relative overflow-hidden transition-colors duration-500 ${selectedTheme.bg}`}
                         >
                             {/* Decorative Elements (FIXED) */}
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 pointer-events-none"></div>

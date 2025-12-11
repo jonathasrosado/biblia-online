@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Verse, ReadingPreferences } from '../types';
-import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause, MessageCircle, ArrowRight, MoreHorizontal } from 'lucide-react';
+import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause, MessageCircle, ArrowRight, MoreHorizontal, Minimize, Maximize2, ChevronDown, ChevronUp } from 'lucide-react';
 import { explainVerse, askVerse, generateAudioFromText } from '../services/geminiService';
 import VerseImageGenerator from './VerseImageGenerator';
 
@@ -42,6 +42,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [askQuery, setAskQuery] = useState('');
   const [showImageGenerator, setShowImageGenerator] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   // Audio State
   const [isAudioLoading, setIsAudioLoading] = useState(false);
@@ -158,6 +159,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     setAskQuery('');
     setIsLoadingAi(false);
+    setIsMinimized(false);
   };
 
   // --- ACTIONS ---
@@ -191,6 +193,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
   const handleExplain = async () => {
     setActiveAction('explain');
+    setIsMinimized(false);
     setIsLoadingAi(true);
     setAiResponse(null);
 
@@ -209,6 +212,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
   const handleAsk = () => {
     setActiveAction('ask');
+    setIsMinimized(false);
     setAiResponse(null);
     setAskQuery('');
     // Focus input after render
@@ -452,8 +456,8 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
               {/* Inline Action Menu (Mobile Optimized) - Shows ONLY after the last selected verse */}
               {isLastSelected && !activeAction && (
-                <div className="animate-slideDown overflow-hidden mt-2 mb-4">
-                  <div className={`backdrop-blur-md rounded-2xl p-2 flex items-center justify-between gap-2 shadow-sm border mx-2
+                <div className="animate-slideDown mt-2 mb-4">
+                  <div className={`relative backdrop-blur-md rounded-2xl p-2 flex flex-wrap items-center justify-between gap-2 shadow-sm border mx-2
                       ${preferences.theme === 'bw'
                       ? 'bg-white border-stone-200 shadow-md'
                       : 'bg-stone-50/80 dark:bg-stone-800/80 border-stone-200 dark:border-stone-700/50'}`}>
@@ -489,18 +493,19 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                           : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
                       <ImageIcon size={16} className={preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'} />
-                      <span className="text-xs font-medium">Imagem</span>
+                      <span className="text-xs font-medium">Compartilhar</span>
                     </button>
 
+                    {/* Smart Close Button (Floating Badge) */}
                     <button
                       onClick={(e) => { e.stopPropagation(); clearSelection(); }}
-                      className={`flex items-center justify-center p-2 rounded-xl transition-all active:scale-95
+                      className={`absolute -top-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full shadow-md border transition-all active:scale-95 z-20
                           ${preferences.theme === 'bw'
-                          ? 'text-stone-400 hover:text-red-600 hover:bg-red-50'
-                          : 'text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'}`}
+                          ? 'bg-white border-stone-200 text-stone-400 hover:text-red-600'
+                          : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-400 hover:text-red-500'}`}
                       title="Fechar"
                     >
-                      <X size={16} />
+                      <X size={14} />
                     </button>
 
                   </div>
@@ -551,14 +556,32 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
       {/* AI Action Modal (Bottom Sheet - Fixed) */}
       {activeAction && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 backdrop-blur-sm animate-fadeIn" onClick={closeAiModal}>
+        <div
+          className={`fixed inset-0 z-[60] flex items-end justify-center transition-all duration-300
+            ${isMinimized ? 'pointer-events-none bg-transparent' : 'bg-black/40 backdrop-blur-sm'}`}
+          onClick={!isMinimized ? closeAiModal : undefined}
+        >
           <div
             ref={modalRef}
-            className="w-full max-w-4xl mx-auto bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.2)] animate-slideUp overflow-hidden max-h-[85vh] flex flex-col"
+            className={`transition-all duration-300 flex flex-col shadow-2xl overflow-hidden
+              ${isMinimized
+                ? 'pointer-events-auto absolute bottom-4 right-4 w-80 rounded-2xl border'
+                : 'w-full max-w-4xl mx-auto rounded-t-3xl max-h-[85vh]'}
+              ${preferences.theme === 'bw'
+                ? 'bg-white border-stone-200'
+                : 'bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800'}`}
             onClick={e => e.stopPropagation()}
           >
-            {/* Drag Handle / Header */}
-            <div className={`px-6 py-4 flex items-center justify-between border-b shrink-0 sticky top-0 z-10
+            {/* Drag Handle (Visual & Clickable) - Improved Visuals */}
+            <div
+              className="w-full flex justify-center py-4 cursor-pointer hover:bg-stone-50/50 dark:hover:bg-stone-800/50 active:opacity-60 transition-all touch-manipulation"
+              onClick={() => setIsMinimized(!isMinimized)}
+            >
+              <div className={`w-32 h-1.5 rounded-full shadow-sm ${preferences.theme === 'bw' ? 'bg-stone-300' : 'bg-stone-300 dark:bg-stone-600'}`}></div>
+            </div>
+
+            {/* Header Content */}
+            <div className={`px-6 pb-4 pt-1 flex items-center justify-between border-b shrink-0 sticky top-0 z-10
                 ${preferences.theme === 'bw' ? 'bg-white border-stone-200' : 'bg-stone-50 dark:bg-stone-900 border-stone-100 dark:border-stone-800'}`}>
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-xl flex items-center justify-center
@@ -574,18 +597,29 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                   <h3 className="text-lg font-bold text-stone-900 dark:text-white leading-none">
                     {activeAction === 'explain' ? 'Explicar' : 'Pergunta'}
                   </h3>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 font-medium">
-                    {getSelectedRef()}
-                  </p>
+                  {!isMinimized && (
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 font-medium">
+                      {getSelectedRef()}
+                    </p>
+                  )}
                 </div>
               </div>
-              <button onClick={closeAiModal} className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
-                <X size={24} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setIsMinimized(!isMinimized); }}
+                  className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors text-stone-400 hover:text-stone-600 dark:hover:text-stone-200"
+                  title={isMinimized ? "Maximizar" : "Minimizar"}
+                >
+                  {isMinimized ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </button>
+                <button onClick={closeAiModal} className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+                  <X size={24} />
+                </button>
+              </div>
             </div>
 
-            {/* Dynamic Content */}
-            <div className="p-6 space-y-6 overflow-y-auto flex-1">
+            {/* Dynamic Content - Hidden when minimized */}
+            <div className={`p-6 space-y-6 overflow-y-auto flex-1 transition-all duration-300 ${isMinimized ? 'hidden' : 'block'}`}>
 
               {/* 1. Prompt Bubble (User) */}
               {activeAction === 'ask' && (
