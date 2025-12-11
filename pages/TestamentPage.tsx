@@ -83,7 +83,7 @@ const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t, t
 
                 <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] uppercase tracking-widest mb-6
                   ${isBw
-                        ? 'bg-black text-white'
+                        ? 'bg-stone-100 text-stone-500'
                         : 'bg-bible-gold/10 text-bible-gold font-bold'}
                 `}>
                     <Book size={12} className="fill-current" />
@@ -150,7 +150,7 @@ const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t, t
                                             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
                                                 <span className={`px-2 py-1 rounded-md transition-colors
                                                   ${isBw
-                                                        ? 'bg-black text-white group-hover:bg-white group-hover:text-black'
+                                                        ? 'bg-stone-100 text-stone-500 group-hover:bg-stone-800 group-hover:text-stone-300'
                                                         : 'bg-stone-100 dark:bg-stone-800 text-stone-400 group-hover:bg-bible-gold/10 group-hover:text-bible-gold'}
                                                 `}>
                                                     {book.chapters} Caps

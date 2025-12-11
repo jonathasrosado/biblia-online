@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { ChevronDown, ChevronLeft, Menu, Search, X, BookOpen, Sun, Moon, ArrowUp, MessageCircle, Book, Settings, Loader2, Minimize, User as UserIcon, AlignJustify, Coffee } from 'lucide-react';
+import { ChevronDown, ChevronLeft, Menu, Search, X, BookOpen, Sun, Moon, ArrowUp, MessageCircle, Book, Settings, Loader2, Minimize, User as UserIcon, AlignJustify, Coffee, Library, Scroll } from 'lucide-react';
 import { bibleBooks, translations, findBookByNormalizedName, normalizeBookName } from './constants';
 
 import { BibleBook, ReadingPreferences, ReadingHistoryItem, BibleVersion, Theme } from './types';
@@ -306,7 +306,7 @@ function AppContent() {
 
           {/* Center: Logo */}
           <div className="flex items-center justify-center cursor-pointer" onClick={() => navigate('/')}>
-            <BookOpen className={`w-8 h-8 ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`} />
+            <BookOpen className={`w-8 h-8 ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`} />
           </div>
 
           {/* Right: Book Access */}
@@ -334,190 +334,182 @@ function AppContent() {
                         : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300'
                     }`}
                 >
-                  <Search size={20} />
+                  <Scroll size={20} />
                 </button>
               )}
             />
           </div>
         </div>
-      )}
+      )
+      }
 
       {/* Sidebar Navigation */}
       {/* Mobile Backdrop - Now for All Screens */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 animate-fadeIn"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {
+        sidebarOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 animate-fadeIn"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )
+      }
 
-      {!isFullScreen && (
-        <aside className={`
+      {
+        !isFullScreen && (
+          <aside className={`
           fixed inset-y-0 left-0 z-50 border-r transform transition-transform duration-300 ease-in-out flex flex-col
           ${preferences.theme === 'bw'
-            ? 'bg-white border-stone-200 text-black'
-            : preferences.theme === 'sepia'
-              ? 'bg-[#efebd6] border-[#e6dcc6]'
-              : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
+              ? 'bg-white border-stone-200 text-black'
+              : preferences.theme === 'sepia'
+                ? 'bg-[#efebd6] border-[#e6dcc6]'
+                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
           ${sidebarOpen ? 'translate-x-0 w-80 shadow-2xl' : '-translate-x-full w-80'}
         `}>
-          {/* Sidebar Header (Unified) */}
-          <div className={`p-4 border-b flex items-center justify-between
+            {/* Sidebar Header (Unified) */}
+            <div className={`p-4 border-b flex items-center justify-between
             ${preferences.theme === 'bw' ? 'border-stone-200 bg-white' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-100 dark:border-stone-800'}`}>
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center
-                ${preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/20 text-bible-accent dark:text-bible-gold'}`}>
-                <BookOpen size={18} />
-              </div>
-              <h2 className={`font-serif text-xl font-bold
+              <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+                <div className={`flex items-center justify-center
+                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>
+                  <BookOpen size={24} />
+                </div>
+                <h2 className={`font-serif text-xl font-bold
                 ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
-                {t.appTitle}
-              </h2>
-            </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 transition-colors"
-                title="Alternar Tema"
-              >
-                {preferences.theme === 'light' ? <Moon size={18} /> : preferences.theme === 'dark' ? <Sun size={18} /> : <Coffee size={18} />}
-              </button>
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400"
-              >
-                <X size={24} />
-              </button>
-            </div>
-          </div>
-
-          <div className="p-4">
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder={t.searchPlaceholder}
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors
-                  ${preferences.theme === 'bw'
-                    ? 'bg-white border-stone-200 focus:ring-black/20 text-black placeholder-stone-500'
-                    : preferences.theme === 'sepia'
-                      ? 'bg-white/60 border-[#d6cba6] placeholder-[#8c7b64] focus:ring-bible-gold/50'
-                      : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 focus:ring-bible-gold/50'}
-                `}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <Search className="absolute left-3 top-2.5 text-stone-400 w-4 h-4" />
-            </form>
-          </div>
-
-          <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-700">
-
-            {/* Book Selector (Dropdown) */}
-            <div className="px-4 mb-2">
-              <BookSelector
-                currentBook={findBookByNormalizedName(location.pathname.split('/')[2] || 'genesis') || bibleBooks[0]}
-                currentChapter={parseInt(location.pathname.split('/')[3] || '1')}
-                history={history}
-                onSelect={(book, chapter) => navigateToBook(book, chapter)}
-                onClearHistory={clearHistory}
-                t={t}
-                theme={preferences.theme}
-              />
-            </div>
-
-            <div className="h-px bg-stone-100 dark:bg-stone-800 my-2 mx-2" />
-
-
-
-            <div className="h-px bg-stone-100 dark:bg-stone-800 my-2 mx-2" />
-
-            <button
-              onClick={() => { navigate('/'); setSidebarOpen(false); setIsVersionsOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                ${location.pathname === '/'
-                  ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
-                  : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-            >
-              <BookOpen size={20} />
-              Início
-            </button>
-
-            {/* Bible Versions Dropdown - Moved Up */}
-            <div className="w-full">
-              <button
-                onClick={() => setIsVersionsOpen(!isVersionsOpen)}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors
-                  ${isVersionsOpen ? 'bg-black/5 dark:bg-white/5' : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-              >
-                <div className="flex items-center gap-3">
-                  <Book size={20} />
-                  <span>Versões da Bíblia</span>
-                </div>
-                <ChevronDown size={16} className={`transition-transform duration-200 ${isVersionsOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isVersionsOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="pl-11 pr-4 py-2 space-y-1">
-                  <button
-                    onClick={() => { setVersion('nvi'); setSidebarOpen(false); }}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'nvi' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                  >
-                    Nova Versão Internacional (NVI)
-                  </button>
-                  <button
-                    onClick={() => { setVersion('acf'); setSidebarOpen(false); }}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'acf' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                  >
-                    Almeida Corrigida Fiel (ACF)
-                  </button>
-                  <button
-                    onClick={() => { setVersion('ntlh'); setSidebarOpen(false); }}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'ntlh' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                  >
-                    Nova Tradução na Linguagem de Hoje (NTLH)
-                  </button>
-                </div>
+                  {t.appTitle}
+                </h2>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 transition-colors"
+                  title="Alternar Tema"
+                >
+                  {preferences.theme === 'light' ? <Moon size={18} /> : preferences.theme === 'dark' ? <Sun size={18} /> : <Coffee size={18} />}
+                </button>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400"
+                >
+                  <X size={24} />
+                </button>
               </div>
             </div>
 
-            <button
-              onClick={() => { navigate('/chat'); setSidebarOpen(false); setIsVersionsOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                ${location.pathname === '/chat'
-                  ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
-                  : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-            >
-              <MessageCircle size={20} />
-              {t.chat}
-            </button>
+            <div className="p-4">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  placeholder={t.searchPlaceholder}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors
+                  ${preferences.theme === 'bw'
+                      ? 'bg-white border-stone-200 focus:ring-black/20 text-black placeholder-stone-500'
+                      : preferences.theme === 'sepia'
+                        ? 'bg-white/60 border-[#d6cba6] placeholder-[#8c7b64] focus:ring-bible-gold/50'
+                        : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 focus:ring-bible-gold/50'}
+                `}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <Search className="absolute left-3 top-2.5 text-stone-400 w-4 h-4" />
+              </form>
+            </div>
 
-            <button
-              onClick={() => { navigate('/devocional'); setSidebarOpen(false); setIsVersionsOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
-                ${location.pathname === '/devocional'
-                  ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
-                  : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
-            >
-              <Sun size={20} />
-              {t.devotional}
-            </button>
+            <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-700">
 
-            {/* Theme Toggle Removed from List per User Request */}
 
-            <button
-              onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
-            >
-              <Settings size={20} />
-              {t.settings}
-            </button>
-          </nav>
 
-          <div className="px-4 pb-4 space-y-4">
-            <AdUnit className="mt-2 scale-90 origin-bottom" label="Publicidade" />
-          </div>
-        </aside>
-      )}
+
+
+              <div className="h-px bg-stone-100 dark:bg-stone-800 my-2 mx-2" />
+
+              <button
+                onClick={() => { navigate('/'); setSidebarOpen(false); setIsVersionsOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
+                ${location.pathname === '/' && !isVersionsOpen
+                    ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
+                    : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
+              >
+                <BookOpen size={20} />
+                Início
+              </button>
+
+              {/* Bible Versions Dropdown - Moved Up */}
+              <div className="w-full">
+                <button
+                  onClick={() => setIsVersionsOpen(!isVersionsOpen)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors
+                  ${isVersionsOpen
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
+                      : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Book size={20} />
+                    <span>Versões da Bíblia</span>
+                  </div>
+                  <ChevronDown size={16} className={`transition-transform duration-200 ${isVersionsOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isVersionsOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <div className="pl-11 pr-4 py-2 space-y-1">
+                    <button
+                      onClick={() => setVersion('nvi')}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'nvi' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                    >
+                      Nova Versão Internacional (NVI)
+                    </button>
+                    <button
+                      onClick={() => setVersion('acf')}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'acf' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                    >
+                      Almeida Corrigida Fiel (ACF)
+                    </button>
+                    <button
+                      onClick={() => setVersion('ntlh')}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${version === 'ntlh' ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                    >
+                      Nova Tradução na Linguagem de Hoje (NTLH)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => { navigate('/chat'); setSidebarOpen(false); setIsVersionsOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
+                ${location.pathname === '/chat' && !isVersionsOpen
+                    ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
+                    : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
+              >
+                <MessageCircle size={20} />
+                {t.chat}
+              </button>
+
+              <button
+                onClick={() => { navigate('/devocional'); setSidebarOpen(false); setIsVersionsOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
+                ${location.pathname === '/devocional' && !isVersionsOpen
+                    ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
+                    : 'hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100'}`}
+              >
+                <Sun size={20} />
+                {t.devotional}
+              </button>
+
+              {/* Theme Toggle Removed from List per User Request */}
+
+              <button
+                onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-80 hover:opacity-100"
+              >
+                <Settings size={20} />
+                {t.settings}
+              </button>
+            </nav>
+
+
+          </aside>
+        )
+      }
 
       <main
         ref={mainScrollRef}
@@ -713,7 +705,7 @@ function AppContent() {
         onLoginSuccess={(u) => setUser(u)}
         t={t}
       />
-    </div>
+    </div >
   );
 }
 

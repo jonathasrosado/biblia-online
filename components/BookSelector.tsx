@@ -54,10 +54,45 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
   }, [isOpen]);
 
   // Filter logic
+  // Priority Order for "All" tab (User Custom Top 10 + Famous Order)
+  const PRIORITY_ORDER = [
+    // User Top 10
+    "Salmos", "Apocalipse", "Mateus", "João", "Gênesis",
+    "Provérbios", "Isaías", "Romanos", "Jeremias", "1 Coríntios",
+    // Famous Narratives & Gospels
+    "Êxodo", "Atos", "Lucas", "Marcos", "Jonas", "Eclesiastes", "Daniel",
+    // Major Epistles & Practical
+    "Efésios", "Filipenses", "Tiago", "Hebreus", "1 Pedro", "2 Coríntios", "Gálatas", "1 João",
+    // Old Testament History/Narrative
+    "Josué", "Juízes", "Rute", "1 Samuel", "2 Samuel", "1 Reis", "2 Reis", "Jó", "Deuteronômio", "Ester", "Neemias", "Esdras",
+    // Prophets & Others
+    "Ezequiel", "Oseias", "Joel", "Amós", "Lamentações", "1 Tessalonicenses", "2 Tessalonicenses", "1 Timóteo", "2 Timóteo", "Tito", "Filemom",
+    "Levítico", "Números", "1 Crônicas", "2 Crônicas", "Cânticos",
+    "Obadias", "Miqueias", "Naum", "Habacuque", "Sofonias", "Ageu", "Zacarias", "Malaquias",
+    "2 Pedro", "2 João", "3 João", "Judas"
+  ];
+
+  // Filter logic
   const filteredBooks = bibleBooks.filter(b => {
     const matchesFilter = filter === 'All' ? true : b.testament === filter;
     const matchesSearch = b.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
+  }).sort((a, b) => {
+    // Only apply custom sort if filtering by 'All' and not searching
+    if (filter === 'All' && !searchTerm) {
+      const idxA = PRIORITY_ORDER.indexOf(a.name);
+      const idxB = PRIORITY_ORDER.indexOf(b.name);
+
+      // Both in priority list: sort by priority index
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      // Only A in priority: A comes first
+      if (idxA !== -1) return -1;
+      // Only B in priority: B comes first
+      if (idxB !== -1) return 1;
+      // Neither in priority: keep original order (canonical)
+      return 0;
+    }
+    return 0;
   });
 
   const toggleBook = (bookName: string) => {
