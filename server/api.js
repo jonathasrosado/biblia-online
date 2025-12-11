@@ -88,7 +88,7 @@ app.use((req, res, next) => {
 let FORCED_KEY = "";
 try {
     // Dynamic import for ESM compatibility
-    const forcedModule = await import('./force_key.js'); 
+    const forcedModule = await import('./force_key.js');
     const forced = forcedModule.default || forcedModule;
     if (forced && forced.GEMINI_KEY) {
         FORCED_KEY = forced.GEMINI_KEY;
@@ -1083,7 +1083,8 @@ app.post('/api/auth/google', async (req, res) => {
 
 
         // Deprecated in favor of Pollinations.ai
-        export const generateSVGImage = async (prompt) => {
+        // Deprecated in favor of Pollinations.ai
+        const generateSVGImage = async (prompt) => {
             return null;
         };
 
