@@ -136,9 +136,9 @@ const TestamentPage: React.FC<TestamentPageProps> = ({ testament, language, t, t
                                         `}
                                     >
                                         <div className={`absolute top-0 right-0 p-4 transition-opacity
-                                           ${isBw ? 'opacity-0' : 'opacity-10 group-hover:opacity-20'}
+                                           ${isBw ? 'opacity-100' : 'opacity-10 group-hover:opacity-20'}
                                         `}>
-                                            <Scroll size={40} className={isBw ? 'text-black' : 'text-bible-gold'} />
+                                            <Scroll size={40} className={isBw ? 'text-stone-200 group-hover:text-stone-800' : 'text-bible-gold'} />
                                         </div>
 
                                         <div className="relative z-10">

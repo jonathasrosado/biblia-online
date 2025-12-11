@@ -150,7 +150,6 @@ const BookSelector: React.FC<BookSelectorProps> = ({ currentBook, currentChapter
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={`w-full pl-9 pr-8 py-2.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-sm outline-none transition-all
                   ${theme === 'bw' ? 'focus:ring-2 focus:ring-black/20 text-black placeholder-stone-500' : 'focus:ring-2 focus:ring-bible-gold/50'}`}
-                autoFocus
               />
               {searchTerm && (
                 <button

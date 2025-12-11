@@ -170,10 +170,17 @@ function AppContent() {
     return () => mainContainer.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Reset sidebar state on close
+  useEffect(() => {
+    if (!sidebarOpen) {
+      setIsVersionsOpen(false);
+    }
+  }, [sidebarOpen]);
+
   // Reset scroll on route change
   useEffect(() => {
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    setSidebarOpen(false);
+    setSidebarOpen(false); // Close sidebar on route change
   }, [location.pathname]);
 
   const scrollToTop = () => {
@@ -327,7 +334,7 @@ function AppContent() {
                         : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300'
                     }`}
                 >
-                  <Book size={20} />
+                  <Search size={20} />
                 </button>
               )}
             />
@@ -425,7 +432,7 @@ function AppContent() {
             <div className="h-px bg-stone-100 dark:bg-stone-800 my-2 mx-2" />
 
             <button
-              onClick={() => { navigate('/'); setSidebarOpen(false); }}
+              onClick={() => { navigate('/'); setSidebarOpen(false); setIsVersionsOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
                 ${location.pathname === '/'
                   ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
@@ -474,7 +481,7 @@ function AppContent() {
             </div>
 
             <button
-              onClick={() => { navigate('/chat'); setSidebarOpen(false); }}
+              onClick={() => { navigate('/chat'); setSidebarOpen(false); setIsVersionsOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
                 ${location.pathname === '/chat'
                   ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
@@ -485,7 +492,7 @@ function AppContent() {
             </button>
 
             <button
-              onClick={() => { navigate('/devocional'); setSidebarOpen(false); }}
+              onClick={() => { navigate('/devocional'); setSidebarOpen(false); setIsVersionsOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors 
                 ${location.pathname === '/devocional'
                   ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold font-medium')
