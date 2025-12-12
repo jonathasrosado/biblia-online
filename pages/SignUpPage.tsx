@@ -5,7 +5,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 
 // Reusing the ID from LoginButton for consistency
-const GOOGLE_CLIENT_ID = "831743160144-0plrd3o0o4a7kth481ks1vjth1o0c1ns.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "924407172436-a94imuk0d7lkb4m9pk80p0u1607q9oj6.apps.googleusercontent.com";
 
 interface SignUpPageProps {
     theme: 'light' | 'dark' | 'sepia' | 'bw';
