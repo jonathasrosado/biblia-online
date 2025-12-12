@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, List, FileText, MessageCircle, X, Sparkles, Send, ImageIcon, Share2, MousePointer2, ArrowUp } from 'lucide-react';
+import { ChevronDown, List, FileText, MessageCircle, X, Sparkles, Send, ImageIcon, Share2, MousePointer2, ArrowUp, BookOpen } from 'lucide-react';
 
 export const ReaderDemo: React.FC = () => {
     // State
@@ -272,9 +272,9 @@ export const ReaderDemo: React.FC = () => {
                 <div className="flex-1 px-6 overflow-y-auto">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-2 bg-stone-100 rounded-full">
-                            <Sparkles size={18} className="text-stone-600" />
+                            <BookOpen size={18} className="text-stone-600" />
                         </div>
-                        <h3 className="font-bold text-stone-800">Explicação IA</h3>
+                        <h3 className="font-bold text-stone-800">Explicação</h3>
                         <div className="ml-auto p-2 rounded-full">
                             <X size={18} className="text-stone-400" />
                         </div>

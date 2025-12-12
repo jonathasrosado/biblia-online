@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Share2, BookOpen } from 'lucide-react';
 import SEO from '../components/SEO';
 import { getDevotional } from '../services/geminiService';
 import { ReadingPreferences, DevotionalContent } from '../types';
@@ -74,6 +75,14 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
                             {/* Decorative Background Icon */}
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-10"></div>
 
+                            {/* Branding at Top */}
+                            <div className="flex flex-col items-center justify-center opacity-70 mb-8 pt-4">
+                                <BookOpen size={24} className="mb-1" />
+                                <span className="text-[10px] uppercase tracking-widest font-sans font-bold opacity-80">
+                                    Biblifly.com
+                                </span>
+                            </div>
+
                             <p className={`text-2xl md:text-3xl italic font-serif leading-relaxed mb-6 relative z-10
                                 ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-100'}
                             `}>
@@ -91,6 +100,33 @@ const DevotionalPage: React.FC<DevotionalPageProps> = ({ language, t, preference
                             `}>
                                 {dailyDevotional.verseReference}
                             </p>
+
+                            <button
+                                onClick={() => {
+                                    if (navigator.share) {
+                                        navigator.share({
+                                            title: 'Devocional do Dia - Bíblia Online',
+                                            text: `"${dailyDevotional.verseText}" - ${dailyDevotional.verseReference}\n\nLeia mais em:`,
+                                            url: window.location.href
+                                        }).catch(console.error);
+                                    } else {
+                                        // Fallback for desktop/unsupported
+                                        navigator.clipboard.writeText(`"${dailyDevotional.verseText}" - ${dailyDevotional.verseReference}\n${window.location.href}`);
+                                        alert('Link copiado para a área de transferência!');
+                                    }
+                                }}
+                                className={`
+                                    relative z-20 mt-8 mx-auto flex items-center gap-2 px-6 py-2 rounded-full transition-all text-sm font-medium
+                                    ${preferences.theme === 'sepia'
+                                        ? 'bg-[#e6dcc6] text-[#5c4b37] hover:bg-[#d2c9a5]'
+                                        : preferences.theme === 'bw'
+                                            ? 'bg-black text-white hover:bg-stone-800'
+                                            : 'bg-white/20 backdrop-blur-md border border-white/30 text-stone-800 dark:text-white hover:bg-white/30'}
+                                `}
+                            >
+                                <Share2 size={16} />
+                                Compartilhar
+                            </button>
                         </div>
                     </div>
 

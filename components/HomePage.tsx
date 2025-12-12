@@ -268,10 +268,10 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                         é preciso <span className={`font-serif italic ${theme === 'bw' ? 'text-stone-400' : 'text-bible-gold'}`}>compreendê-la.</span>
                     </h2>
 
-                    <p className={`text-lg md:text-xl font-serif max-w-2xl mx-auto mb-2 leading-relaxed opacity-90
+                    <p className={`text-base md:text-lg font-sans max-w-2xl mx-auto mb-2 leading-relaxed opacity-90
                         ${theme === 'bw' ? 'text-stone-700' : 'text-stone-600 dark:text-stone-400'}
                     `}>
-                        Obtenha explicações profundas e tire dúvidas enquanto lê.
+                        Obtenha explicações profundas e tire dúvidas enquanto lê. Conheça <span className={`font-bold ${theme === 'bw' ? 'text-stone-900' : 'text-bible-gold'}`}>BIBLIFLY</span>, a Bíblia Inteligente.
                     </p>
 
                     {/* Visual Onboarding (Reader Demo) - Inserted Here */}

@@ -482,14 +482,20 @@ function AppContent() {
             <div className={`p-3 border-b flex items-center justify-between
             ${preferences.theme === 'bw' ? 'border-stone-200 bg-white' : preferences.theme === 'sepia' ? 'border-[#e6dcc6] bg-[#f4ecd8]' : 'border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-950'}`}>
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-                <div className={`p-1.5 rounded-lg flex items-center justify-center
+                <div className={`p-2 rounded-xl flex items-center justify-center shadow-sm
                 ${preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold text-white'}`}>
-                  <BookOpen size={18} />
+                  <BookOpen size={20} />
                 </div>
-                <h2 className={`font-serif text-lg font-bold
-                ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-100'}`}>
-                  {t.appTitle}
-                </h2>
+                <div className="flex flex-col -space-y-0.5">
+                  <h2 className={`font-sans text-sm font-bold tracking-wide
+                  ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-100'}`}>
+                    BIBLIFLY.COM
+                  </h2>
+                  <span className={`text-[10px] font-medium opacity-70
+                   ${preferences.theme === 'bw' ? 'text-stone-600' : 'text-stone-500 dark:text-stone-400'}`}>
+                    Sua Bíblia Inteligente
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-1">
                 <button
