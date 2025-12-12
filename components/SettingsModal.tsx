@@ -137,9 +137,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, preferen
                 type="range"
                 min="80"
                 max="180"
-                step="5"
+                step="1"
                 value={preferences.fontSize}
                 onChange={(e) => update('fontSize', parseInt(e.target.value))}
+                style={{ touchAction: 'none' }}
                 className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-bible-gold
                   ${preferences.theme === 'dark' ? 'bg-stone-700' : 'bg-stone-200'}
                   ${preferences.theme === 'bw' ? 'accent-black bg-stone-300' : ''}

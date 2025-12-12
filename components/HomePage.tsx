@@ -427,37 +427,13 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
 
                 {/* 3. FEATURED SECTIONS - SEO Pages */}
                 <div className="mb-12 animate-slideUp" style={{ animationDelay: '0.5s' }}>
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-serif font-bold">Explore as Escrituras</h2>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Verses Card */}
-                        <button
-                            onClick={() => navigate('/versiculos')}
-                            className="group relative h-64 rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-stone-800 to-bible-accent"></div>
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"></div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                    <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 md:gap-6 pb-6 -mx-6 px-6 md:mx-0 md:px-0 scrollbar-hide">
 
-                            <div className="absolute bottom-0 left-0 p-6 w-full">
-                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-bible-gold uppercase bg-black/50 backdrop-blur-sm rounded-full border border-bible-gold/30">
-                                    Temas Bíblicos
-                                </span>
-                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
-                                    Encontre Versículos<br />por Tema
-                                </h3>
-                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
-                                    Explorar Coleção <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </button>
-
-                        {/* Guide Card (Using Generated Image) */}
+                        {/* Guide Card (Using Generated Image) - FIRST POSITION */}
                         <button
                             onClick={() => navigate('/como-ler-biblia')}
-                            className="group relative h-64 rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                            className="group relative h-64 min-w-[85vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
                         >
                             <div className="absolute inset-0 bg-stone-900"></div>
                             {/* Using the generated image we copied to public/images */}
@@ -481,10 +457,32 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                             </div>
                         </button>
 
-                        {/* FAQ Card */}
+                        {/* Verses Card - SECOND POSITION */}
+                        <button
+                            onClick={() => navigate('/versiculos')}
+                            className="group relative h-64 min-w-[85vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-stone-800 to-bible-accent"></div>
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-bible-gold uppercase bg-black/50 backdrop-blur-sm rounded-full border border-bible-gold/30">
+                                    Temas Bíblicos
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Encontre Versículos<br />por Tema
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Explorar Coleção <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* FAQ Card - THIRD POSITION */}
                         <button
                             onClick={() => navigate('/faq-biblia')}
-                            className="group relative h-64 rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                            className="group relative h-64 min-w-[85vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
                         >
                             <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-800"></div>
                             <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>

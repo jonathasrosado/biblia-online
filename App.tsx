@@ -142,13 +142,20 @@ function AppContent() {
 
   // Apply Theme & Save Preferences
   useEffect(() => {
+    // Apply visual theme immediately
     if (preferences.theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-    localStorage.setItem('readingPreferences', JSON.stringify(preferences));
-    localStorage.setItem('theme', preferences.theme === 'dark' ? 'dark' : 'light');
+
+    // Debounce storage save to prevent stuttering during slider interactions
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem('readingPreferences', JSON.stringify(preferences));
+      localStorage.setItem('theme', preferences.theme === 'dark' ? 'dark' : 'light');
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [preferences]);
 
   // Save History
@@ -365,24 +372,25 @@ function AppContent() {
 
       {
         !isFullScreen && (
+
           <aside className={`
-          fixed inset-y-0 left-0 z-50 border-r transform transition-transform duration-300 ease-in-out flex flex-col
+          fixed inset-y-0 left-0 z-50 border-r transform transition-transform duration-300 ease-in-out flex flex-col shadow-2xl
           ${preferences.theme === 'bw'
               ? 'bg-white border-stone-200 text-black'
               : preferences.theme === 'sepia'
-                ? 'bg-[#efebd6] border-[#e6dcc6]'
-                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
-          ${sidebarOpen ? 'translate-x-0 w-80 shadow-2xl' : '-translate-x-full w-80'}
+                ? 'bg-[#f4ecd8] border-[#e6dcc6] text-[#5c4b37]'
+                : 'bg-white dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-300'}
+          ${sidebarOpen ? 'translate-x-0 w-72' : '-translate-x-full w-72'}
         `}>
             {/* Sidebar Header (Unified) */}
-            <div className={`p-4 border-b flex items-center justify-between
-            ${preferences.theme === 'bw' ? 'border-stone-200 bg-white' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-100 dark:border-stone-800'}`}>
+            <div className={`p-3 border-b flex items-center justify-between
+            ${preferences.theme === 'bw' ? 'border-stone-200 bg-white' : preferences.theme === 'sepia' ? 'border-[#e6dcc6] bg-[#f4ecd8]' : 'border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-950'}`}>
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
                 <div className={`p-1.5 rounded-lg flex items-center justify-center
                 ${preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold text-white'}`}>
-                  <BookOpen size={20} />
+                  <BookOpen size={18} />
                 </div>
-                <h2 className={`font-serif text-xl font-bold
+                <h2 className={`font-serif text-lg font-bold
                 ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-100'}`}>
                   {t.appTitle}
                 </h2>
@@ -390,116 +398,84 @@ function AppContent() {
               <div className="flex items-center gap-1">
                 <button
                   onClick={toggleTheme}
-                  className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 transition-colors"
+                  className="p-1.5 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 transition-colors"
                   title="Alternar Tema"
                 >
-                  {preferences.theme === 'light' ? <Moon size={18} /> : preferences.theme === 'dark' ? <Sun size={18} /> : <Coffee size={18} />}
+                  {preferences.theme === 'light' ? <Moon size={16} /> : preferences.theme === 'dark' ? <Sun size={16} /> : <Coffee size={16} />}
                 </button>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400"
+                  className="p-1.5 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400"
                 >
-                  <X size={24} />
+                  <X size={20} />
                 </button>
               </div>
             </div>
 
-            <div className="p-4">
+            <div className="p-3">
               <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
                   placeholder={t.searchPlaceholder}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors
+                  className={`w-full pl-9 pr-3 py-1.5 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors
                   ${preferences.theme === 'bw'
                       ? 'bg-white border-stone-200 focus:ring-black/20 text-black placeholder-stone-500'
                       : preferences.theme === 'sepia'
-                        ? 'bg-white/60 border-[#d6cba6] placeholder-[#8c7b64] focus:ring-bible-gold/50'
-                        : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 focus:ring-bible-gold/50'}
+                        ? 'bg-[#efebd6] border-[#d6cba6] placeholder-[#8c7b64] focus:ring-bible-gold/50'
+                        : 'bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 focus:ring-bible-gold/50'}
                 `}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <Search className="absolute left-3 top-2.5 text-stone-400 w-4 h-4" />
+                <Search className="absolute left-2.5 top-2 text-stone-400 w-4 h-4" />
               </form>
             </div>
 
-            <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-6 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-700">
+            <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-4 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-800">
 
               {/* Section 1: Navigation */}
-              <div className="space-y-1">
-                <h3 className={`px-4 text-xs font-semibold uppercase tracking-wider mb-2 ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-stone-400'}`}>
+              <div className="space-y-0.5">
+                <h3 className={`px-3 text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70 ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-stone-400'}`}>
                   Principal
                 </h3>
 
                 <button
                   onClick={() => { navigate('/'); setSidebarOpen(false); setIsVersionsOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
                   ${location.pathname === '/' && !isVersionsOpen
-                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/10 text-bible-accent dark:text-bible-gold')
                       : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
                 >
-                  <BookOpen size={18} />
+                  <BookOpen size={16} />
                   Início
                 </button>
 
-                {/* Bible Versions Dropdown - HIDDEN
-                <div className="w-full">
-                  <button
-                    onClick={() => setIsVersionsOpen(!isVersionsOpen)}
-                    className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
-                    ${isVersionsOpen
-                        ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
-                        : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Book size={18} />
-                      <span>Versões</span>
-                    </div>
-                    <ChevronDown size={14} className={`transition-transform duration-200 ${isVersionsOpen ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isVersionsOpen ? 'max-h-[60vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}`}>
-                    <div className="pl-11 pr-4 py-1 space-y-1">
-                      {BIBLE_VERSIONS.map((v) => (
-                        <button
-                          key={v}
-                          onClick={() => setVersion(v)}
-                          className={`w-full text-left px-3 py-2 rounded-md text-xs transition-colors ${version === v ? (preferences.theme === 'bw' ? 'bg-black text-white font-medium' : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold font-medium') : 'text-stone-500 dark:text-stone-500 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                        >
-                          {t[v] || v.toUpperCase()}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                */}
-
                 <button
                   onClick={() => { navigate('/chat'); setSidebarOpen(false); setIsVersionsOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
                   ${location.pathname === '/chat' && !isVersionsOpen
-                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/10 text-bible-accent dark:text-bible-gold')
                       : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
                 >
-                  <MessageCircle size={18} />
+                  <MessageCircle size={16} />
                   {t.chat}
                 </button>
 
                 <button
                   onClick={() => { navigate('/devocional'); setSidebarOpen(false); setIsVersionsOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
                   ${location.pathname === '/devocional' && !isVersionsOpen
-                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/10 text-bible-accent dark:text-bible-gold')
                       : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
                 >
-                  <Sun size={18} />
+                  <Sun size={16} />
                   {t.devotional}
                 </button>
               </div>
 
               {/* Section 2: User Area */}
-              <div className="space-y-1">
-                <h3 className={`px-4 text-xs font-semibold uppercase tracking-wider mb-2 ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-stone-400'}`}>
+              <div className="space-y-0.5">
+                <h3 className={`px-3 text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70 ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-stone-400'}`}>
                   Sua Área
                 </h3>
 
@@ -507,22 +483,22 @@ function AppContent() {
                   <>
                     <button
                       onClick={() => { /* Navigate to Favorites */ setSidebarOpen(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
                     >
-                      <Heart size={18} />
+                      <Heart size={16} />
                       Meus Favoritos
                     </button>
                     <button
                       onClick={() => { /* Navigate to Progress */ setSidebarOpen(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
                     >
-                      <BarChart2 size={18} />
+                      <BarChart2 size={16} />
                       Meu Progresso
                     </button>
                   </>
                 ) : (
-                  <div className="px-4 py-3 bg-stone-50 dark:bg-stone-800/50 rounded-lg border border-stone-100 dark:border-stone-800">
-                    <p className="text-xs text-stone-500 dark:text-stone-500 mb-2">Faça login para salvar seu progresso e favoritos.</p>
+                  <div className="mx-2 px-3 py-2 bg-stone-50/50 dark:bg-stone-800/30 rounded-lg border border-stone-100 dark:border-stone-800">
+                    <p className="text-[10px] text-stone-500 dark:text-stone-500 mb-2 leading-relaxed">Faça login para salvar seu progresso e favoritos.</p>
                     <button
                       onClick={() => { setIsLoginModalOpen(true); setSidebarOpen(false); }}
                       className="text-xs font-bold text-bible-accent dark:text-bible-gold hover:underline"
@@ -534,51 +510,51 @@ function AppContent() {
               </div>
 
               {/* Section 3: Tools/Settings (Implicit) */}
-              <div className="pt-4 border-t border-stone-100 dark:border-stone-800 space-y-1">
+              <div className="pt-2 border-t border-stone-100 dark:border-stone-800 space-y-0.5">
                 <button
                   onClick={() => { setIsFullScreen(!isFullScreen); setSidebarOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
                   ${isFullScreen
-                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/20 text-bible-accent dark:text-bible-gold')
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/10 text-bible-accent dark:text-bible-gold')
                       : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
                 >
-                  {isFullScreen ? <Minimize size={18} /> : <Maximize size={18} />}
+                  {isFullScreen ? <Minimize size={16} /> : <Maximize size={16} />}
                   {isFullScreen ? t.exitFullScreen : t.fullScreen}
                 </button>
 
                 <button
                   onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
                 >
-                  <Settings size={18} />
+                  <Settings size={16} />
                   {t.settings}
                 </button>
               </div>
 
             </nav>
             {/* Sidebar Footer - Auth Actions */}
-            <div className={`p-4 border-t space-y-3
-              ${preferences.theme === 'bw' ? 'border-stone-200 bg-stone-50' : preferences.theme === 'sepia' ? 'border-[#d6cba6] bg-[#fdfbf6]' : 'border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50'}`}>
+            <div className={`p-3 border-t space-y-2
+              ${preferences.theme === 'bw' ? 'border-stone-200 bg-stone-50' : preferences.theme === 'sepia' ? 'border-[#e0d6b6] bg-[#f4ecd8]' : 'border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-950'}`}>
 
               {user ? (
                 // LOGGED IN STATE
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700 shadow-sm">
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm">
                   {user.picture ? (
-                    <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full border border-bible-gold/30" />
+                    <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border border-bible-gold/30" />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-bible-gold/20 flex items-center justify-center text-bible-gold">
-                      <UserIcon size={20} />
+                    <div className="w-8 h-8 rounded-full bg-bible-gold/20 flex items-center justify-center text-bible-gold">
+                      <UserIcon size={16} />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className={`text-sm font-bold truncate ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-200'}`}>
+                    <div className={`text-xs font-bold truncate ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-200'}`}>
                       {user.name}
                     </div>
                     <button
                       onClick={() => setUser(null)}
-                      className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mt-0.5"
+                      className="text-[10px] text-red-500 hover:text-red-700 flex items-center gap-1 mt-0.5"
                     >
-                      <LogOut size={12} /> Sair
+                      <LogOut size={10} /> Sair
                     </button>
                   </div>
                 </div>
@@ -587,23 +563,23 @@ function AppContent() {
                 <>
                   <button
                     onClick={() => { setIsLoginModalOpen(true); setSidebarOpen(false); }}
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-medium transition-colors shadow-sm
+                    className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors shadow-sm
                       ${preferences.theme === 'bw'
                         ? 'bg-white text-black border-stone-300 hover:bg-stone-50'
                         : isFullScreen
                           ? 'bg-white text-stone-700 border-stone-200'
                           : preferences.theme === 'dark'
-                            ? 'bg-transparent text-stone-200 border-stone-700 hover:border-bible-gold/50'
+                            ? 'bg-transparent text-stone-300 border-stone-700 hover:border-bible-gold/50'
                             : 'bg-white text-stone-700 border-stone-200 hover:border-bible-gold/50'
                       }`}
                   >
-                    <LogIn size={18} />
+                    <LogIn size={16} />
                     Login
                   </button>
 
                   <button
                     onClick={() => { navigate('/cadastro'); setSidebarOpen(false); }}
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm
+                    className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm
                       ${preferences.theme === 'bw'
                         ? 'bg-black text-white hover:bg-stone-800'
                         : preferences.theme === 'sepia'
@@ -611,7 +587,7 @@ function AppContent() {
                           : 'bg-stone-900 dark:bg-bible-gold text-white hover:opacity-90'
                       }`}
                   >
-                    <UserPlus size={18} />
+                    <UserPlus size={16} />
                     Cadastre-se
                   </button>
                 </>
