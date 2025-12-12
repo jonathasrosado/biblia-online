@@ -412,7 +412,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                     </p>
                 </div>
 
-                <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:gap-6 pb-6 -mx-6 px-6 md:mx-0 md:px-0 scrollbar-hide">
+                <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:gap-6 pb-6 px-6 md:px-0 scrollbar-hide">
 
                     {/* Guide Card - FIRST POSITION */}
                     <button
