@@ -11,6 +11,7 @@ import { createRequire } from "module";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
 import { aiManager } from './services/aiManager.js';
 import connectDB from './config/db.js'; // Import MongoDB config
+import User from './models/User.js';
 import os from 'os'; // Required for tmpdir
 
 const __filename = fileURLToPath(import.meta.url);
@@ -84,7 +85,59 @@ app.use((req, res, next) => {
     next();
 });
 
+
 // --- ROUTES ---
+
+// --- AUTH ROUTES ---
+app.post('/api/auth/google', async (req, res) => {
+    try {
+        const { profile } = req.body;
+        // profile comes from jwt-decode in LoginButton.tsx
+        // Expected fields: email, name, picture, sub (googleId)
+
+        if (!profile || !profile.email) {
+            return res.status(400).json({ error: 'Invalid profile data' });
+        }
+
+        let user = await User.findOne({ email: profile.email });
+
+        if (user) {
+            // Update existing user information if needed
+            let updated = false;
+            if (!user.googleId) {
+                user.googleId = profile.sub;
+                updated = true;
+            }
+            if (!user.picture && profile.picture) {
+                user.picture = profile.picture;
+                updated = true;
+            }
+
+            if (updated) await user.save();
+            console.log(`[AUTH] User logged in: ${user.email}`);
+        } else {
+            // Create new user
+            console.log(`[AUTH] Creating new user: ${profile.email}`);
+            user = new User({
+                email: profile.email,
+                name: profile.name,
+                picture: profile.picture,
+                googleId: profile.sub,
+                username: profile.email.split('@')[0], // generate base username
+                role: 'user', // default role
+                preferences: {},
+                favorites: [],
+                history: []
+            });
+            await user.save();
+        }
+
+        res.json({ user });
+    } catch (error) {
+        console.error("Auth Error:", error);
+        res.status(500).json({ error: "Authentication failed" });
+    }
+});
 
 
 // SECURITY: Allow data: blobs for audio (iOS fix)

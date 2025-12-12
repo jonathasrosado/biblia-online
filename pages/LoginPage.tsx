@@ -4,23 +4,19 @@ import { Eye, EyeOff, BookOpen, Loader2 } from 'lucide-react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 
-// Reusing the ID from LoginButton for consistency
+// Same ID as other components
 const GOOGLE_CLIENT_ID = "831743160144-0plrd3o0o4a7kth481ks1vjth1o0c1ns.apps.googleusercontent.com";
 
-interface SignUpPageProps {
+interface LoginPageProps {
     theme: 'light' | 'dark' | 'sepia' | 'bw';
-    t: any;
     onLoginSuccess?: (user: any) => void;
 }
 
-const SignUpPage: React.FC<SignUpPageProps> = ({ theme, t, onLoginSuccess }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ theme, onLoginSuccess }) => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        name: '',
-        username: '',
         email: '',
-        password: '',
-        confirmPassword: ''
+        password: ''
     });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -56,30 +52,16 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ theme, t, onLoginSuccess }) => 
         setError('');
         setIsLoading(true);
 
-        if (formData.password !== formData.confirmPassword) {
-            setError('As senhas não coincidem.');
-            setIsLoading(false);
-            return;
-        }
-
         try {
-            const res = await fetch('/api/auth/register', {
+            const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: formData.name,
-                    username: formData.username,
-                    email: formData.email,
-                    password: formData.password
-                })
+                body: JSON.stringify(formData)
             });
 
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Erro ao criar conta.');
+            if (!res.ok) throw new Error(data.error || 'Erro ao entrar.');
 
-            // Auto login or redirect?
-            // Usually simpler to just redirect to login or auto-login
-            // Let's mimic auto-login by calling onLoginSuccess if provided, or redirecting
             if (onLoginSuccess) onLoginSuccess(data.user);
             navigate('/');
 
@@ -103,6 +85,8 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ theme, t, onLoginSuccess }) => 
                 const data = await res.json();
                 if (onLoginSuccess) onLoginSuccess(data.user);
                 navigate('/');
+            } else {
+                setError("Falha ao autenticar com Google.");
             }
         } catch (error) {
             console.error("Google Login Failed", error);
@@ -115,14 +99,13 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ theme, t, onLoginSuccess }) => 
 
             <div className="w-full max-w-sm animate-scaleIn relative">
 
-                {/* Header */}
                 <div className="text-center mb-6">
                     <h1 className={`text-2xl md:text-3xl font-serif font-bold mb-2 tracking-tight
                         ${isDark ? 'text-white' : 'text-stone-900'}`}>
-                        Crie sua conta
+                        Bem-vindo de volta
                     </h1>
                     <p className={`text-sm ${isDark ? 'text-stone-400' : 'text-stone-500'}`}>
-                        Já tem uma conta? <Link to="/login" className={`font-semibold underline decoration-2 underline-offset-4 hover:opacity-80 ${isDark ? 'text-white' : 'text-stone-900'}`}>Fazer login</Link>
+                        Não tem uma conta? <Link to="/cadastro" className={`font-semibold underline decoration-2 underline-offset-4 hover:opacity-80 ${isDark ? 'text-white' : 'text-stone-900'}`}>Cadastre-se</Link>
                     </p>
                 </div>
 
@@ -150,46 +133,16 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ theme, t, onLoginSuccess }) => 
                         />
                     </div>
 
-                    {/* Username */}
-                    <div className="space-y-1.5">
-                        <label className={`text-sm font-semibold tracking-wide ${isDark ? 'text-stone-300' : 'text-stone-700'}`}>Nome de usuário</label>
-                        <input
-                            type="text"
-                            required
-                            value={formData.username}
-                            onChange={e => setFormData({ ...formData, username: e.target.value })}
-                            className={`w-full px-4 py-3 rounded-xl border outline-none transition-all placeholder-stone-400
-                                ${isDark
-                                    ? 'bg-stone-900 border-stone-800 focus:border-white text-white'
-                                    : 'bg-white border-stone-200 focus:border-black text-stone-900 shadow-sm'}`}
-                            placeholder="nome de usuário"
-                        />
-                    </div>
-
-                    {/* Name */}
-                    <div className="space-y-1.5">
-                        <label className={`text-sm font-semibold tracking-wide ${isDark ? 'text-stone-300' : 'text-stone-700'}`}>Nome</label>
-                        <input
-                            type="text"
-                            required
-                            value={formData.name}
-                            onChange={e => setFormData({ ...formData, name: e.target.value })}
-                            className={`w-full px-4 py-3 rounded-xl border outline-none transition-all placeholder-stone-400
-                                ${isDark
-                                    ? 'bg-stone-900 border-stone-800 focus:border-white text-white'
-                                    : 'bg-white border-stone-200 focus:border-black text-stone-900 shadow-sm'}`}
-                            placeholder="Seu nome"
-                        />
-                    </div>
-
                     {/* Password */}
                     <div className="space-y-1.5">
-                        <label className={`text-sm font-semibold tracking-wide ${isDark ? 'text-stone-300' : 'text-stone-700'}`}>Senha</label>
+                        <div className="flex justify-between items-center">
+                            <label className={`text-sm font-semibold tracking-wide ${isDark ? 'text-stone-300' : 'text-stone-700'}`}>Senha</label>
+                            <span className={`text-xs font-medium cursor-pointer hover:underline ${isDark ? 'text-stone-500' : 'text-stone-400'}`}>Esqueceu a senha?</span>
+                        </div>
                         <div className="relative">
                             <input
                                 type={showPassword ? "text" : "password"}
                                 required
-                                autoComplete="new-password"
                                 value={formData.password}
                                 onChange={e => setFormData({ ...formData, password: e.target.value })}
                                 className={`w-full px-4 py-3 rounded-xl border outline-none transition-all pr-12 placeholder-stone-400
@@ -208,45 +161,31 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ theme, t, onLoginSuccess }) => 
                         </div>
                     </div>
 
-                    {/* Confirm Password */}
-                    <div className="space-y-1.5">
-                        <label className={`text-sm font-semibold tracking-wide ${isDark ? 'text-stone-300' : 'text-stone-700'}`}>Confirme sua senha</label>
-                        <input
-                            type="password"
-                            required
-                            autoComplete="new-password"
-                            value={formData.confirmPassword}
-                            onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-                            className={`w-full px-4 py-3 rounded-xl border outline-none transition-all placeholder-stone-400
-                                ${isDark
-                                    ? 'bg-stone-900 border-stone-800 focus:border-white text-white'
-                                    : 'bg-white border-stone-200 focus:border-black text-stone-900 shadow-sm'}`}
-                            placeholder="********"
-                        />
-                    </div>
-
                     <button
                         type="submit"
                         disabled={isLoading}
                         className={`w-full py-3.5 rounded-full font-bold text-sm tracking-wide transform active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2 shadow-lg
                             ${isBW
                                 ? 'bg-black text-white hover:bg-stone-800'
-                                : 'bg-stone-900 text-white hover:bg-black dark:bg-white dark:text-black dark:hover:bg-stone-200'}`
+                                : 'bg-stone-900 text-white hover:bg-black dark:bg-white dark:text-black dark:hover:bg-stone-200'
+                            }`
                         }
                     >
-                        {isLoading ? <Loader2 size={18} className="animate-spin" /> : 'Inscrever-se'}
+                        {isLoading ? <Loader2 size={18} className="animate-spin" /> : 'Conecte-se'}
                     </button>
                 </form>
 
+                {/* Divider */}
                 <div className="relative my-8">
                     <div className="absolute inset-0 flex items-center">
                         <div className={`w-full border-t ${isDark ? 'border-stone-800' : 'border-stone-200'}`}></div>
                     </div>
                     <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold">
-                        <span className={`px-4 ${isDark ? 'bg-stone-950 text-stone-600' : 'bg-stone-50 text-stone-400'}`}>Ou</span>
+                        <span className={`px-4 ${isDark ? 'bg-stone-950 text-stone-600' : 'bg-stone-50 text-stone-400'}`}>Ou continue com</span>
                     </div>
                 </div>
 
+                {/* Google Button */}
                 <div className="flex justify-center">
                     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
                         <div className="w-full">
@@ -264,9 +203,10 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ theme, t, onLoginSuccess }) => 
                     </GoogleOAuthProvider>
                 </div>
 
+                {/* Footer Terms */}
                 <p className={`text-center text-[10px] mt-8 leading-tight max-w-xs mx-auto ${isDark ? 'text-stone-600' : 'text-stone-400'}`}>
-                    Este site está protegido pelo reCAPTCHA e pelo Google.<br />
-                    Ao clicar em continuar, você concorda com nossos Termos de Uso e Política de Privacidade.
+                    Este site está protegido pelo reCAPTCHA e pelo Google.
+                    Ao fazer login, você concorda com nossos <span className="underline cursor-pointer">Termos de Uso</span> e <span className="underline cursor-pointer">Política de Privacidade</span>.
                 </p>
 
             </div>
@@ -274,4 +214,4 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ theme, t, onLoginSuccess }) => 
     );
 };
 
-export default SignUpPage;
+export default LoginPage;

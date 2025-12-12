@@ -34,6 +34,10 @@ const TermsPage = React.lazy(() => import('./pages/TermsPage'));
 const ContactPage = React.lazy(() => import('./pages/ContactPage'));
 const AdminPage = React.lazy(() => import('./pages/AdminPage'));
 const SignUpPage = React.lazy(() => import('./pages/SignUpPage'));
+const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const ProgressPage = React.lazy(() => import('./pages/ProgressPage'));
+
+
 
 // Admin Components (Lazy Loaded)
 const BlogManager = React.lazy(() => import('./components/admin/BlogManager'));
@@ -489,25 +493,31 @@ function AppContent() {
                       Meus Favoritos
                     </button>
                     <button
-                      onClick={() => { /* Navigate to Progress */ setSidebarOpen(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
+                      onClick={() => { navigate('/progresso'); setSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
+                        ${location.pathname === '/progresso'
+                          ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/10 text-bible-accent dark:text-bible-gold')
+                          : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
                     >
                       <BarChart2 size={16} />
                       Meu Progresso
                     </button>
                   </>
+
                 ) : (
                   <div className="mx-2 px-3 py-2 bg-stone-50/50 dark:bg-stone-800/30 rounded-lg border border-stone-100 dark:border-stone-800">
                     <p className="text-[10px] text-stone-500 dark:text-stone-500 mb-2 leading-relaxed">Faça login para salvar seu progresso e favoritos.</p>
                     <button
-                      onClick={() => { setIsLoginModalOpen(true); setSidebarOpen(false); }}
+                      onClick={() => { navigate('/login'); setSidebarOpen(false); }}
                       className="text-xs font-bold text-bible-accent dark:text-bible-gold hover:underline"
                     >
                       Entrar agora
                     </button>
                   </div>
+
                 )}
               </div>
+
 
               {/* Section 3: Tools/Settings (Implicit) */}
               <div className="pt-2 border-t border-stone-100 dark:border-stone-800 space-y-0.5">
@@ -562,7 +572,7 @@ function AppContent() {
                 // LOGGED OUT STATE
                 <>
                   <button
-                    onClick={() => { setIsLoginModalOpen(true); setSidebarOpen(false); }}
+                    onClick={() => { navigate('/login'); setSidebarOpen(false); }}
                     className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors shadow-sm
                       ${preferences.theme === 'bw'
                         ? 'bg-white text-black border-stone-300 hover:bg-stone-50'
@@ -726,17 +736,37 @@ function AppContent() {
               </ViewWrapper>
             } />
 
-            <Route path="/cadastro" element={
+            <Route path="/signup" element={
               <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
-                <SignUpPage theme={preferences.theme} t={t} onLoginSuccess={(u) => setUser(u)} />
+                <SignUpPage theme={preferences.theme} t={translations[language]} onLoginSuccess={(u) => { setUser(u); navigate('/'); }} />
               </ViewWrapper>
             } />
+
+            <Route path="/cadastro" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <SignUpPage theme={preferences.theme} t={translations[language]} onLoginSuccess={(u) => { setUser(u); navigate('/'); }} />
+              </ViewWrapper>
+            } />
+
+            <Route path="/login" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <LoginPage theme={preferences.theme} onLoginSuccess={(u) => { setUser(u); }} />
+              </ViewWrapper>
+            } />
+
 
             <Route path="/blog/:slug" element={
               <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
                 <BlogPostPage />
               </ViewWrapper>
             } />
+
+            <Route path="/progresso" element={
+              <ViewWrapper isFullScreen={isFullScreen} theme={preferences.theme}>
+                <ProgressPage user={user} theme={preferences.theme} />
+              </ViewWrapper>
+            } />
+
 
             <Route path="/admin" element={<AdminPage t={t} isDark={preferences.theme === 'dark'} />}>
               <Route index element={<div className="p-8 text-center text-stone-500">Selecione uma opção no menu lateral.</div>} />
