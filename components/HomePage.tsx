@@ -220,7 +220,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                         {getGreeting()}
                     </h1>
 
-                    <p className="text-lg opacity-60 font-serif mb-10 animate-slideUp" style={{ animationDelay: '0.2s' }}>
+                    <p className="text-lg opacity-60 font-serif mb-8 animate-slideUp" style={{ animationDelay: '0.2s' }}>
                         Que a paz de Deus esteja com você hoje.
                     </p>
 
@@ -249,7 +249,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                         </form>
 
                         {/* Quick Chips */}
-                        <div className="flex flex-wrap justify-center gap-2 mt-4">
+                        <div className="flex flex-wrap justify-center gap-2 mt-8">
                             {['Salmos 91', 'Amor', 'Fé', 'Esperança', 'Paz'].map((s, i) => (
                                 <button
                                     key={s}
@@ -266,6 +266,34 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                                     {s}
                                 </button>
                             ))}
+                        </div>
+
+                        {/* NEW: Value Proposition Block - Refined & Premium */}
+                        <div className="mt-24 mb-16 animate-slideUp" style={{ animationDelay: '0.6s' }}>
+                            <h2 className={`text-4xl md:text-6xl font-black mb-8 tracking-tight leading-[1.1]
+                                ${theme === 'bw' ? 'text-black' : isDark ? 'text-stone-100' : 'text-stone-900'}
+                            `}>
+                                Não basta ler a Bíblia,<br className="hidden md:block" />
+                                é preciso <span className={`font-serif italic ${theme === 'bw' ? 'text-stone-400' : 'text-bible-gold'}`}>entende-la.</span>
+                            </h2>
+
+                            <p className={`text-xl md:text-2xl font-serif max-w-2xl mx-auto mb-12 leading-relaxed opacity-90
+                                ${theme === 'bw' ? 'text-stone-700' : 'text-stone-600 dark:text-stone-400'}
+                            `}>
+                                Obtenha explicações profundas e tire dúvidas enquanto lê — tudo com a ajuda de inteligência artificial.
+                            </p>
+
+                            <button
+                                onClick={() => navigate('/leitura/genesis/1')}
+                                className={`px-10 py-5 rounded-2xl font-bold text-lg md:text-xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center gap-3 mx-auto group
+                                    ${theme === 'bw'
+                                        ? 'bg-black text-white hover:bg-stone-800 ring-4 ring-stone-100'
+                                        : 'bg-stone-900 text-white hover:bg-black dark:bg-bible-gold dark:text-stone-900 dark:hover:bg-yellow-500 ring-4 ring-white/50 dark:ring-stone-800'}
+                                `}
+                            >
+                                Comece agora
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-1"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -348,6 +376,133 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                 </div>
 
 
+                {/* 3. FEATURED SECTIONS - SEO Pages */}
+                <div className="mb-12 animate-slideUp" style={{ animationDelay: '0.5s' }}>
+
+                    <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:gap-6 pb-6 -mx-6 px-6 md:mx-0 md:px-0 scrollbar-hide">
+
+                        {/* Guide Card - FIRST POSITION */}
+                        <button
+                            onClick={() => navigate('/como-ler-biblia')}
+                            className="group relative h-64 min-w-[85vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                        >
+                            <div className="absolute inset-0 bg-stone-900"></div>
+                            <img
+                                src="/images/guide_feature_card.png"
+                                alt="Guia de Leitura Bíblica"
+                                className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-emerald-400 uppercase bg-emerald-950/50 backdrop-blur-sm rounded-full border border-emerald-500/30">
+                                    Iniciantes
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Como Ler a Bíblia<br />Guia Completo
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Começar Jornada <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* Verses Card - SECOND POSITION */}
+                        <button
+                            onClick={() => navigate('/versiculos')}
+                            className="group relative h-64 min-w-[85vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-stone-800 to-bible-accent"></div>
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-bible-gold uppercase bg-black/50 backdrop-blur-sm rounded-full border border-bible-gold/30">
+                                    Temas Bíblicos
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Encontre Versiculos<br />por Tema
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Explorar Coleção <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* FAQ Card - THIRD POSITION */}
+                        <button
+                            onClick={() => navigate('/faq-biblia')}
+                            className="group relative h-64 min-w-[85vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-800"></div>
+                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
+                            <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                                <HelpCircle size={180} />
+                            </div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-indigo-400 uppercase bg-indigo-950/50 backdrop-blur-sm rounded-full border border-indigo-500/30">
+                                    Tire Dúvidas
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Perguntas Frequentes<br />sobre a Fé
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Ver Respostas <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* Devotional Card - FOURTH POSITION (NEW) */}
+                        <button
+                            onClick={() => navigate('/devocional')}
+                            className="group relative h-64 min-w-[75vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-amber-900 via-yellow-700 to-amber-600"></div>
+                            {/* Texture/Effect */}
+                            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+                            <div className="absolute -right-8 -top-8 text-white/10 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                                <Calendar size={180} />
+                            </div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-yellow-300 uppercase bg-yellow-950/50 backdrop-blur-sm rounded-full border border-yellow-500/30">
+                                    Diário
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Devocional<br />do Dia
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Ler Reflexão <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* Chat Card - FIFTH POSITION (NEW) */}
+                        <button
+                            onClick={() => navigate('/chat')}
+                            className="group relative h-64 min-w-[75vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-neutral-900 to-stone-800"></div>
+                            <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                                <MessageCircle size={180} />
+                            </div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-blue-400 uppercase bg-blue-950/50 backdrop-blur-sm rounded-full border border-blue-500/30">
+                                    Converse
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Chat<br />Teológico
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Tirar Dúvidas <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
                 {/* 1. DAILY VERSE (Featured - Moved Up) */}
                 <div className="animate-slideUp" style={{ animationDelay: '0.45s' }}>
                     <div id="daily-verse-card" ref={verseCardRef} className={`w-full p-10 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[240px] text-center items-center shadow-md transition-all hover:scale-[1.01]
@@ -425,155 +580,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                     </div>
                 </div>
 
-                {/* 3. FEATURED SECTIONS - SEO Pages */}
-                <div className="mb-12 animate-slideUp" style={{ animationDelay: '0.5s' }}>
-
-                    <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 md:gap-6 pb-6 -mx-6 px-6 md:mx-0 md:px-0 scrollbar-hide">
-
-                        {/* Guide Card (Using Generated Image) - FIRST POSITION */}
-                        <button
-                            onClick={() => navigate('/como-ler-biblia')}
-                            className="group relative h-64 min-w-[85vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
-                        >
-                            <div className="absolute inset-0 bg-stone-900"></div>
-                            {/* Using the generated image we copied to public/images */}
-                            <img
-                                src="/images/guide_feature_card.png"
-                                alt="Guia de Leitura Bíblica"
-                                className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-
-                            <div className="absolute bottom-0 left-0 p-6 w-full">
-                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-emerald-400 uppercase bg-emerald-950/50 backdrop-blur-sm rounded-full border border-emerald-500/30">
-                                    Iniciantes
-                                </span>
-                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
-                                    Como Ler a Bíblia:<br />Guia Completo
-                                </h3>
-                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
-                                    Começar Jornada <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </button>
-
-                        {/* Verses Card - SECOND POSITION */}
-                        <button
-                            onClick={() => navigate('/versiculos')}
-                            className="group relative h-64 min-w-[85vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-stone-800 to-bible-accent"></div>
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 mix-blend-overlay transition-transform duration-700 group-hover:scale-110"></div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-
-                            <div className="absolute bottom-0 left-0 p-6 w-full">
-                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-bible-gold uppercase bg-black/50 backdrop-blur-sm rounded-full border border-bible-gold/30">
-                                    Temas Bíblicos
-                                </span>
-                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
-                                    Encontre Versículos<br />por Tema
-                                </h3>
-                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
-                                    Explorar Coleção <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </button>
-
-                        {/* FAQ Card - THIRD POSITION */}
-                        <button
-                            onClick={() => navigate('/faq-biblia')}
-                            className="group relative h-64 min-w-[85vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-800"></div>
-                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
-                            <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
-                                <HelpCircle size={180} />
-                            </div>
-
-                            <div className="absolute bottom-0 left-0 p-6 w-full">
-                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-indigo-400 uppercase bg-indigo-950/50 backdrop-blur-sm rounded-full border border-indigo-500/30">
-                                    Tire Dúvidas
-                                </span>
-                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
-                                    Perguntas Frequentes<br />sobre a Fé
-                                </h3>
-                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
-                                    Ver Respostas <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-
-                {/* 4. TOOLS / FEATURES - Vibrant CTAs */}
-                {/* 4. TOOLS / FEATURES - New Design */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
-                    {/* Chat Card */}
-                    <button
-                        onClick={() => navigate('/chat')}
-                        className={`group relative overflow-hidden rounded-2xl p-8 text-left shadow-lg border transition-colors
-                            ${theme === 'bw'
-                                ? 'bg-black border-black text-white'
-                                : 'bg-[#1c1c1c] border-stone-800 text-white'}
-                        `}
-                    >
-                        <div className="absolute top-1/2 -translate-y-1/2 right-4 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
-                            <MessageCircle size={140} className={theme === 'bw' ? 'text-white' : 'text-white'} />
-                        </div>
-                        <div className="relative z-10">
-                            <div className={`w-fit p-3 rounded-xl mb-6 border
-                                ${theme === 'bw'
-                                    ? 'bg-white text-black border-white'
-                                    : 'bg-stone-800/50 text-bible-gold border-stone-700'}
-                            `}>
-                                <MessageCircle size={24} />
-                            </div>
-                            <h3 className={`text-2xl font-bold mb-3 ${theme === 'bw' ? 'text-white' : 'text-white'}`}>Chat Teológico</h3>
-                            <p className={`mb-8 max-w-sm text-sm leading-relaxed ${theme === 'bw' ? 'text-stone-300' : 'text-stone-400'}`}>
-                                Tire suas dúvidas sobre passagens complexas com nossa Inteligência Artificial especializada em teologia.
-                            </p>
-                            <span className={`inline-flex items-center font-bold text-sm tracking-wide group-hover:translate-x-2 transition-transform
-                                ${theme === 'bw' ? 'text-white' : 'text-bible-gold'}
-                            `}>
-                                Começar Conversa <ArrowRight size={16} className="ml-2" />
-                            </span>
-                        </div>
-                    </button>
-
-                    {/* Devotional Card */}
-                    <button
-                        onClick={() => navigate('/devocional')}
-                        className={`group relative overflow-hidden rounded-2xl p-8 text-left shadow-lg border transition-colors
-                            ${theme === 'bw'
-                                ? 'bg-white border-stone-200 text-black'
-                                : 'bg-[#d9a01c] border-[#c28e18] text-white'}
-                        `}
-                    >
-                        <div className="absolute top-1/2 -translate-y-1/2 right-4 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
-                            <Calendar size={140} className={theme === 'bw' ? 'text-stone-200' : 'text-white'} />
-                        </div>
-                        <div className="relative z-10">
-                            <div className={`w-fit p-3 rounded-xl mb-6 border
-                                ${theme === 'bw'
-                                    ? 'bg-black text-white border-black'
-                                    : 'bg-white/20 text-white border-white/10'}
-                            `}>
-                                <Calendar size={24} />
-                            </div>
-                            <h3 className={`text-2xl font-bold mb-3 ${theme === 'bw' ? 'text-black' : 'text-white'}`}>Devocional Diário</h3>
-                            <p className={`mb-8 max-w-sm text-sm leading-relaxed ${theme === 'bw' ? 'text-stone-600' : 'text-white/90'}`}>
-                                Receba uma reflexão inspiradora todos os dias para começar sua manhã conectado com Deus.
-                            </p>
-                            <span className={`inline-flex items-center font-bold text-sm tracking-wide group-hover:translate-x-2 transition-transform
-                                ${theme === 'bw' ? 'text-black' : 'text-white'}
-                            `}>
-                                Ler Devocional <ArrowRight size={16} className="ml-2" />
-                            </span>
-                        </div>
-                    </button>
-                </div>
-
-
+                {/* Old Tools Section Removed */}
             </div>
 
             {/* Verse Image Generator Modal Removed */}

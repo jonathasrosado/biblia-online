@@ -1467,6 +1467,31 @@ app.post('/api/ai/explain', async (req, res) => {
     }
 });
 
+app.post('/api/ai/ask-verse', async (req, res) => {
+    try {
+        const { book, chapter, verse, text, question, language } = req.body;
+        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
+
+        const prompt = `
+        You are a knowledgeable Bible assistant.
+        Context: The user is reading ${book} ${chapter}:${verse}: "${text}".
+        User Question: "${question}"
+        
+        Task: Answer the question based on the verse context and biblical theology.
+        Guidelines:
+        - Be concise and clear.
+        - Answer in ${langName}.
+        - Focus on the specific question asked.
+        `;
+
+        const responseText = await aiManager.generateContent('ask_verse', prompt, '');
+        res.json({ text: responseText });
+    } catch (error) {
+        console.error("Ask Verse API Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.post('/api/ai/detailed-answer', async (req, res) => {
     try {
         const { query, language } = req.body;
@@ -1630,34 +1655,7 @@ app.post('/api/ai/explain', async (req, res) => {
     }
 });
 
-// Ask Verse Question
-app.post('/api/ai/ask-verse', async (req, res) => {
-    try {
-        const { book, chapter, verse, text, question, language } = req.body;
-        const langName = language === 'en' ? 'English' : language === 'es' ? 'Spanish' : 'Portuguese';
 
-        const prompt = `
-      Act as a knowledgeable and friendly Bible study assistant.
-      
-      Verse(s): "${book} ${chapter}:${verse} - ${text}"
-      
-      User Question: "${question}"
-      
-      Task: Answer the user's question specifically based on these verses and their immediate context.
-      Output Language: ${langName}.
-      Tone: Helpful, concise, theological but accessible.
-      Limit: Keep the answer under 100 words if possible.
-      Constraint: Start directly with the answer. Do NOT start with "Okay", "Here is", "Sure", or any intro filler.
-    `;
-
-        const result = await aiManager.model.generateContent(prompt);
-        const response = await result.response;
-        res.json({ text: response.text() });
-    } catch (error) {
-        console.error("Ask Verse Error:", error);
-        res.status(500).json({ error: "Failed to answer question" });
-    }
-});
 
 
 app.post('/api/ai/blog-post', async (req, res) => {
