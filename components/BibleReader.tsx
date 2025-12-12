@@ -570,7 +570,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             ref={modalRef}
             className={`transition-all duration-300 flex flex-col shadow-2xl overflow-hidden
               ${isMinimized
-                ? 'pointer-events-auto absolute bottom-20 right-4 w-80 rounded-2xl border'
+                ? 'pointer-events-auto absolute bottom-24 left-1/2 -translate-x-1/2 w-80 rounded-2xl border'
                 : 'w-full max-w-4xl mx-auto rounded-t-3xl max-h-[85vh]'}
               ${preferences.theme === 'bw'
                 ? 'bg-white border-stone-200'
@@ -588,7 +588,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
             </div>
 
             {/* Header Content */}
-            <div className={`px-6 pb-4 pt-1 flex items-center justify-between border-b shrink-0 sticky top-0 z-10
+            <div className={`px-6 py-4 flex items-center justify-between border-b shrink-0 sticky top-0 z-10
                 ${preferences.theme === 'bw' ? 'bg-white border-stone-200' : 'bg-stone-50 dark:bg-stone-900 border-stone-100 dark:border-stone-800'}`}>
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-xl flex items-center justify-center
