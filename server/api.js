@@ -23,12 +23,20 @@ if (!global.crypto) {
     global.crypto = crypto;
 }
 
+// --- HARDCODED KEY FALLBACK (User Request) ---
+if (!process.env.GEMINI_API_KEY) {
+    process.env.GEMINI_API_KEY = "AIzaSyBkUiW3B4QypeX3K4tNoB-bdzH2QNj63vU";
+    console.log("[API] Loaded GEMINI_API_KEY from hardcoded fallback");
+}
+
 // --- LOAD KEYS FROM AI-CONFIG (Fix for missing local .env) ---
 // This ensures process.env is populated even if .env is empty, satisfying libraries that verify keys.
 try {
     const aiConfig = aiManager.getConfig();
     if (aiConfig.apiKeys) {
         if (aiConfig.apiKeys.gemini && !process.env.GEMINI_API_KEY) {
+            // Priority is given to existing env (or hardcoded above), so this only runs if still missing
+            process.env.GEMINI_API_KEY = aiConfig.apiKeys.gemini;
             process.env.GEMINI_API_KEY = aiConfig.apiKeys.gemini;
             console.log("[API] Loaded GEMINI_API_KEY from ai-config.json");
         }

@@ -44,6 +44,27 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     const [loadingContent, setLoadingContent] = useState(false);
     const [togglingRead, setTogglingRead] = useState(false);
 
+    // Font Menu Logic (Click Outside)
+    const [isFontModalOpen, setIsFontModalOpen] = useState(false);
+    const fontModalRef = useRef<HTMLDivElement>(null);
+    const fontButtonRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (
+                isFontModalOpen &&
+                fontModalRef.current &&
+                !fontModalRef.current.contains(e.target as Node) &&
+                fontButtonRef.current &&
+                !fontButtonRef.current.contains(e.target as Node)
+            ) {
+                setIsFontModalOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isFontModalOpen]);
+
     // Audio State
     const bibleReaderRef = React.useRef<BibleReaderRef>(null);
     const [isVerseAudioPlaying, setIsVerseAudioPlaying] = useState(false);
@@ -303,8 +324,9 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             />
 
                             {/* The Menu */}
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[90vw] max-w-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl z-50 p-6 animate-slideUp origin-top">
-                                <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+                            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-4xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl z-50 p-6 animate-fadeIn">
+                                <h3 className="text-center text-sm font-bold text-stone-400 mb-4 uppercase tracking-wider">Selecione o Capítulo</h3>
+                                <div className="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-12 gap-2 max-h-[60vh] overflow-y-auto p-1">
                                     {Array.from({ length: currentBook.chapters }, (_, i) => i + 1).map((chap) => (
                                         <button
                                             key={chap}
@@ -328,62 +350,134 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                     )}
                 </div>
 
-                <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-6 mb-2">
-                    <div className="flex flex-wrap items-center justify-center gap-4">
-                        <div className="bg-stone-100 dark:bg-stone-800 p-1 rounded-xl flex gap-1 shadow-inner">
-                            <button
-                                className={`px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition-all
-                                    ${preferences.theme === 'bw' ? 'bg-white text-black' : 'bg-white dark:bg-stone-700 text-bible-accent dark:text-bible-gold'}`}
-                            >
-                                <List size={16} className="inline mr-2 mb-0.5" />
-                                Versículos
-                            </button>
-                            <button
-                                onClick={() => navigate(`/resumo/${normalizeBookName(currentBook.name)}/${currentChapter}`)}
-                                className={`px-6 py-2 rounded-lg text-sm font-medium transition-all
-                                    ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black hover:bg-white/50' : 'text-stone-400 dark:text-stone-500 hover:text-bible-gold hover:bg-white/50 dark:hover:bg-stone-600/50'}`}
-                            >
-                                <FileText size={16} className="inline mr-2 mb-0.5" />
-                                Resumo
-                            </button>
-                        </div>
+                {/* Controls Bar - Single Line */}
+                <div className="flex items-center justify-center gap-3 mt-6 mb-2 relative">
 
-                        <div className="flex items-center gap-3 bg-stone-100 dark:bg-stone-800 px-4 py-2 rounded-lg shrink-0 h-10">
-                            <Type size={14} className="opacity-50" />
-                            <input
-                                type="range"
-                                min="80"
-                                max="180"
-                                step="5"
-                                value={preferences.fontSize}
-                                onChange={(e) => onUpdatePreferences({ ...preferences, fontSize: parseInt(e.target.value) })}
-                                className={`w-24 h-1.5 bg-stone-300 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer
-                                    ${preferences.theme === 'bw' ? 'accent-black' : 'accent-bible-gold'}`}
-                            />
-                            <Type size={18} className="opacity-80" />
-                        </div>
-
+                    {/* 1. Verses/Summary Toggle */}
+                    <div className="bg-stone-100 dark:bg-stone-800 p-1.5 rounded-xl flex gap-1 shadow-inner h-11 items-center">
                         <button
-                            onClick={() => bibleReaderRef.current?.toggleAudio()}
-                            disabled={isVerseAudioLoading} // Only disable if loading initial audio
-                            className={`
-                        h-10 px-6 rounded-lg font-bold text-sm transition-all flex items-center gap-2 active:scale-95
-                        ${isVerseAudioPlaying
-                                    ? (preferences.theme === 'bw' ? 'bg-white text-black border border-stone-200 shadow-inner' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 shadow-inner')
-                                    : (preferences.theme === 'bw' ? 'bg-black text-white hover:bg-stone-800' : 'bg-bible-gold text-white hover:bg-yellow-600 shadow-lg shadow-bible-gold/30 hover:shadow-bible-gold/40')
-                                }
-                    `}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-all flex items-center gap-2
+                                ${preferences.theme === 'bw' ? 'bg-white text-black' : 'bg-white dark:bg-stone-700 text-bible-accent dark:text-bible-gold'}`}
                         >
-                            {isVerseAudioLoading ? (
-                                <Loader2 size={18} className="animate-spin" />
-                            ) : isVerseAudioPlaying ? (
-                                <Pause size={18} />
-                            ) : (
-                                <Volume2 size={18} />
-                            )}
-                            <span>{isVerseAudioPlaying ? 'Pausar' : 'Ouvir'}</span>
+                            <List size={16} className="mb-0.5" />
+                            Versículos
+                        </button>
+                        <button
+                            onClick={() => navigate(`/resumo/${normalizeBookName(currentBook.name)}/${currentChapter}`)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2
+                                ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black hover:bg-white/50' : 'text-stone-400 dark:text-stone-500 hover:text-bible-gold hover:bg-white/50 dark:hover:bg-stone-600/50'}`}
+                        >
+                            <FileText size={16} className="mb-0.5" />
+                            Resumo
                         </button>
                     </div>
+
+                    <div className="w-px h-6 bg-stone-200 dark:bg-stone-800 mx-1"></div>
+
+                    {/* 2. Text Size Toggle (Icon Only) */}
+                    <div className="relative font-control-dropdown">
+                        <button
+                            ref={fontButtonRef}
+                            onClick={() => setIsFontModalOpen(!isFontModalOpen)}
+                            className={`h-11 w-11 flex items-center justify-center rounded-xl transition-all
+                                ${preferences.theme === 'bw'
+                                    ? 'hover:bg-stone-100 text-black'
+                                    : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400 hover:text-bible-gold'}`}
+                            title="Ajustar Texto"
+                        >
+                            <div className="flex items-end mb-0.5 pointer-events-none gap-0.5">
+                                <span className="text-sm font-bold leading-none font-serif">a</span>
+                                <span className="text-xl font-bold leading-none font-serif">A</span>
+                            </div>
+                        </button>
+
+                        {/* Font Control Bottom Sheet (Fixed Bottom) */}
+                        <div
+                            id="font-popover"
+                            ref={fontModalRef}
+                            className={`
+                                fixed bottom-0 left-0 right-0 w-full bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-6 z-[100] transition-all duration-300 ease-out safe-area-bottom
+                                ${isFontModalOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}
+                            `}
+                        >
+                            <div className="max-w-xl mx-auto relative pt-2">
+                                {/* Drag Handle */}
+                                <div className="w-12 h-1.5 bg-stone-300 dark:bg-stone-700 rounded-full mx-auto mb-4 opacity-50" />
+
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-lg font-bold text-stone-900 dark:text-white">Tamanho do Texto</h3>
+                                    <button
+                                        onClick={() => setIsFontModalOpen(false)}
+                                        className="p-2 bg-stone-100 dark:bg-stone-800 rounded-full text-stone-500 hover:bg-stone-200"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+
+                                <div className="relative flex items-center w-full h-12 bg-stone-100 dark:bg-stone-800 rounded-full px-4 mb-4">
+                                    {/* Side Labels */}
+                                    <span className="text-xs font-bold text-stone-400 mr-4 font-serif">A</span>
+
+                                    {/* Visual Track & Ticks */}
+                                    <div className="relative flex-1 h-1 bg-stone-300 dark:bg-stone-600 rounded-full flex justify-between items-center px-0.5">
+                                        {[80, 100, 120, 140, 160, 180].map((step) => (
+                                            <div key={step} className={`rounded-full transition-all duration-300 z-10
+                                                ${preferences.fontSize >= step
+                                                    ? (preferences.theme === 'bw' ? 'bg-black w-3 h-3' : 'bg-bible-gold w-3 h-3')
+                                                    : 'bg-stone-400 dark:bg-stone-500 w-2 h-2'}`}
+                                            />
+                                        ))}
+                                        {/* Progress Fill */}
+                                        <div
+                                            className={`absolute left-0 top-0 h-full rounded-full ${preferences.theme === 'bw' ? 'bg-black' : 'bg-bible-gold'}`}
+                                            style={{ width: `${((preferences.fontSize - 80) / 100) * 100}%` }}
+                                        />
+                                    </div>
+
+                                    {/* Range Input (Invisible) */}
+                                    <input
+                                        type="range"
+                                        min="80"
+                                        max="180"
+                                        step="20"
+                                        value={preferences.fontSize}
+                                        onChange={(e) => {
+                                            const newVal = parseInt(e.target.value);
+                                            if (newVal !== preferences.fontSize) {
+                                                if (navigator.vibrate) navigator.vibrate(15);
+                                                onUpdatePreferences({ ...preferences, fontSize: newVal });
+                                            }
+                                        }}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 mx-4"
+                                    />
+
+                                    <span className="text-xl font-bold text-stone-400 ml-4 font-serif">A</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 3. Audio Button (Icon Only) */}
+                    <button
+                        onClick={() => bibleReaderRef.current?.toggleAudio()}
+                        disabled={isVerseAudioLoading}
+                        className={`
+                            h-11 w-11 rounded-xl flex items-center justify-center transition-all active:scale-95
+                            ${isVerseAudioPlaying
+                                ? (preferences.theme === 'bw' ? 'bg-white text-black border border-stone-200 shadow-inner' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400')
+                                : (preferences.theme === 'bw' ? 'bg-black text-white hover:bg-stone-800' : 'bg-bible-gold text-white hover:bg-yellow-600 shadow-bible-gold/30 hover:shadow-bible-gold/40')
+                            }
+                        `}
+                        title={isVerseAudioPlaying ? 'Pausar Áudio' : 'Ouvir Capítulo'}
+                    >
+                        {isVerseAudioLoading ? (
+                            <Loader2 size={16} className="animate-spin" />
+                        ) : isVerseAudioPlaying ? (
+                            <Pause size={16} />
+                        ) : (
+                            <Volume2 size={16} />
+                        )}
+                    </button>
                 </div>
             </header>
 

@@ -472,7 +472,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                       className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
                           ${preferences.theme === 'bw'
                           ? 'bg-stone-800 text-white hover:bg-stone-700'
-                          : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
+                          : 'bg-stone-100 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
                       <span className={`w-4 h-4 flex items-center justify-center rounded-full border text-[10px] font-serif font-bold
                           ${preferences.theme === 'bw' ? 'border-white text-white' : 'border-bible-gold text-bible-gold'}`}>!</span>
@@ -484,7 +484,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                       className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
                           ${preferences.theme === 'bw'
                           ? 'bg-stone-800 text-white hover:bg-stone-700'
-                          : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
+                          : 'bg-stone-100 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
                       <MessageCircle size={16} className={preferences.theme === 'bw' ? 'text-white' : 'text-bible-gold'} />
                       <span className="text-xs font-medium">Perguntar</span>
@@ -495,7 +495,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                       className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
                           ${preferences.theme === 'bw'
                           ? 'bg-stone-800 text-white hover:bg-stone-700'
-                          : 'bg-white/50 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
+                          : 'bg-stone-100 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
                     >
                       <ImageIcon size={16} className={preferences.theme === 'bw' ? 'text-white' : 'text-bible-gold'} />
                       <span className="text-xs font-medium">Compartilhar</span>

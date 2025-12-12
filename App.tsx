@@ -586,10 +586,10 @@ function AppContent() {
                 <>
                   <button
                     onClick={() => { setIsLoginModalOpen(true); setSidebarOpen(false); }}
-                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl border font-bold transition-all shadow-sm hover:shadow-md
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-medium transition-colors shadow-sm
                       ${preferences.theme === 'bw'
                         ? 'bg-white text-black border-stone-300 hover:bg-stone-50'
-                        : isFullScreen // Fallback logic for complex conditions if needed, essentially mimics "Light/Dark"
+                        : isFullScreen
                           ? 'bg-white text-stone-700 border-stone-200'
                           : preferences.theme === 'dark'
                             ? 'bg-transparent text-stone-200 border-stone-700 hover:border-bible-gold/50'
@@ -602,7 +602,7 @@ function AppContent() {
 
                   <button
                     onClick={() => { navigate('/cadastro'); setSidebarOpen(false); }}
-                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all shadow-md hover:shadow-lg
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm
                       ${preferences.theme === 'bw'
                         ? 'bg-black text-white hover:bg-stone-800'
                         : preferences.theme === 'sepia'
