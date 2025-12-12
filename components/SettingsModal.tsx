@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, AlignLeft, AlignJustify, Moon, Sun, Coffee } from 'lucide-react';
+import { X, AlignLeft, AlignJustify, Moon, Sun, Coffee, Maximize, Minimize } from 'lucide-react';
 import { ReadingPreferences } from '../types';
 
 interface SettingsModalProps {
@@ -12,7 +12,7 @@ interface SettingsModalProps {
   t: any;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, preferences, onUpdate, t }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, preferences, onUpdate, isFullScreen, onToggleFullScreen, t }) => {
   if (!isOpen) return null;
 
   const update = (key: keyof ReadingPreferences, value: any) => {
@@ -233,6 +233,33 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, preferen
             </div>
           </div>
 
+          {/* Full Screen Section */}
+          <div>
+            <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${themeClasses.subtext}`}>
+              {t.fullScreen}
+            </label>
+            <button
+              onClick={onToggleFullScreen}
+              className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all ${isFullScreen
+                ? (preferences.theme === 'bw' ? 'border-black bg-black text-white' : 'border-bible-gold bg-bible-gold text-white')
+                : (preferences.theme === 'bw' ? 'border-transparent bg-stone-100 text-stone-500 hover:border-black hover:text-black' : 'border-transparent bg-stone-100 dark:bg-stone-800 text-stone-500 hover:border-bible-gold/50 hover:text-bible-gold')
+                }`}
+            >
+              <div className="flex items-center gap-2">
+                {isFullScreen ? <Minimize size={20} /> : <Maximize size={20} />}
+                <span className="text-sm font-medium">
+                  {isFullScreen ? t.exitFullScreen : t.fullScreen}
+                </span>
+              </div>
+              <div className={`text-xs font-bold px-2 py-1 rounded ${isFullScreen
+                ? 'bg-white/20 text-white'
+                : (preferences.theme === 'bw' ? 'bg-stone-200 text-stone-600' : 'bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-400')
+                }`}>
+                {isFullScreen ? 'ATIVADO' : 'DESATIVADO'}
+              </div>
+            </button>
+          </div>
+
         </div>
 
         <div className={`p-4 border-t flex justify-end ${themeClasses.footer}`}>
@@ -246,7 +273,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, preferen
           </button>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -23,6 +23,10 @@ interface ReadingPageProps {
     setUser?: (user: any) => void;
     favorites?: FavoriteVerse[]; // Add favorites prop
     onToggleFavorite?: (verse: FavoriteVerse) => void; // Add toggle callback
+    checkGuestAccess?: () => boolean; // Add guest check
+    guestCompletedChapters?: any[]; // Local guest chapters
+    onToggleGuestRead?: (book: string, chapter: number, completed: boolean) => void;
+    onRequestLogin?: () => void;
 }
 
 const ReadingPage: React.FC<ReadingPageProps> = ({
@@ -37,7 +41,11 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     user,
     setUser,
     favorites = [],
-    onToggleFavorite
+    onToggleFavorite,
+    checkGuestAccess,
+    guestCompletedChapters = [],
+    onToggleGuestRead,
+    onRequestLogin
 }) => {
     // ... existing hooks ...
     const { bookAbbrev, chapterNum } = useParams<{ bookAbbrev: string; chapterNum: string }>();
@@ -83,12 +91,33 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     const currentChapter = parseInt(chapterNum || '1', 10);
 
     const isCompleted = useMemo(() => {
-        if (!user || !user.completedChapters) return false;
-        return user.completedChapters.some((c: any) => c.book === currentBook.name && c.chapter === currentChapter);
-    }, [user, currentBook.name, currentChapter]);
+        if (user && user.completedChapters) {
+            return user.completedChapters.some((c: any) => c.book === currentBook.name && c.chapter === currentChapter);
+        }
+        // Fallback to guest chapters if not logged in
+        return guestCompletedChapters.some((c: any) => c.book === currentBook.name && c.chapter === currentChapter);
+    }, [user, currentBook.name, currentChapter, guestCompletedChapters]);
 
     const handleToggleRead = async () => {
-        if (!user || togglingRead) return;
+        if (togglingRead) return;
+
+        // Guest Gate
+        if (!user) {
+            // New Requirement: Force login immediately for Mark as Read
+            if (onRequestLogin) {
+                onRequestLogin();
+                return;
+            }
+
+            // Old Logic (Fallback)
+            if (checkGuestAccess && !checkGuestAccess()) return;
+            // Local toggle for guest
+            if (onToggleGuestRead) {
+                onToggleGuestRead(currentBook.name, currentChapter, !isCompleted);
+            }
+            return;
+        }
+
         setTogglingRead(true);
         try {
             const res = await fetch('/api/user/complete-chapter', {
@@ -185,8 +214,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
 
     const handleToggleFavorite = () => {
         if (!user) {
-            alert('Faça login para favoritar versículos.');
-            return;
+            // Guest Gate: Allow first action, block subsequent
+            if (checkGuestAccess && !checkGuestAccess()) return;
         }
         if (initialSelectedVerses.length === 0) {
             alert('Selecione pelo menos um versículo para favoritar.'); // Replace with Toast later if available
@@ -517,24 +546,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
 
                     </button>
 
-                    {/* 4. Favorite Button */}
-                    {user && (
-                        <button
-                            onClick={handleToggleFavorite}
-                            className={`
-                                h-11 w-11 rounded-xl flex items-center justify-center transition-all active:scale-95
-                                ${areSelectedVersesFavorited
-                                    ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-red-500 text-white shadow-red-200')
-                                    : (preferences.theme === 'bw'
-                                        ? 'hover:bg-stone-100 text-stone-400 hover:text-black'
-                                        : 'hover:bg-red-50 text-stone-400 dark:text-stone-500 hover:text-red-500 dark:hover:text-red-400')
-                                }
-                            `}
-                            title={initialSelectedVerses.length === 0 ? "Selecione um versículo" : areSelectedVersesFavorited ? "Remover dos Favoritos" : "Adicionar aos Favoritos"}
-                        >
-                            <Heart size={18} className={areSelectedVersesFavorited ? "fill-current" : ""} />
-                        </button>
-                    )}
+
                 </div>
             </header>
 
@@ -563,6 +575,8 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                                     setIsVerseAudioPlaying(playing);
                                     setIsVerseAudioLoading(loading);
                                 }}
+                                favorites={favorites}
+                                onToggleFavorite={handleToggleFavorite}
                             />
                         </div>
                     </div>
@@ -573,7 +587,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             <div className="mt-12 pt-8 border-t border-stone-200 dark:border-stone-800 space-y-6">
 
                 {/* MARK AS READ BUTTON */}
-                {user && (
+                {true && (
                     <button
                         onClick={handleToggleRead}
                         disabled={togglingRead}

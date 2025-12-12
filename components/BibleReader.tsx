@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Verse, ReadingPreferences } from '../types';
-import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause, MessageCircle, ArrowRight, MoreHorizontal, Minimize, Maximize2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause, MessageCircle, ArrowRight, MoreHorizontal, Minimize, Maximize2, ChevronDown, ChevronUp, Heart } from 'lucide-react';
 import { explainVerse, askVerse, generateAudioFromText } from '../services/geminiService';
 import VerseImageGenerator_ from './VerseImageGenerator'; // Keep strictly for types if needed, but usually we just use typeof or rely on lazy inference. 
 // Actually, better to just remove import and define lazy.
@@ -23,6 +23,8 @@ interface BibleReaderProps {
   initialSelectedVerses?: number[];
   onSelectionChange?: (selected: number[]) => void;
   onAudioStateChange?: (isPlaying: boolean, isLoading: boolean) => void;
+  favorites?: any[]; // Using any to avoid circular deps or import issues, but ideally FavoriteVerse[]
+  onToggleFavorite?: (verse: any) => void;
 }
 
 const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
@@ -34,10 +36,19 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
   t,
   initialSelectedVerses = [],
   onSelectionChange,
-  onAudioStateChange
+  onAudioStateChange,
+  favorites = [],
+  onToggleFavorite
 }, ref) => {
   // Selection State
   const [selectedVerses, setSelectedVerses] = useState<Set<number>>(new Set(initialSelectedVerses));
+
+  // Sync selection with prop
+  useEffect(() => {
+    if (initialSelectedVerses.length > 0) {
+      setSelectedVerses(new Set(initialSelectedVerses));
+    }
+  }, [initialSelectedVerses]);
 
   // Action State
   const [activeAction, setActiveAction] = useState<'explain' | 'ask' | null>(null);
@@ -499,6 +510,44 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                     >
                       <ImageIcon size={16} className={preferences.theme === 'bw' ? 'text-white' : 'text-bible-gold'} />
                       <span className="text-xs font-medium">Compartilhar</span>
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onToggleFavorite && selectedVerses.size > 0) {
+                          const sorted = Array.from(selectedVerses).sort((a, b) => a - b);
+                          sorted.forEach(vNum => {
+                            const verse = verses.find(v => v.number === vNum);
+                            if (verse) {
+                              onToggleFavorite({
+                                book,
+                                chapter,
+                                verse: verse.number,
+                                text: verse.text,
+                                timestamp: Date.now(),
+                                id: `${book}-${chapter}-${verse.number}`
+                              });
+                            }
+                          });
+                        }
+                      }}
+                      className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-95
+                          ${preferences.theme === 'bw'
+                          ? 'bg-stone-800 text-white hover:bg-stone-700'
+                          : 'bg-stone-100 dark:bg-stone-700/30 text-stone-700 dark:text-stone-200 hover:bg-white dark:hover:bg-stone-700'}`}
+                    >
+                      <Heart
+                        size={16}
+                        className={`
+                            ${preferences.theme === 'bw' ? 'text-white' : 'text-bible-gold'} 
+                            ${Array.from(selectedVerses).every(vNum => favorites.some((f: any) => f.id === `${book}-${chapter}-${vNum}`)) ? 'fill-current' : ''}
+                        `}
+                      />
+
+                      <span className="text-xs font-medium">
+                        {Array.from(selectedVerses).every(vNum => favorites.some((f: any) => f.id === `${book}-${chapter}-${vNum}`)) ? 'Remover' : 'Favoritar'}
+                      </span>
                     </button>
 
                     {/* Smart Close Button (Floating Badge) */}

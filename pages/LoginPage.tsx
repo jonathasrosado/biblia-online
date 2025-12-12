@@ -203,6 +203,28 @@ const LoginPage: React.FC<LoginPageProps> = ({ theme, onLoginSuccess }) => {
                     </GoogleOAuthProvider>
                 </div>
 
+                {/* DEV LOGIN BUTTON (Only visible in development) */}
+                {import.meta.env.DEV && (
+                    <div className="mt-4 flex justify-center w-full">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                // Simulate a user object
+                                const devUser = {
+                                    name: "Dev User",
+                                    email: "dev@bibliaonline.me",
+                                    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dev"
+                                };
+                                if (onLoginSuccess) onLoginSuccess(devUser);
+                                navigate('/');
+                            }}
+                            className={`w-full py-2 rounded-full border border-dashed border-red-300 text-red-400 text-xs font-mono uppercase hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors`}
+                        >
+                            [DEV MODE] Force Login
+                        </button>
+                    </div>
+                )}
+
                 {/* Footer Terms */}
                 <p className={`text-center text-[10px] mt-8 leading-tight max-w-xs mx-auto ${isDark ? 'text-stone-600' : 'text-stone-400'}`}>
                     Este site está protegido pelo reCAPTCHA e pelo Google.

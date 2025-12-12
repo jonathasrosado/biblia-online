@@ -81,6 +81,7 @@ function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isFavoritesExpanded, setIsFavoritesExpanded] = useState(false);
 
   // Language State
   const [language, setLanguage] = useState<string>('pt');
@@ -95,6 +96,7 @@ function AppContent() {
   }, []);
 
   const t = translations[language as keyof typeof translations] || translations.pt;
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Scroll & Ref State
   const mainScrollRef = useRef<HTMLDivElement>(null);
@@ -140,6 +142,61 @@ function AppContent() {
     return [];
   });
 
+  // User State
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // Guest State - Persist local actions count
+  const [guestActionCount, setGuestActionCount] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('guest_action_count');
+      return saved ? parseInt(saved, 10) : 0;
+    }
+    return 0;
+  });
+
+  const [guestCompletedChapters, setGuestCompletedChapters] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('guest_completed_chapters');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('guest_action_count', guestActionCount.toString());
+  }, [guestActionCount]);
+
+  useEffect(() => {
+    localStorage.setItem('guest_completed_chapters', JSON.stringify(guestCompletedChapters));
+  }, [guestCompletedChapters]);
+
+  const checkGuestAccess = () => {
+    if (user) return true; // Logged in users always access
+    if (guestActionCount < 1) {
+      setGuestActionCount(prev => prev + 1);
+      return true; // First action allowed
+    }
+    setIsLoginModalOpen(true); // Gate subsequent actions
+    return false;
+  };
+
+  const toggleGuestRead = (book: string, chapter: number, completed: boolean) => {
+    // Guest Gate check is done in ReadingPage effectively or here?
+    // It's cleaner to just update state here.
+    setGuestCompletedChapters(prev => {
+      if (completed) {
+        // Mark as read
+        const exists = prev.some(c => c.book === book && c.chapter === chapter);
+        if (exists) return prev;
+        return [...prev, { book, chapter, timestamp: Date.now() }];
+      } else {
+        // Mark as unread
+        return prev.filter(c => !(c.book === book && c.chapter === chapter));
+      }
+    });
+  };
+
   // Favorites State
   const [favorites, setFavorites] = useState<FavoriteVerse[]>(() => {
     if (typeof window !== 'undefined') {
@@ -154,7 +211,22 @@ function AppContent() {
     localStorage.setItem('user_favorites', JSON.stringify(favorites));
   }, [favorites]);
 
+
   const toggleFavorite = (verse: FavoriteVerse) => {
+    // Guest Check
+    if (!user) {
+      // Allow toggling OFF without incrementing count? Or gate everything?
+      // Request implies "gate login" on usage.
+      // If removing, maybe allow freely? Or strict gate?
+      // "Ao tentar favoritar um segundo item... exibir gate".
+      // So removing existing might be fine, but adding new one checks limit.
+
+      const exists = favorites.some(f => f.id === verse.id);
+      if (!exists && !checkGuestAccess()) {
+        return;
+      }
+    }
+
     setFavorites(prev => {
       const exists = prev.some(f => f.id === verse.id);
       if (exists) {
@@ -163,10 +235,6 @@ function AppContent() {
       return [verse, ...prev];
     });
   };
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [user, setUser] = useState<any>(null);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Apply Theme & Save Preferences
   useEffect(() => {
@@ -507,37 +575,45 @@ function AppContent() {
                   Sua Área
                 </h3>
 
-                {user ? (
-                  <>
-                    <button
-                      onClick={() => { /* Navigate to Favorites */ setSidebarOpen(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5"
-                    >
+                {/* Always show for Guests too, but with Gate logic implicity via actions */}
+                {/* 1. Meu Progresso */}
+                <button
+                  onClick={() => { navigate('/progresso'); setSidebarOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
+                    ${location.pathname === '/progresso'
+                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/10 text-bible-accent dark:text-bible-gold')
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                >
+                  <BarChart2 size={16} />
+                  Meu Progresso
+                </button>
+
+                {/* 2. Meus Favoritos (Collapsible) */}
+                <div>
+                  <button
+                    onClick={() => setIsFavoritesExpanded(!isFavoritesExpanded)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors text-sm font-medium group
+                        ${isFavoritesExpanded
+                        ? (preferences.theme === 'bw' ? 'bg-stone-100' : 'bg-black/5 dark:bg-white/5 text-bible-accent dark:text-bible-gold')
+                        : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'
+                      }`}
+                  >
+                    <div className="flex items-center gap-3">
                       <Heart size={16} />
                       Meus Favoritos
-                    </button>
-                    <button
-                      onClick={() => { navigate('/progresso'); setSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
-                        ${location.pathname === '/progresso'
-                          ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/10 text-bible-accent dark:text-bible-gold')
-                          : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                    >
-                      <BarChart2 size={16} />
-                      Meu Progresso
-                    </button>
+                    </div>
+                    <ChevronDown size={14} className={`transition-transform duration-200 ${isFavoritesExpanded ? 'rotate-180' : ''}`} />
+                  </button>
 
-                    {/* Favorites Section */}
-                    <div className="pt-2">
-                      <h3 className={`px-3 text-[10px] font-bold uppercase tracking-widest mb-2 opacity-70 flex items-center gap-1 ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-stone-400'}`}>
-                        <Heart size={10} className="fill-current" /> Favoritos
-                      </h3>
+                  {/* Expandable List */}
+                  <div className={`grid transition-all duration-300 ease-in-out ${isFavoritesExpanded ? 'grid-rows-[1fr] opacity-100 mt-1' : 'grid-rows-[0fr] opacity-0'}`}>
+                    <div className="overflow-hidden">
                       {favorites.length === 0 ? (
-                        <div className="px-3 py-2 text-xs text-stone-500 italic">
-                          Nenhum versículo salvo ainda.
+                        <div className="px-3 py-2 text-xs text-stone-500 italic pl-10">
+                          {user ? 'Nenhum versículo salvo ainda.' : 'Favoritos locais. Faça login para sincronizar.'}
                         </div>
                       ) : (
-                        <div className="space-y-1">
+                        <div className="space-y-0.5 pl-2">
                           {favorites.map(fav => (
                             <button
                               key={fav.id}
@@ -545,8 +621,8 @@ function AppContent() {
                                 navigate(`/leitura/${normalizeBookName(fav.book)}/${fav.chapter}?verses=${fav.verse}`);
                                 setSidebarOpen(false);
                               }}
-                              className={`w-full text-left px-3 py-2 rounded-lg transition-colors group
-                                  ${preferences.theme === 'bw' ? 'hover:bg-stone-50' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
+                              className={`w-full text-left px-3 py-2 rounded-lg transition-colors group border-l-2 border-transparent hover:border-bible-gold/30
+                                          ${preferences.theme === 'bw' ? 'hover:bg-stone-50' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
                             >
                               <div className={`text-xs font-bold mb-0.5 ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-700 dark:text-stone-300'}`}>
                                 {fav.book} {fav.chapter}:{fav.verse}
@@ -559,35 +635,16 @@ function AppContent() {
                         </div>
                       )}
                     </div>
-                  </>
-
-                ) : (
-                  <div className="mx-2 px-3 py-2 bg-stone-50/50 dark:bg-stone-800/30 rounded-lg border border-stone-100 dark:border-stone-800">
-                    <p className="text-[10px] text-stone-500 dark:text-stone-500 mb-2 leading-relaxed">Faça login para salvar seu progresso e favoritos.</p>
-                    <button
-                      onClick={() => { navigate('/login'); setSidebarOpen(false); }}
-                      className="text-xs font-bold text-bible-accent dark:text-bible-gold hover:underline"
-                    >
-                      Entrar agora
-                    </button>
                   </div>
+                </div>
 
-                )}
+
               </div>
 
 
               {/* Section 3: Tools/Settings (Implicit) */}
               <div className="pt-2 border-t border-stone-100 dark:border-stone-800 space-y-0.5">
-                <button
-                  onClick={() => { setIsFullScreen(!isFullScreen); setSidebarOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
-                  ${isFullScreen
-                      ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-bible-gold/10 dark:bg-bible-gold/10 text-bible-accent dark:text-bible-gold')
-                      : 'text-stone-600 dark:text-stone-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
-                >
-                  {isFullScreen ? <Minimize size={16} /> : <Maximize size={16} />}
-                  {isFullScreen ? t.exitFullScreen : t.fullScreen}
-                </button>
+
 
                 <button
                   onClick={() => { setSettingsModalOpen(true); setSidebarOpen(false); }}
@@ -753,6 +810,10 @@ function AppContent() {
                   setUser={setUser}
                   favorites={favorites}
                   onToggleFavorite={toggleFavorite}
+                  checkGuestAccess={checkGuestAccess}
+                  guestCompletedChapters={guestCompletedChapters}
+                  onToggleGuestRead={toggleGuestRead}
+                  onRequestLogin={() => setIsLoginModalOpen(true)}
                 />
               </ViewWrapper>
             } />
