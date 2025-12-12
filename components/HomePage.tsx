@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from './SEO';
 import { toPng } from 'html-to-image';
-import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2, Loader2, RefreshCw, HelpCircle } from 'lucide-react';
+import { BookOpen, MessageCircle, Sun, Search, ArrowRight, Clock, Star, Calendar, Share2, Loader2, RefreshCw, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { normalizeBookName, bibleBooks } from '../constants';
 import { ReadingHistoryItem } from '../types';
 import versesRaw from '../src/data/daily_verses.json';
@@ -43,6 +43,18 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
     const navigate = useNavigate();
 
     const verseCardRef = useRef<HTMLDivElement>(null);
+    const carouselRef = useRef<HTMLDivElement>(null);
+
+    const scrollCarousel = (direction: 'left' | 'right') => {
+        if (carouselRef.current) {
+            const scrollAmount = 350; // Approximates card width + gap
+            carouselRef.current.scrollBy({
+                left: direction === 'right' ? scrollAmount : -scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     const [localQuery, setLocalQuery] = useState('');
     const [dailyVerse, setDailyVerse] = useState(DAILY_VERSES[0]);
     const [isSharing, setIsSharing] = useState(false);
@@ -74,9 +86,42 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (localQuery.trim()) {
-            navigate(`/busca?q=${encodeURIComponent(localQuery)}`);
+        const query = localQuery.trim();
+        if (!query) return;
+
+        // 1. Try to parse as Bible Reference
+        const sortedBooks = [...bibleBooks].sort((a, b) => b.name.length - a.name.length);
+        const lowerQuery = query.toLowerCase();
+
+        for (const book of sortedBooks) {
+            const bookLower = book.name.toLowerCase();
+            // Check if query starts with book name
+            if (lowerQuery.startsWith(bookLower)) {
+                // Check remainder for chapter/verse
+                const remainder = lowerQuery.slice(bookLower.length).trim();
+
+                // Allow " 5", " 5:1", " 5 1", or just ""
+                const match = remainder.match(/^(\d+)?(?:[:\s](\d+))?$/);
+
+                if (match || remainder === '') {
+                    const chapter = match?.[1] || '1';
+                    const verse = match?.[2];
+
+                    const bookSlug = normalizeBookName(book.name);
+                    let url = `/leitura/${bookSlug}/${chapter}`;
+
+                    if (verse) {
+                        url += `#v${verse}`;
+                    }
+
+                    navigate(url);
+                    return;
+                }
+            }
         }
+
+        // 2. Fallback: Chat for themes/questions
+        navigate(`/chat?p=${encodeURIComponent(query)}`);
     };
 
     const getGreeting = () => {
@@ -251,7 +296,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
             </div>
 
             {/* 2. MAIN INTERACTION CARD (Reading Card) */}
-            <div className="max-w-4xl mx-auto px-4 md:px-6 mt-6 md:-mt-16 relative z-20 mb-16 animate-slideUp" style={{ animationDelay: '0.2s' }}>
+            <div className="max-w-5xl mx-auto px-4 md:px-0 mt-6 md:mt-12 relative z-20 mb-16 animate-slideUp" style={{ animationDelay: '0.2s' }}>
                 <div className={`p-8 md:p-12 rounded-[2.5rem] shadow-xl border
                     ${theme === 'bw'
                         ? 'bg-white border-stone-200 shadow-stone-200/50'
@@ -286,7 +331,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                                     value={localQuery}
                                     onChange={(e) => setLocalQuery(e.target.value)}
                                     placeholder="Buscar livro, capítulo ou tema (ex: Gênesis, / Fé)"
-                                    className={`w-full p-4 pl-12 pr-4 rounded-2xl border outline-none transition-all text-base
+                                    className={`w-full p-4 pl-12 pr-14 rounded-2xl border outline-none transition-all text-base
                                         ${theme === 'bw'
                                             ? 'bg-white border-stone-300 text-black placeholder-stone-400 focus:border-black focus:ring-1 focus:ring-black'
                                             : isDark
@@ -294,6 +339,17 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                                                 : 'bg-white border-stone-200 text-stone-800 placeholder-stone-400 focus:border-bible-gold/50 shadow-sm'}
                                     `}
                                 />
+                                {/* Submit Button */}
+                                <button
+                                    type="submit"
+                                    className={`absolute right-2 p-2 rounded-xl transition-all
+                                        ${theme === 'bw'
+                                            ? 'bg-stone-100 text-black hover:bg-stone-200'
+                                            : 'bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white'}
+                                    `}
+                                >
+                                    <ArrowRight size={20} />
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -412,201 +468,229 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                     </p>
                 </div>
 
-                <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:gap-6 pb-6 px-6 md:px-0 scrollbar-hide">
+                {/* CAROUSEL CONTAINER WRAPPER for Arrows */}
+                <div className="relative max-w-5xl mx-auto group/carousel">
 
-                    {/* Daily Verse Card - FIRST POSITION (MOVED) */}
-                    <div className="group relative h-64 min-w-[75vw] md:min-w-0 snap-center rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 block w-full">
-                        <button
-                            ref={verseCardRef}
-                            onClick={handleShare}
-                            disabled={isSharing}
-                            className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center px-6 outline-none text-center
-                                ${theme === 'bw'
-                                    ? 'bg-white border border-stone-200'
-                                    : isDark
-                                        ? 'bg-gradient-to-br from-stone-900 via-stone-900 to-bible-gold/20 border border-bible-gold/20'
-                                        : 'bg-gradient-to-br from-white via-stone-50 to-bible-gold/10 border border-white'}
-                            `}
-                        >
-                            {/* Backgrounds */}
-                            {theme !== 'bw' && (
-                                <>
-                                    <div className="absolute top-0 right-0 w-48 h-48 bg-bible-gold/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none mix-blend-overlay"></div>
-                                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-bible-accent/5 rounded-full blur-3xl -ml-5 -mb-5 pointer-events-none"></div>
-                                </>
-                            )}
+                    {/* Left Arrow */}
+                    <button
+                        onClick={() => scrollCarousel('left')}
+                        className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 z-20 p-3 rounded-full shadow-lg transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:block
+                            ${theme === 'bw' ? 'bg-white text-black hover:bg-stone-100' : 'bg-stone-800 text-white hover:bg-stone-700'}
+                        `}
+                    >
+                        <ChevronLeft size={24} />
+                    </button>
 
-                            {/* Header */}
-                            <div className="flex items-center gap-2 mb-3 relative z-10 opacity-80">
-                                <div className={`p-1.5 rounded-full ${theme === 'bw' ? 'bg-stone-100 text-black' : 'bg-bible-gold/10 text-bible-gold'}`}>
-                                    <Calendar size={14} />
+                    {/* Right Arrow */}
+                    <button
+                        onClick={() => scrollCarousel('right')}
+                        className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 z-20 p-3 rounded-full shadow-lg transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:block
+                            ${theme === 'bw' ? 'bg-white text-black hover:bg-stone-100' : 'bg-stone-800 text-white hover:bg-stone-700'}
+                        `}
+                    >
+                        <ChevronRight size={24} />
+                    </button>
+
+                    <div
+                        ref={carouselRef}
+                        className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 px-6 md:px-0 max-w-5xl mx-auto scrollbar-hide scroll-smooth"
+                    >
+                        {/* Daily Verse Card - FIRST POSITION */}
+                        <div className="group relative h-64 min-w-[85vw] md:min-w-[320px] md:w-[320px] flex-shrink-0 snap-center rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 block">
+                            <button
+                                ref={verseCardRef}
+                                onClick={handleShare}
+                                disabled={isSharing}
+                                className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center px-6 outline-none text-center
+                                    ${theme === 'bw'
+                                        ? 'bg-white border border-stone-200'
+                                        : isDark
+                                            ? 'bg-gradient-to-br from-stone-900 via-stone-900 to-bible-gold/20 border border-bible-gold/20'
+                                            : 'bg-gradient-to-br from-white via-stone-50 to-bible-gold/10 border border-white'}
+                                `}
+                            >
+                                {/* Backgrounds */}
+                                {theme !== 'bw' && (
+                                    <>
+                                        <div className="absolute top-0 right-0 w-48 h-48 bg-bible-gold/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none mix-blend-overlay"></div>
+                                        <div className="absolute bottom-0 left-0 w-32 h-32 bg-bible-accent/5 rounded-full blur-3xl -ml-5 -mb-5 pointer-events-none"></div>
+                                    </>
+                                )}
+
+                                {/* Header */}
+                                <div className="flex items-center gap-2 mb-3 relative z-10 opacity-80">
+                                    <div className={`p-1.5 rounded-full ${theme === 'bw' ? 'bg-stone-100 text-black' : 'bg-bible-gold/10 text-bible-gold'}`}>
+                                        <Calendar size={14} />
+                                    </div>
+                                    <span className={`text-[10px] font-bold uppercase tracking-widest ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>Versículo do Dia</span>
                                 </div>
-                                <span className={`text-[10px] font-bold uppercase tracking-widest ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>Versículo do Dia</span>
+
+                                {/* Text */}
+                                <blockquote className={`text-lg leading-relaxed mb-3 relative z-10 drop-shadow-sm line-clamp-4 font-serif italic
+                                        ${theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-stone-100'}`}>
+                                    "{dailyVerse.text}"
+                                </blockquote>
+
+                                {/* Ref */}
+                                <cite className={`not-italic font-bold tracking-wider uppercase text-xs flex items-center justify-center gap-2 relative z-10
+                                        ${theme === 'bw' ? 'text-stone-600' : 'text-stone-500 dark:text-stone-400'}`}>
+                                    {dailyVerse.ref}
+                                </cite>
+
+                                {/* Share Label */}
+                                <div className={`mt-4 text-xs font-bold uppercase tracking-wider flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity
+                                    ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}
+                                 `}>
+                                    {isSharing ? <Loader2 size={12} className="animate-spin" /> : <Share2 size={12} />}
+                                    {isSharing ? 'Gerando...' : 'Compartilhar'}
+                                </div>
+                            </button>
+
+                            {/* Reset Button (Absolute Top Right) */}
+                            <button
+                                onClick={(e) => { e.stopPropagation(); handleNextVerse(); }}
+                                className={`absolute top-3 right-3 p-2 rounded-full z-20 transition-colors
+                                    ${theme === 'bw' ? 'bg-stone-100 hover:bg-stone-200 text-stone-500' : 'bg-black/20 hover:bg-black/30 text-white/70'}
+                                `}
+                                title="Trocar Versículo"
+                            >
+                                <RefreshCw size={14} />
+                            </button>
+                        </div>
+
+                        {/* Guide Card - SECOND POSITION */}
+                        <button
+                            onClick={() => navigate('/como-ler-biblia')}
+                            className="group relative h-64 min-w-[85vw] md:min-w-[320px] md:w-[320px] flex-shrink-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block"
+                        >
+                            <div className="absolute inset-0 bg-stone-900"></div>
+                            {/* Shine Effect */}
+                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
+                            <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                                <BookOpen size={180} />
                             </div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
 
-                            {/* Text */}
-                            <blockquote className={`text-lg leading-relaxed mb-3 relative z-10 drop-shadow-sm line-clamp-4 font-serif italic
-                                    ${theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-stone-100'}`}>
-                                "{dailyVerse.text}"
-                            </blockquote>
-
-                            {/* Ref */}
-                            <cite className={`not-italic font-bold tracking-wider uppercase text-xs flex items-center justify-center gap-2 relative z-10
-                                    ${theme === 'bw' ? 'text-stone-600' : 'text-stone-500 dark:text-stone-400'}`}>
-                                {dailyVerse.ref}
-                            </cite>
-
-                            {/* Share Label */}
-                            <div className={`mt-4 text-xs font-bold uppercase tracking-wider flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity
-                                ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}
-                             `}>
-                                {isSharing ? <Loader2 size={12} className="animate-spin" /> : <Share2 size={12} />}
-                                {isSharing ? 'Gerando...' : 'Compartilhar'}
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-emerald-400 uppercase bg-emerald-950/50 backdrop-blur-sm rounded-full border border-emerald-500/30">
+                                    Iniciantes
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Como Ler a Bíblia<br />Guia Completo
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Começar Jornada <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
                             </div>
                         </button>
 
-                        {/* Reset Button (Absolute Top Right) */}
+                        {/* Verses Card - THIRD POSITION */}
                         <button
-                            onClick={(e) => { e.stopPropagation(); handleNextVerse(); }}
-                            className={`absolute top-3 right-3 p-2 rounded-full z-20 transition-colors
-                                ${theme === 'bw' ? 'bg-stone-100 hover:bg-stone-200 text-stone-500' : 'bg-black/20 hover:bg-black/30 text-white/70'}
-                            `}
-                            title="Trocar Versículo"
+                            onClick={() => navigate('/versiculos')}
+                            className="group relative h-64 min-w-[85vw] md:min-w-[320px] md:w-[320px] flex-shrink-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block"
                         >
-                            <RefreshCw size={14} />
+                            <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-teal-900 to-cyan-950"></div>
+                            {/* Shine Effect */}
+                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
+                            <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                                <Search size={180} />
+                            </div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-bible-gold uppercase bg-yellow-950/50 backdrop-blur-sm rounded-full border border-bible-gold/30">
+                                    Temas Bíblicos
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Encontre Versiculos<br />por Tema
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Explorar Coleção <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* FAQ Card - FOURTH POSITION */}
+                        <button
+                            onClick={() => navigate('/faq-biblia')}
+                            className="group relative h-64 min-w-[85vw] md:min-w-[320px] md:w-[320px] flex-shrink-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-800"></div>
+                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
+                            <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                                <HelpCircle size={180} />
+                            </div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-indigo-400 uppercase bg-indigo-950/50 backdrop-blur-sm rounded-full border border-indigo-500/30">
+                                    Tire Dúvidas
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Perguntas Frequentes<br />sobre a Fé
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Ver Respostas <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+                        {/* End of Carousel Container Inner */}
+
+
+
+                        {/* Devotional Card - FOURTH POSITION (NEW) */}
+                        <button
+                            onClick={() => navigate('/devocional')}
+                            className="group relative h-64 min-w-[85vw] md:min-w-[320px] md:w-[320px] flex-shrink-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-amber-900 via-yellow-700 to-amber-600"></div>
+                            {/* Texture/Effect */}
+                            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+                            <div className="absolute -right-8 -top-8 text-white/10 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                                <Calendar size={180} />
+                            </div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-yellow-300 uppercase bg-yellow-950/50 backdrop-blur-sm rounded-full border border-yellow-500/30">
+                                    Diário
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Devocional<br />do Dia
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Ler Reflexão <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* Chat Card - FIFTH POSITION (NEW) */}
+                        <button
+                            onClick={() => navigate('/chat')}
+                            className="group relative h-64 min-w-[85vw] md:min-w-[320px] md:w-[320px] flex-shrink-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-neutral-900 to-stone-800"></div>
+                            {/* Shine Effect */}
+                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
+                            <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                                <MessageCircle size={180} />
+                            </div>
+
+                            <div className="absolute bottom-0 left-0 p-6 w-full">
+                                <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-blue-400 uppercase bg-blue-950/50 backdrop-blur-sm rounded-full border border-blue-500/30">
+                                    Converse
+                                </span>
+                                <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
+                                    Chat<br />Teológico
+                                </h3>
+                                <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
+                                    Tirar Dúvidas <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
                         </button>
                     </div>
-
-                    {/* Guide Card - FIRST POSITION */}
-                    <button
-                        onClick={() => navigate('/como-ler-biblia')}
-                        className="group relative h-64 min-w-[75vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
-                    >
-                        <div className="absolute inset-0 bg-stone-900"></div>
-                        {/* Shine Effect */}
-                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
-                        <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
-                            <BookOpen size={180} />
-                        </div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-
-                        <div className="absolute bottom-0 left-0 p-6 w-full">
-                            <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-emerald-400 uppercase bg-emerald-950/50 backdrop-blur-sm rounded-full border border-emerald-500/30">
-                                Iniciantes
-                            </span>
-                            <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
-                                Como Ler a Bíblia<br />Guia Completo
-                            </h3>
-                            <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
-                                Começar Jornada <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </div>
-                    </button>
-
-                    {/* Verses Card - SECOND POSITION */}
-                    <button
-                        onClick={() => navigate('/versiculos')}
-                        className="group relative h-64 min-w-[75vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-teal-900 to-cyan-950"></div>
-                        {/* Shine Effect */}
-                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
-                        <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
-                            <Search size={180} />
-                        </div>
-
-                        <div className="absolute bottom-0 left-0 p-6 w-full">
-                            <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-bible-gold uppercase bg-yellow-950/50 backdrop-blur-sm rounded-full border border-bible-gold/30">
-                                Temas Bíblicos
-                            </span>
-                            <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
-                                Encontre Versiculos<br />por Tema
-                            </h3>
-                            <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
-                                Explorar Coleção <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </div>
-                    </button>
-
-                    {/* FAQ Card - THIRD POSITION */}
-                    <button
-                        onClick={() => navigate('/faq-biblia')}
-                        className="group relative h-64 min-w-[75vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-800"></div>
-                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
-                        <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
-                            <HelpCircle size={180} />
-                        </div>
-
-                        <div className="absolute bottom-0 left-0 p-6 w-full">
-                            <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-indigo-400 uppercase bg-indigo-950/50 backdrop-blur-sm rounded-full border border-indigo-500/30">
-                                Tire Dúvidas
-                            </span>
-                            <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
-                                Perguntas Frequentes<br />sobre a Fé
-                            </h3>
-                            <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
-                                Ver Respostas <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </div>
-                    </button>
-
-                    {/* Devotional Card - FOURTH POSITION (NEW) */}
-                    <button
-                        onClick={() => navigate('/devocional')}
-                        className="group relative h-64 min-w-[75vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-amber-900 via-yellow-700 to-amber-600"></div>
-                        {/* Texture/Effect */}
-                        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-                        <div className="absolute -right-8 -top-8 text-white/10 rotate-12 group-hover:scale-110 transition-transform duration-500">
-                            <Calendar size={180} />
-                        </div>
-
-                        <div className="absolute bottom-0 left-0 p-6 w-full">
-                            <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-yellow-300 uppercase bg-yellow-950/50 backdrop-blur-sm rounded-full border border-yellow-500/30">
-                                Diário
-                            </span>
-                            <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
-                                Devocional<br />do Dia
-                            </h3>
-                            <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
-                                Ler Reflexão <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </div>
-                    </button>
-
-                    {/* Chat Card - FIFTH POSITION (NEW) */}
-                    <button
-                        onClick={() => navigate('/chat')}
-                        className="group relative h-64 min-w-[75vw] md:min-w-0 snap-center rounded-3xl overflow-hidden text-left shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 block w-full"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-neutral-900 to-stone-800"></div>
-                        {/* Shine Effect */}
-                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 animate-shine transition-all"></div>
-                        <div className="absolute -right-8 -top-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
-                            <MessageCircle size={180} />
-                        </div>
-
-                        <div className="absolute bottom-0 left-0 p-6 w-full">
-                            <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-widest text-blue-400 uppercase bg-blue-950/50 backdrop-blur-sm rounded-full border border-blue-500/30">
-                                Converse
-                            </span>
-                            <h3 className="text-2xl font-serif font-bold text-white mb-2 leading-tight">
-                                Chat<br />Teológico
-                            </h3>
-                            <div className="flex items-center gap-2 text-stone-300 text-sm font-medium group-hover:text-white transition-colors">
-                                Tirar Dúvidas <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </div>
-                    </button>
                 </div>
+
+
+
             </div>
-
-
-
-            {/* Old Tools Section Removed */}
         </div>
     );
 };
