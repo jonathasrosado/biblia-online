@@ -262,11 +262,11 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                 }}
             />
 
-            <header className={`mb-8 text-center border-b pb-8 transition-colors relative z-10
+            <header className={`mb-5 text-center border-b pb-6 transition-colors relative z-10
          ${preferences.theme === 'bw' ? 'border-stone-200' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-200 dark:border-stone-800'}`}>
 
                 {/* Chapter Title & Navigation */}
-                <div className="relative flex items-center justify-center max-w-xl mx-auto mb-8 min-h-[48px]">
+                <div className="relative flex items-center justify-center max-w-xl mx-auto mb-4 min-h-[48px]">
                     {/* Left - Previous Chapter (Absolute) */}
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
                         {prevChapter && (
@@ -319,7 +319,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                         <>
                             {/* Backdrop to close */}
                             <div
-                                className="fixed inset-0 z-40 bg-black/5 dark:bg-black/20 backdrop-blur-[1px]"
+                                className="fixed inset-0 z-40 bg-black/5 dark:bg-black/20"
                                 onClick={() => setIsChapterGridOpen(false)}
                             />
 
@@ -351,7 +351,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                 </div>
 
                 {/* Controls Bar - Single Line */}
-                <div className="flex items-center justify-center gap-3 mt-6 mb-2 relative">
+                <div className="flex items-center justify-center gap-3 mt-2 relative">
 
                     {/* 1. Verses/Summary Toggle */}
                     <div className="bg-stone-100 dark:bg-stone-800 p-1.5 rounded-xl flex gap-1 shadow-inner h-11 items-center">
@@ -401,8 +401,6 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                             `}
                         >
                             <div className="max-w-xl mx-auto relative pt-2">
-                                {/* Drag Handle */}
-                                <div className="w-12 h-1.5 bg-stone-300 dark:bg-stone-700 rounded-full mx-auto mb-4 opacity-50" />
 
                                 <div className="flex justify-between items-center mb-6">
                                     <h3 className="text-lg font-bold text-stone-900 dark:text-white">Tamanho do Texto</h3>

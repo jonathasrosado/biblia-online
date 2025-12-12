@@ -402,7 +402,7 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
 
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 animate-fadeIn">
+    <div className="max-w-3xl mx-auto px-4 pt-1 pb-8 animate-fadeIn">
       {/* Verses List */}
       {/* Verses List */}
       <div className="space-y-4">

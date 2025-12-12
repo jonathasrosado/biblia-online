@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
-import { ChevronRight, ChevronLeft, Volume2, Pause, Play, Share2, BookOpen, Mic, Loader2, List, FileText, ArrowLeft, Type, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Volume2, Pause, Play, Share2, BookOpen, Mic, Loader2, List, FileText, ArrowLeft, Type, ChevronDown, X } from 'lucide-react';
 import { bibleBooks, normalizeBookName, findBookByNormalizedName } from '../constants';
 import { getChapterContentLocal } from '../services/localBibleService'; // Unused but kept for reference
 import { getChapterSummary, generateAudioFromText } from '../services/geminiService';
@@ -34,6 +34,27 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isChapterGridOpen, setIsChapterGridOpen] = useState(false);
+
+    // Font Menu Logic (Click Outside)
+    const [isFontModalOpen, setIsFontModalOpen] = useState(false);
+    const fontModalRef = useRef<HTMLDivElement>(null);
+    const fontButtonRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (
+                isFontModalOpen &&
+                fontModalRef.current &&
+                !fontModalRef.current.contains(e.target as Node) &&
+                fontButtonRef.current &&
+                !fontButtonRef.current.contains(e.target as Node)
+            ) {
+                setIsFontModalOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isFontModalOpen]);
 
     // Audio State
     const [isAudioLoading, setIsAudioLoading] = useState(false);
@@ -183,8 +204,9 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                 ${preferences.theme === 'bw' ? 'border-stone-200' : preferences.theme === 'sepia' ? 'border-[#e6dcc6]' : 'border-stone-200 dark:border-stone-800'}`}>
 
                 {/* Chapter Title & Navigation */}
-                <div className="grid grid-cols-[48px_1fr_48px] items-center max-w-xl mx-auto mb-8">
-                    <div className="flex justify-start">
+                <div className="relative flex items-center justify-center max-w-xl mx-auto mb-8 min-h-[48px]">
+                    {/* Left - Previous Chapter (Absolute) */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
                         {prevChapter && (
                             <button
                                 onClick={() => navigate(`/resumo/${prevChapter.book}/${prevChapter.chapter}`)}
@@ -197,45 +219,22 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                         )}
                     </div>
 
-                    <div className="text-center relative">
+                    {/* Center - Title Button */}
+                    <div className="relative z-10">
                         <button
                             onClick={() => setIsChapterGridOpen(!isChapterGridOpen)}
-                            className="group flex flex-col items-center mx-auto"
+                            className="group flex flex-col items-center justify-center p-2 rounded-xl transition-all"
                         >
-                            <h1 className={`flex items-center gap-3 text-2xl md:text-3xl font-serif font-bold transition-colors
+                            <h1 className={`flex items-center gap-2 text-2xl md:text-3xl font-serif font-bold transition-colors text-center
                                 ${preferences.theme === 'bw' ? 'text-black hover:text-stone-600' : 'text-bible-accent dark:text-bible-gold hover:text-bible-gold'}`}>
-                                {currentBook.name} {currentChapter}
-                                <ChevronDown size={24} className={`transition-transform duration-300 ${isChapterGridOpen ? 'rotate-180' : ''}`} />
+                                <span>{currentBook.name} {currentChapter}</span>
+                                <ChevronDown size={24} className={`transition-transform duration-300 opacity-50 group-hover:opacity-100 ${isChapterGridOpen ? 'rotate-180' : ''}`} />
                             </h1>
                         </button>
-
-                        {/* Expandable Chapter Grid */}
-                        {isChapterGridOpen && (
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[90vw] max-w-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-xl z-50 p-6 animate-slideUp">
-                                <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
-                                    {Array.from({ length: currentBook.chapters }, (_, i) => i + 1).map((chap) => (
-                                        <button
-                                            key={chap}
-                                            onClick={() => {
-                                                navigate(`/resumo/${normalizeBookName(currentBook.name)}/${chap}`);
-                                                setIsChapterGridOpen(false);
-                                            }}
-                                            className={`
-                                                h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                                                ${currentChapter === chap
-                                                    ? (preferences.theme === 'bw' ? 'bg-black text-white shadow-md' : 'bg-bible-gold text-white shadow-md')
-                                                    : (preferences.theme === 'bw' ? 'bg-stone-50 border border-transparent hover:border-black hover:text-black' : 'bg-stone-50 dark:bg-stone-800 border border-transparent hover:border-bible-gold hover:text-bible-gold')}
-                                            `}
-                                        >
-                                            {chap}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
                     </div>
 
-                    <div className="flex justify-end">
+                    {/* Right - Next Chapter (Absolute) */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
                         {nextChapter && (
                             <button
                                 onClick={() => navigate(`/resumo/${nextChapter.book}/${nextChapter.chapter}`)}
@@ -247,73 +246,164 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
                             </button>
                         )}
                     </div>
+
+                    {/* Dropdown - Anchored to MAIN CONTAINER (Centered on Page) */}
+                    {isChapterGridOpen && (
+                        <>
+                            {/* Backdrop to close */}
+                            <div
+                                className="fixed inset-0 z-40 bg-black/5 dark:bg-black/20"
+                                onClick={() => setIsChapterGridOpen(false)}
+                            />
+
+                            {/* The Menu */}
+                            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-4xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl z-50 p-6 animate-fadeIn">
+                                <h3 className="text-center text-sm font-bold text-stone-400 mb-4 uppercase tracking-wider">Selecione o Capítulo</h3>
+                                <div className="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-12 gap-2 max-h-[60vh] overflow-y-auto p-1">
+                                    {Array.from({ length: currentBook.chapters }, (_, i) => i + 1).map((chap) => (
+                                        <button
+                                            key={chap}
+                                            onClick={() => {
+                                                navigate(`/resumo/${normalizeBookName(currentBook.name)}/${chap}`);
+                                                setIsChapterGridOpen(false);
+                                            }}
+                                            className={`
+                                                h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all
+                                                ${currentChapter === chap
+                                                    ? (preferences.theme === 'bw' ? 'bg-black text-white shadow-md' : 'bg-bible-gold text-white shadow-md')
+                                                    : (preferences.theme === 'bw' ? 'bg-stone-50 border border-transparent hover:border-black hover:text-black' : 'bg-stone-50 dark:bg-stone-800 border border-stone-100 dark:border-stone-700/50 hover:border-bible-gold hover:text-bible-gold')}
+                                            `}
+                                        >
+                                            {chap}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
 
-                <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-6 mb-2">
-                    {/* Centered Group containing all 4 elements */}
-                    <div className="flex flex-wrap items-center justify-center gap-4">
-                        {/* Tab Navigation (Verses vs Summary) */}
-                        <div className="bg-stone-100 dark:bg-stone-800 p-1 rounded-xl flex gap-1 shadow-inner">
-                            <button
-                                onClick={() => navigate(`/leitura/${normalizeBookName(currentBook.name)}/${currentChapter}`)}
-                                className={`px-6 py-2 rounded-lg text-sm font-medium transition-all
-                                    ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black hover:bg-white/50' : 'text-stone-400 dark:text-stone-500 hover:text-bible-gold hover:bg-white/50 dark:hover:bg-stone-600/50'}`}
-                            >
-                                <List size={16} className="inline mr-2 mb-0.5" />
-                                Versículos
-                            </button>
-                            <button
-                                className={`px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition-all
-                                    ${preferences.theme === 'bw' ? 'bg-white text-black' : 'bg-white dark:bg-stone-700 text-bible-accent dark:text-bible-gold'}`}
-                            >
-                                <FileText size={16} className="inline mr-2 mb-0.5" />
-                                Resumo
-                            </button>
-                        </div>
+                {/* Controls Bar - Single Line */}
+                <div className="flex items-center justify-center gap-3 mt-6 mb-2 relative">
 
-                        {/* Font Size Slider */}
-                        <div className="flex items-center gap-3 bg-stone-100 dark:bg-stone-800 px-4 py-2 rounded-lg shrink-0 h-10">
-                            <Type size={14} className="opacity-50" />
-                            <input
-                                type="range"
-                                min="80"
-                                max="180"
-                                step="5"
-                                value={preferences.fontSize}
-                                onChange={(e) => onUpdatePreferences({ ...preferences, fontSize: parseInt(e.target.value) })}
-                                className="w-24 h-1.5 bg-stone-300 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-bible-gold"
-                                title={`Tamanho da fonte: ${preferences.fontSize}%`}
-                            />
-                            <Type size={18} className="opacity-80" />
-                        </div>
-
-                        {/* Audio Button */}
+                    {/* 1. Verses/Summary Toggle */}
+                    <div className="bg-stone-100 dark:bg-stone-800 p-1.5 rounded-xl flex gap-1 shadow-inner h-11 items-center">
                         <button
-                            onClick={handleToggleAudio}
-                            disabled={isAudioLoading || !content}
-                            className={`px-4 py-2 rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 h-10
-                                ${isPlaying
-                                    ? (preferences.theme === 'bw' ? 'bg-stone-200 text-stone-900' : 'bg-bible-gold/20 text-bible-gold hover:bg-bible-gold/30')
-                                    : (preferences.theme === 'bw' ? 'bg-black text-white hover:bg-stone-800' : 'bg-bible-gold text-white hover:bg-yellow-600')} 
-                                ${isAudioLoading || !content ? 'opacity-50 cursor-not-allowed' : ''}
-                            `}
-                            title="Ouvir Resumo"
+                            onClick={() => navigate(`/leitura/${normalizeBookName(currentBook.name)}/${currentChapter}`)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2
+                                ${preferences.theme === 'bw' ? 'text-stone-400 hover:text-black hover:bg-white/50' : 'text-stone-400 dark:text-stone-500 hover:text-bible-gold hover:bg-white/50 dark:hover:bg-stone-600/50'}`}
                         >
-                            {isAudioLoading ? (
-                                <Loader2 size={16} className="animate-spin" />
-                            ) : isPlaying ? (
-                                <>
-                                    <Pause size={16} fill="currentColor" />
-                                    <span className="text-sm font-medium">Pausar</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Volume2 size={16} />
-                                    <span className="text-sm font-medium">Ouvir</span>
-                                </>
-                            )}
+                            <List size={16} className="mb-0.5" />
+                            Versículos
+                        </button>
+                        <button
+                            className={`px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-all flex items-center gap-2
+                                ${preferences.theme === 'bw' ? 'bg-white text-black' : 'bg-white dark:bg-stone-700 text-bible-accent dark:text-bible-gold'}`}
+                        >
+                            <FileText size={16} className="mb-0.5" />
+                            Resumo
                         </button>
                     </div>
+
+                    <div className="w-px h-6 bg-stone-200 dark:bg-stone-800 mx-1"></div>
+
+                    {/* 2. Text Size Toggle (Icon Only) */}
+                    <div className="relative font-control-dropdown">
+                        <button
+                            ref={fontButtonRef}
+                            onClick={() => setIsFontModalOpen(!isFontModalOpen)}
+                            className={`h-11 w-11 flex items-center justify-center rounded-xl transition-all
+                                ${preferences.theme === 'bw'
+                                    ? 'hover:bg-stone-100 text-black'
+                                    : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400 hover:text-bible-gold'}`}
+                            title="Ajustar Texto"
+                        >
+                            <div className="flex items-end mb-0.5 pointer-events-none gap-0.5">
+                                <span className="text-sm font-bold leading-none font-serif">a</span>
+                                <span className="text-xl font-bold leading-none font-serif">A</span>
+                            </div>
+                        </button>
+
+                        {/* Font Control Bottom Sheet (Fixed Bottom) */}
+                        <div
+                            id="font-popover"
+                            ref={fontModalRef}
+                            className={`
+                                fixed bottom-0 left-0 right-0 w-full bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-6 z-[100] transition-all duration-300 ease-out safe-area-bottom
+                                ${isFontModalOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}
+                            `}
+                        >
+                            <div className="max-w-xl mx-auto relative pt-2">
+
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-lg font-bold text-stone-900 dark:text-white">Tamanho do Texto</h3>
+                                    <button
+                                        onClick={() => setIsFontModalOpen(false)}
+                                        className="p-2 bg-stone-100 dark:bg-stone-800 rounded-full text-stone-500 hover:bg-stone-200"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+
+                                <div className="relative flex items-center w-full h-12 bg-stone-100 dark:bg-stone-800 rounded-full px-4 mb-4">
+                                    {/* Side Labels */}
+                                    <span className="text-xs font-bold text-stone-400 mr-4 font-serif">A</span>
+
+                                    {/* Visual Track & Ticks */}
+                                    {/* Visual Track (Simple) */}
+                                    <div className="relative flex-1 h-1 bg-stone-300 dark:bg-stone-600 rounded-full flex items-center px-0.5">
+                                        {/* Progress Fill */}
+                                        <div
+                                            className={`absolute left-0 top-0 h-full rounded-full ${preferences.theme === 'bw' ? 'bg-black' : 'bg-bible-gold'}`}
+                                            style={{ width: `${((preferences.fontSize - 80) / 100) * 100}%` }}
+                                        />
+
+                                        {/* Thumb (Visual only, moves with percentage) */}
+                                        <div
+                                            className={`absolute h-4 w-4 rounded-full shadow-md z-10 pointer-events-none transition-colors
+                                                ${preferences.theme === 'bw' ? 'bg-black' : 'bg-bible-gold'}`}
+                                            style={{ left: `calc(${((preferences.fontSize - 80) / 100) * 100}% - 8px)` }}
+                                        />
+                                    </div>
+
+                                    {/* Range Input */}
+                                    <input
+                                        type="range"
+                                        min="80"
+                                        max="180"
+                                        step="1"
+                                        value={preferences.fontSize}
+                                        onChange={(e) => onUpdatePreferences({ ...preferences, fontSize: parseInt(e.target.value) })}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 mx-4"
+                                    />
+
+                                    <span className="text-xl font-bold text-stone-400 ml-4 font-serif">A</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 3. Audio Button (Icon Only) */}
+                    <button
+                        onClick={handleToggleAudio}
+                        disabled={isAudioLoading || !content}
+                        className={`
+                            h-11 w-11 rounded-xl flex items-center justify-center transition-all active:scale-95
+                            ${isPlaying
+                                ? (preferences.theme === 'bw' ? 'bg-white text-black border border-stone-200 shadow-inner' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400')
+                                : (preferences.theme === 'bw' ? 'bg-black text-white hover:bg-stone-800' : 'bg-bible-gold text-white hover:bg-yellow-600 shadow-bible-gold/30 hover:shadow-bible-gold/40')
+                            }
+                        `}
+                        title={isPlaying ? 'Pausar Áudio' : 'Ouvir Resumo'}
+                    >
+                        {isAudioLoading ? (
+                            <Loader2 size={16} className="animate-spin" />
+                        ) : isPlaying ? (
+                            <Pause size={16} />
+                        ) : (
+                            <Volume2 size={16} />
+                        )}
+                    </button>
                 </div>
             </header>
 
