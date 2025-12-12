@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, List, FileText, MessageCircle, X, Sparkles, Send, ImageIcon, Share2, MousePointer2, ArrowUp, BookOpen } from 'lucide-react';
+import { ChevronDown, List, FileText, MessageCircle, X, Sparkles, Send, ImageIcon, Share2, MousePointer2, ArrowUp, BookOpen, ChevronRight, Volume2 } from 'lucide-react';
 
 export const ReaderDemo: React.FC = () => {
     // State
@@ -129,48 +129,79 @@ export const ReaderDemo: React.FC = () => {
             </div>
 
             {/* 2. Header */}
-            <div className="px-4 py-3 border-b border-stone-100 flex items-center justify-between bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-                <button className="p-2 rounded-full text-stone-400">
-                    <div className="w-5 h-5 flex flex-col justify-center gap-1">
-                        <div className="w-full h-0.5 bg-current rounded-full"></div>
-                        <div className="w-2/3 h-0.5 bg-current rounded-full"></div>
-                    </div>
-                </button>
+            {/* 2. Header & Controls (Replicated from ReadingPage.tsx) */}
+            <div className={`px-4 pt-4 pb-0 bg-white sticky top-0 z-10 border-b border-stone-100`}>
 
-                <div className="flex flex-col items-center">
-                    <span className="font-serif font-bold text-lg leading-none text-stone-900 flex items-center gap-1">
-                        Gênesis 1 <ChevronDown size={14} className="text-stone-400" />
-                    </span>
-                    <span className="text-[10px] text-stone-500 uppercase tracking-wider font-medium mt-0.5">A Criação</span>
+                {/* Chapter Title & Nav */}
+                <div className="relative flex items-center justify-center mb-3">
+                    {/* Prev */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2">
+                        <button className="p-1 rounded-full text-stone-300">
+                            <ChevronRight className="rotate-180" size={20} />
+                        </button>
+                    </div>
+
+                    {/* Title */}
+                    <button className="flex flex-col items-center justify-center p-1 rounded-xl">
+                        <h1 className="flex items-center gap-2 text-xl font-serif font-bold text-stone-800">
+                            <span>Gênesis 1</span>
+                            <ChevronDown size={18} className="text-stone-400 opacity-50" />
+                        </h1>
+                        <p className="text-[10px] text-stone-500 font-medium italic mt-0.5">A Criação</p>
+                    </button>
+
+                    {/* Next */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                        <button className="p-1 rounded-full text-stone-300">
+                            <ChevronRight size={20} />
+                        </button>
+                    </div>
                 </div>
 
-                <button className="text-sm font-serif font-bold text-stone-400 w-8 h-8 flex items-center justify-center">
-                    AA
-                </button>
+                {/* Controls Bar (Tabs + Icons) */}
+                <div className="flex items-center justify-center gap-2 mb-4">
+
+                    {/* Tabs: Verses / Summary */}
+                    <div className="bg-stone-100 p-1 rounded-xl flex gap-1 shadow-inner items-center">
+                        <button
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm flex items-center gap-1.5 transition-all
+                                ${activeAction !== 'summary' ? 'bg-white text-stone-800 shadow-sm' : 'text-stone-400'}
+                            `}
+                        >
+                            <List size={14} className="mb-0.5" />
+                            Versículos
+                        </button>
+                        <button
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all
+                                ${activeAction === 'summary' ? 'bg-white text-stone-800 shadow-sm' : 'text-stone-400'}
+                            `}
+                        >
+                            <FileText size={14} className="mb-0.5" />
+                            Resumo
+                        </button>
+                    </div>
+
+                    <div className="w-px h-5 bg-stone-200 mx-0.5"></div>
+
+                    {/* Font Icon */}
+                    <button className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-stone-100 text-stone-400">
+                        <div className="flex items-end mb-0.5 gap-0.5">
+                            <span className="text-[10px] font-bold leading-none font-serif">a</span>
+                            <span className="text-sm font-bold leading-none font-serif">A</span>
+                        </div>
+                    </button>
+
+                    {/* Audio Icon */}
+                    <button className="h-8 w-8 shrink-0 flex items-center justify-center rounded-xl bg-bible-gold text-white shadow-bible-gold/30 shadow-sm">
+                        <Volume2 size={16} />
+                    </button>
+
+                </div>
             </div>
+
 
             {/* 3. Content Area */}
             <div className="h-[480px] overflow-hidden bg-white relative">
-
-                {/* Controls Bar */}
-                <div className="px-4 py-4">
-                    <div className="bg-stone-100 p-1 rounded-xl flex gap-1 shadow-inner items-center">
-                        <button
-                            className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-all
-                                ${activeAction !== 'summary' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-400'}
-                            `}
-                        >
-                            <List size={12} className={activeAction !== 'summary' ? "opacity-100" : "opacity-50"} /> Versículos
-                        </button>
-                        <button
-                            className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all
-                                ${activeAction === 'summary' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-400'}
-                            `}
-                        >
-                            <FileText size={12} className={activeAction === 'summary' ? "opacity-100" : "opacity-50"} /> Resumo
-                        </button>
-                    </div>
-                </div>
 
                 {/* VIEW: SUMMARY */}
                 {activeAction === 'summary' ? (
@@ -185,10 +216,7 @@ export const ReaderDemo: React.FC = () => {
                                 <li><strong>Dia 2:</strong> Céus e águas.</li>
                                 <li><strong>Dia 3:</strong> Terra seca e plantas.</li>
                             </ul>
-                            <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-100 text-yellow-800 text-xs font-medium flex gap-2">
-                                <Sparkles size={16} className="text-yellow-600 shrink-0 mt-0.5" />
-                                <span>Resumo gerado por IA para facilitar o entendimento do contexto geral.</span>
-                            </div>
+
                         </div>
                     </div>
                 ) : (
@@ -292,6 +320,6 @@ export const ReaderDemo: React.FC = () => {
 
             {/* Ask Overlay and Share Overlay would be here but simplified for demo */}
 
-        </div>
+        </div >
     );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { bibleBooks } from '../constants';
+import { Link } from 'react-router-dom';
 import { Trophy, Calendar, BookOpen, ChevronDown, ChevronUp, CheckCircle, BarChart2 } from 'lucide-react';
 import { BibleBook } from '../types';
 
@@ -55,15 +56,98 @@ const ProgressPage: React.FC<ProgressPageProps> = ({ user, theme }) => {
 
     if (!user) {
         return (
-            <div className={`min-h-screen p-6 md:p-12 flex flex-col items-center justify-center text-center animate-fadeIn
-                ${theme === 'dark' ? 'text-stone-300' : 'text-stone-600'}`}>
-                <div className="w-24 h-24 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mb-6">
-                    <BarChart2 size={48} className="text-stone-400" />
+            <div className="relative min-h-[80vh] overflow-hidden">
+                {/* --- MOCK BACKGROUND (Blurred) --- */}
+                <div className="filter blur-sm opacity-50 pointer-events-none p-4 md:p-8 select-none">
+                    {/* Header Mock */}
+                    <header className="mb-8 md:mb-12">
+                        <h1 className={`text-3xl md:text-4xl font-serif font-bold mb-3 ${theme === 'dark' ? 'text-stone-700' : 'text-stone-300'}`}>
+                            Meu Progresso
+                        </h1>
+                        <p className={`text-lg opacity-50 ${theme === 'dark' ? 'text-stone-500' : 'text-stone-400'}`}>
+                            Descubra quanto da Bíblia você já leu.
+                        </p>
+                    </header>
+
+                    {/* Stats Mock */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-12">
+                        {/* Mock Streak */}
+                        <div className={`p-6 rounded-2xl border shadow-sm flex items-center justify-between
+                            ${theme === 'dark' ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-100'}`}>
+                            <div>
+                                <div className="text-sm uppercase tracking-wider opacity-60 font-semibold mb-1">Sequência Diária</div>
+                                <div className="text-4xl font-bold flex items-baseline gap-2">
+                                    12 <span className="text-lg font-normal opacity-60">dias</span>
+                                </div>
+                                <p className="text-xs mt-2 opacity-50">Sua sequência atual de leitura</p>
+                            </div>
+                            <div className={`p-4 rounded-full ${theme === 'dark' ? 'bg-orange-500/10 text-orange-900' : 'bg-orange-50 text-orange-200'}`}>
+                                <Calendar size={32} />
+                            </div>
+                        </div>
+                        {/* Mock Total */}
+                        <div className={`p-6 rounded-2xl border shadow-sm flex items-center justify-between
+                            ${theme === 'dark' ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-100'}`}>
+                            <div className="w-full">
+                                <div className="text-sm uppercase tracking-wider opacity-60 font-semibold mb-1">Leitura Total</div>
+                                <div className="text-4xl font-bold mb-3">42%</div>
+                                <div className="w-full h-1.5 bg-stone-200 dark:bg-stone-800 rounded-full overflow-hidden">
+                                    <div className="h-full bg-green-500 w-[42%]"></div>
+                                </div>
+                            </div>
+                            <div className={`ml-4 p-4 rounded-full ${theme === 'dark' ? 'bg-green-500/10 text-green-900' : 'bg-green-50 text-green-200'}`}>
+                                <Trophy size={32} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mock Books List */}
+                    <div className="space-y-4 opacity-50">
+                        <div className={`rounded-xl border p-6 flex items-center gap-4 ${theme === 'dark' ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-100'}`}>
+                            <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center"><CheckCircle size={20} /></div>
+                            <div className="flex-1">
+                                <h4 className="font-serif font-bold text-lg">Gênesis</h4>
+                                <div className="h-2 w-full bg-stone-100 dark:bg-stone-800 rounded-full mt-2"><div className="h-full bg-green-500 w-full rounded-full" /></div>
+                            </div>
+                        </div>
+                        <div className={`rounded-xl border p-6 flex items-center gap-4 ${theme === 'dark' ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-100'}`}>
+                            <div className="w-10 h-10 rounded-full bg-bible-gold text-white flex items-center justify-center text-xs font-bold">35%</div>
+                            <div className="flex-1">
+                                <h4 className="font-serif font-bold text-lg">Êxodo</h4>
+                                <div className="h-2 w-full bg-stone-100 dark:bg-stone-800 rounded-full mt-2"><div className="h-full bg-bible-gold w-[35%] rounded-full" /></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h2 className="text-2xl font-serif font-bold mb-2">Acompanhe seu Progresso</h2>
-                <p className="max-w-md mb-8 opacity-80">
-                    Faça login para visualizar suas estatísticas de leitura, sequência diária e marcar capítulos como lidos.
-                </p>
+
+                {/* --- CTA OVERLAY --- */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-6 bg-gradient-to-b from-transparent via-white/90 to-white dark:via-stone-950/90 dark:to-stone-950">
+                    <div className={`max-w-md w-full p-8 rounded-3xl shadow-xl text-center transform transition-all
+                        ${theme === 'dark' ? 'bg-stone-900 border border-stone-800' : 'bg-white border border-stone-100'}`}>
+
+                        <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6
+                            ${theme === 'dark' ? 'bg-bible-gold/10 text-bible-gold' : 'bg-bible-gold/10 text-bible-gold'}`}>
+                            <BarChart2 size={40} />
+                        </div>
+
+                        <h2 className="text-2xl md:text-3xl font-serif font-bold mb-4">Acompanhe sua Evolução</h2>
+                        <p className={`mb-8 leading-relaxed ${theme === 'dark' ? 'text-stone-400' : 'text-stone-600'}`}>
+                            Mantenha o foco na sua jornada espiritual. Visualize gráficos, ganhe medalhas e veja sua sequência diária de leitura.
+                        </p>
+
+                        <div className="space-y-4">
+                            <Link to="/login" className="block w-full py-4 rounded-xl bg-bible-gold text-white font-bold text-lg hover:bg-yellow-600 transition-colors shadow-lg shadow-bible-gold/20">
+                                Fazer Login
+                            </Link>
+                            <Link to="/signup" className={`block w-full py-4 rounded-xl font-bold border transition-colors
+                                ${theme === 'dark'
+                                    ? 'border-stone-700 hover:bg-stone-800 text-stone-300'
+                                    : 'border-stone-200 hover:bg-stone-50 text-stone-600'}`}>
+                                Criar Conta Grátis
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

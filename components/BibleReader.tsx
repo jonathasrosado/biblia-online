@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Verse, ReadingPreferences } from '../types';
-import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause, MessageCircle, ArrowRight, MoreHorizontal, Minimize, Maximize2, ChevronDown, ChevronUp, Heart } from 'lucide-react';
+import { Sparkles, X, Share2, Copy, Volume2, Square, Loader2, Link as LinkIcon, Image as ImageIcon, Play, Pause, MessageCircle, ArrowRight, MoreHorizontal, Minimize, Maximize2, ChevronDown, ChevronUp, Heart, Plus, Minus } from 'lucide-react';
 import { explainVerse, askVerse, generateAudioFromText } from '../services/geminiService';
 import VerseImageGenerator_ from './VerseImageGenerator'; // Keep strictly for types if needed, but usually we just use typeof or rely on lazy inference. 
 // Actually, better to just remove import and define lazy.
@@ -464,7 +464,29 @@ const BibleReader = React.forwardRef<BibleReaderRef, BibleReaderProps>(({
                       `}
                   >
                     <span className={isAudioActive ? (preferences.theme === 'bw' ? 'text-stone-900' : 'text-bible-accent dark:text-stone-200') : ''}>
-                      {verse.text}
+                      {(() => {
+                        const text = verse.text.trim();
+                        const lastSpace = text.lastIndexOf(' ');
+                        const Badge = (
+                          <span className={`inline-flex items-center justify-center align-middle rounded-full shadow-sm w-5 h-5 ml-1.5
+                            ${preferences.theme === 'bw' ? 'bg-stone-100 text-stone-500' : 'bg-orange-50 text-bible-gold dark:bg-stone-800 dark:text-stone-400'}`}>
+                            {isSelected ? <Minus size={10} strokeWidth={3} /> : <Plus size={10} strokeWidth={3} />}
+                          </span>
+                        );
+
+                        if (lastSpace === -1) return <span className="whitespace-nowrap">{text}{Badge}</span>;
+
+                        return (
+                          <>
+                            {text.substring(0, lastSpace)}
+                            {' '}
+                            <span className="whitespace-nowrap">
+                              {text.substring(lastSpace + 1)}
+                              {Badge}
+                            </span>
+                          </>
+                        );
+                      })()}
                     </span>
                   </span>
                 </p>
