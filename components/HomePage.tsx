@@ -207,7 +207,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
             {/* NEW LAYOUT STRUCTURE */}
 
             {/* 1. HERO BLOCK - Top of Page */}
-            <div className={`relative pt-6 pb-12 px-6 md:px-12 text-center overflow-hidden
+            <div className={`relative pt-12 pb-12 px-6 md:pt-20 md:px-12 text-center overflow-hidden
                 ${theme === 'bw' ? 'bg-white text-black' : isDark ? 'bg-stone-950' : 'bg-stone-50'}
             `}>
                 {/* Background Ambience */}
@@ -216,25 +216,25 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                 )}
 
                 <div className="max-w-4xl mx-auto relative z-10 animate-slideUp">
-                    <h2 className={`text-4xl md:text-6xl font-black mb-4 tracking-tight leading-[1.1]
+                    <h2 className={`text-3xl md:text-5xl font-black mb-6 tracking-tight leading-[1.1]
                         ${theme === 'bw' ? 'text-black' : isDark ? 'text-stone-100' : 'text-stone-900'}
                     `}>
-                        Não basta ler a Bíblia,<br className="hidden md:block" />
-                        é preciso <span className={`font-serif italic ${theme === 'bw' ? 'text-stone-400' : 'text-bible-gold'}`}>entende-la.</span>
+                        Não basta ler a Bíblia,<br />
+                        é preciso <span className={`font-serif italic ${theme === 'bw' ? 'text-stone-400' : 'text-bible-gold'}`}>compreendê-la.</span>
                     </h2>
 
+                    <p className={`text-lg md:text-xl font-serif max-w-2xl mx-auto mb-2 leading-relaxed opacity-90
+                        ${theme === 'bw' ? 'text-stone-700' : 'text-stone-600 dark:text-stone-400'}
+                    `}>
+                        Obtenha explicações profundas e tire dúvidas enquanto lê.
+                    </p>
+
                     {/* Visual Onboarding (Reader Demo) - Inserted Here */}
-                    <div className="my-2 md:my-10 animate-slideUp" style={{ animationDelay: '0.2s' }}>
+                    <div className="mt-0 mb-4 md:my-8 animate-slideUp" style={{ animationDelay: '0.2s' }}>
                         <div className="transform scale-[0.85] md:scale-100 origin-center">
                             <ReaderDemo />
                         </div>
                     </div>
-
-                    <p className={`text-xl md:text-2xl font-serif max-w-2xl mx-auto mb-6 leading-relaxed opacity-90
-                        ${theme === 'bw' ? 'text-stone-700' : 'text-stone-600 dark:text-stone-400'}
-                    `}>
-                        Obtenha explicações profundas e tire dúvidas enquanto lê — tudo com a ajuda de inteligência artificial.
-                    </p>
 
                     <button
                         onClick={() => navigate('/leitura/genesis/1')}
@@ -398,7 +398,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
 
 
             {/* 3. FEATURED SECTIONS - SEO Pages */}
-            <div className="mb-16 animate-slideUp" style={{ animationDelay: '0.5s' }}>
+            <div className="mb-8 animate-slideUp" style={{ animationDelay: '0.5s' }}>
                 <div className="text-center mb-10 px-4">
                     <h3 className={`text-2xl font-serif font-bold mb-2
                         ${theme === 'bw' ? 'text-black' : isDark ? 'text-stone-100' : 'text-stone-800'}
@@ -413,6 +413,69 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                 </div>
 
                 <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:gap-6 pb-6 px-6 md:px-0 scrollbar-hide">
+
+                    {/* Daily Verse Card - FIRST POSITION (MOVED) */}
+                    <div className="group relative h-64 min-w-[75vw] md:min-w-0 snap-center rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 block w-full">
+                        <button
+                            ref={verseCardRef}
+                            onClick={handleShare}
+                            disabled={isSharing}
+                            className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center px-6 outline-none text-center
+                                ${theme === 'bw'
+                                    ? 'bg-white border border-stone-200'
+                                    : isDark
+                                        ? 'bg-gradient-to-br from-stone-900 via-stone-900 to-bible-gold/20 border border-bible-gold/20'
+                                        : 'bg-gradient-to-br from-white via-stone-50 to-bible-gold/10 border border-white'}
+                            `}
+                        >
+                            {/* Backgrounds */}
+                            {theme !== 'bw' && (
+                                <>
+                                    <div className="absolute top-0 right-0 w-48 h-48 bg-bible-gold/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none mix-blend-overlay"></div>
+                                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-bible-accent/5 rounded-full blur-3xl -ml-5 -mb-5 pointer-events-none"></div>
+                                </>
+                            )}
+
+                            {/* Header */}
+                            <div className="flex items-center gap-2 mb-3 relative z-10 opacity-80">
+                                <div className={`p-1.5 rounded-full ${theme === 'bw' ? 'bg-stone-100 text-black' : 'bg-bible-gold/10 text-bible-gold'}`}>
+                                    <Calendar size={14} />
+                                </div>
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>Versículo do Dia</span>
+                            </div>
+
+                            {/* Text */}
+                            <blockquote className={`text-lg leading-relaxed mb-3 relative z-10 drop-shadow-sm line-clamp-4 font-serif italic
+                                    ${theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-stone-100'}`}>
+                                "{dailyVerse.text}"
+                            </blockquote>
+
+                            {/* Ref */}
+                            <cite className={`not-italic font-bold tracking-wider uppercase text-xs flex items-center justify-center gap-2 relative z-10
+                                    ${theme === 'bw' ? 'text-stone-600' : 'text-stone-500 dark:text-stone-400'}`}>
+                                {dailyVerse.ref}
+                            </cite>
+
+                            {/* Share Label */}
+                            <div className={`mt-4 text-xs font-bold uppercase tracking-wider flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity
+                                ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}
+                             `}>
+                                {isSharing ? <Loader2 size={12} className="animate-spin" /> : <Share2 size={12} />}
+                                {isSharing ? 'Gerando...' : 'Compartilhar'}
+                            </div>
+                        </button>
+
+                        {/* Reset Button (Absolute Top Right) */}
+                        <button
+                            onClick={(e) => { e.stopPropagation(); handleNextVerse(); }}
+                            className={`absolute top-3 right-3 p-2 rounded-full z-20 transition-colors
+                                ${theme === 'bw' ? 'bg-stone-100 hover:bg-stone-200 text-stone-500' : 'bg-black/20 hover:bg-black/30 text-white/70'}
+                            `}
+                            title="Trocar Versículo"
+                        >
+                            <RefreshCw size={14} />
+                        </button>
+                    </div>
 
                     {/* Guide Card - FIRST POSITION */}
                     <button
@@ -541,82 +604,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                 </div>
             </div>
 
-            {/* 1. DAILY VERSE (Featured - Moved Up) */}
-            <div className="animate-slideUp" style={{ animationDelay: '0.45s' }}>
-                <div id="daily-verse-card" ref={verseCardRef} className={`w-full p-10 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[240px] text-center items-center shadow-md transition-all hover:scale-[1.01]
-                        ${theme === 'bw'
-                        ? 'bg-white border border-stone-200'
-                        : isDark
-                            ? 'bg-gradient-to-br from-stone-900 via-stone-900 to-bible-gold/20 border border-bible-gold/20'
-                            : 'bg-gradient-to-br from-white via-stone-50 to-bible-gold/10 border border-white'}
-                    `}>
 
-                    {/* Background Ambience */}
-                    {theme !== 'bw' && (
-                        <>
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-bible-gold/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none mix-blend-overlay"></div>
-                            <div className="absolute bottom-0 left-0 w-48 h-48 bg-bible-accent/5 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
-                        </>
-                    )}
-
-                    {/* Quote Icons */}
-                    <div className={`absolute top-6 left-6 opacity-20 pointer-events-none ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21L14.017 18C14.017 16.896 14.321 15.923 14.929 15.081C15.539 14.238 16.417 13.565 17.564 13.06L17.564 12.637C16.956 12.637 16.488 12.483 16.157 12.176C15.828 11.87 15.663 11.464 15.663 10.959C15.663 10.457 15.845 10.051 16.208 9.74001C16.572 9.42901 17.065 9.27401 17.689 9.27401C18.423 9.27401 18.995 9.53701 19.408 10.062C19.821 10.589 20.027 11.233 20.027 11.996C20.027 13.433 19.488 14.82 18.411 16.157C17.334 17.495 15.868 18.775 14.016 19.998L14.017 21ZM5.00201 21L5.00201 18C5.00201 16.896 5.30601 15.923 5.91401 15.081C6.52401 14.238 7.40001 13.565 8.54801 13.06L8.54801 12.637C7.94001 12.637 7.47201 12.483 7.14101 12.176C6.81201 11.87 6.64701 11.464 6.64701 10.959C6.64701 10.457 6.82901 10.051 7.19201 9.74001C7.55601 9.42901 8.05001 9.27401 8.67301 9.27401C9.40701 9.27401 9.97901 9.53701 10.392 10.062C10.805 10.589 11.011 11.233 11.011 11.996C11.011 13.433 10.472 14.82 9.39501 16.157C8.31801 17.495 6.85301 18.775 5.00201 19.998L5.00201 21Z"></path></svg>
-                    </div>
-
-                    <div className="flex items-center gap-3 mb-6 relative z-10">
-                        <div className={`p-2 rounded-full ${theme === 'bw' ? 'bg-stone-100 text-black' : 'bg-bible-gold/10 text-bible-gold'}`}>
-                            <Calendar size={20} />
-                        </div>
-                        <span className={`text-xs font-bold uppercase tracking-[0.2em] ${theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>Versículo do Dia</span>
-                    </div>
-
-                    <blockquote className={`text-3xl md:text-4xl font-serif italic leading-tight mb-8 max-w-4xl mx-auto relative z-10 drop-shadow-sm
-                            ${theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-stone-100'}`}>
-                        "{dailyVerse.text}"
-                    </blockquote>
-
-                    <cite className={`not-italic font-bold tracking-wider uppercase text-sm flex items-center gap-4 relative z-10 mb-8
-                            ${theme === 'bw' ? 'text-stone-600' : 'text-stone-500 dark:text-stone-400'}`}>
-                        <span className={`h-px w-12 ${theme === 'bw' ? 'bg-black/20' : 'bg-gradient-to-r from-transparent to-bible-gold'}`}></span>
-                        {dailyVerse.ref}
-                        <span className={`h-px w-12 ${theme === 'bw' ? 'bg-black/20' : 'bg-gradient-to-l from-transparent to-bible-gold'}`}></span>
-                    </cite>
-
-                    {/* Visible Watermark Footer */}
-                    <div className="relative z-10 font-serif font-bold tracking-[0.2em] opacity-80 uppercase text-sm mb-2" style={{ color: isDark ? '#e7c674' : '#b45309' }}>
-                        BIBLIAONLINE.ME
-                    </div>
-                </div>
-
-                {/* Share Button (Outside Card) */}
-                <div className="flex justify-center mt-6 gap-4">
-                    <button
-                        onClick={handleShare}
-                        disabled={isSharing}
-                        className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md disabled:opacity-50 transition-all
-                                ${theme === 'bw'
-                                ? 'bg-stone-100 text-stone-900 hover:bg-black hover:text-white'
-                                : 'bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white'}
-                            `}
-                    >
-                        {isSharing ? <Loader2 size={18} className="animate-spin" /> : <Share2 size={18} />}
-                        {isSharing ? 'Gerando...' : 'Compartilhar'}
-                    </button>
-
-                    <button
-                        onClick={handleNextVerse}
-                        className={`flex items-center gap-2 px-6 py-2 rounded-full border font-bold text-sm uppercase tracking-wide shadow-sm hover:shadow-md transition-all
-                                ${theme === 'bw'
-                                ? 'border-stone-200 text-stone-600 hover:bg-stone-50'
-                                : 'border-bible-gold/30 text-bible-gold hover:bg-bible-gold/10'}
-                            `}
-                    >
-                        <RefreshCw size={18} />
-                        Outro
-                    </button>
-                </div>
-            </div>
 
             {/* Old Tools Section Removed */}
         </div>
