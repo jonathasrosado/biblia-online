@@ -40,6 +40,15 @@ export interface ReadingHistoryItem {
   timestamp: number;
 }
 
+export interface FavoriteVerse {
+  id: string; // Composite: book-chapter-verse
+  book: string;
+  chapter: number;
+  verse: number;
+  text: string;
+  timestamp: number;
+}
+
 export interface DevotionalContent {
   title: string;
   verseReference: string;

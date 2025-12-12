@@ -5,9 +5,10 @@ import { ChevronRight, ChevronLeft, Volume2, Pause, Play, Share2, BookOpen, Mic,
 import { bibleBooks, normalizeBookName, findBookByNormalizedName } from '../constants';
 import { chapterTitles } from '../data/chapterTitles';
 import { getChapterContent } from '../services/geminiService';
-import { Verse, ReadingPreferences, BibleVersion } from '../types';
+import { Verse, ReadingPreferences, BibleVersion, FavoriteVerse } from '../types';
 import BibleReader, { BibleReaderRef } from '../components/BibleReader';
 import { AdUnit } from '../components/AdUnit';
+import { Heart } from 'lucide-react';
 
 interface ReadingPageProps {
     language: string;
@@ -20,6 +21,8 @@ interface ReadingPageProps {
     addToHistory: (book: string, chapter: number) => void;
     user?: any;
     setUser?: (user: any) => void;
+    favorites?: FavoriteVerse[]; // Add favorites prop
+    onToggleFavorite?: (verse: FavoriteVerse) => void; // Add toggle callback
 }
 
 const ReadingPage: React.FC<ReadingPageProps> = ({
@@ -32,7 +35,9 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
     setIsFullScreen,
     addToHistory,
     user,
-    setUser
+    setUser,
+    favorites = [],
+    onToggleFavorite
 }) => {
     // ... existing hooks ...
     const { bookAbbrev, chapterNum } = useParams<{ bookAbbrev: string; chapterNum: string }>();
@@ -163,6 +168,44 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
             }
         }
     }, [loadingContent, initialSelectedVerses]);
+
+
+
+    // Check if selected verses are favorited
+    const areSelectedVersesFavorited = React.useMemo(() => {
+        if (initialSelectedVerses.length === 0) return false;
+        // Returns true if ALL selected verses are selected favorites.
+        // Or simpler: Returns true if at least ONE is favorited? Usually "Is Favorited" state implies the set.
+        // Let's go with: If 1 verse selected, shows its state. If multiple, shows "Active" if ALL are favs.
+        return initialSelectedVerses.every(vNum => {
+            const id = `${currentBook.name}-${currentChapter}-${vNum}`;
+            return favorites.some(f => f.id === id);
+        });
+    }, [initialSelectedVerses, favorites, currentBook.name, currentChapter]);
+
+    const handleToggleFavorite = () => {
+        if (!user) {
+            alert('Faça login para favoritar versículos.');
+            return;
+        }
+        if (initialSelectedVerses.length === 0) {
+            alert('Selecione pelo menos um versículo para favoritar.'); // Replace with Toast later if available
+            return;
+        }
+
+        initialSelectedVerses.forEach(vNum => {
+            const verseText = chapterContent.find(v => v.number === vNum)?.text || '';
+            const verseObj: FavoriteVerse = {
+                id: `${currentBook.name}-${currentChapter}-${vNum}`,
+                book: currentBook.name,
+                chapter: currentChapter,
+                verse: vNum,
+                text: verseText,
+                timestamp: Date.now()
+            };
+            if (onToggleFavorite) onToggleFavorite(verseObj);
+        });
+    };
 
     useEffect(() => {
         const loadChapter = async () => {
@@ -471,7 +514,27 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                         ) : (
                             <Volume2 size={16} />
                         )}
+
                     </button>
+
+                    {/* 4. Favorite Button */}
+                    {user && (
+                        <button
+                            onClick={handleToggleFavorite}
+                            className={`
+                                h-11 w-11 rounded-xl flex items-center justify-center transition-all active:scale-95
+                                ${areSelectedVersesFavorited
+                                    ? (preferences.theme === 'bw' ? 'bg-black text-white' : 'bg-red-500 text-white shadow-red-200')
+                                    : (preferences.theme === 'bw'
+                                        ? 'hover:bg-stone-100 text-stone-400 hover:text-black'
+                                        : 'hover:bg-red-50 text-stone-400 dark:text-stone-500 hover:text-red-500 dark:hover:text-red-400')
+                                }
+                            `}
+                            title={initialSelectedVerses.length === 0 ? "Selecione um versículo" : areSelectedVersesFavorited ? "Remover dos Favoritos" : "Adicionar aos Favoritos"}
+                        >
+                            <Heart size={18} className={areSelectedVersesFavorited ? "fill-current" : ""} />
+                        </button>
+                    )}
                 </div>
             </header>
 

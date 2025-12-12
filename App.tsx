@@ -4,7 +4,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { ChevronDown, ChevronLeft, Menu, Search, X, BookOpen, Sun, Moon, ArrowUp, MessageCircle, Book, Settings, Loader2, Minimize, Maximize, User as UserIcon, AlignJustify, Coffee, Library, Scroll, LogIn, LogOut, UserPlus, Heart, BarChart2 } from 'lucide-react';
 import { bibleBooks, translations, findBookByNormalizedName, normalizeBookName, BIBLE_VERSIONS } from './constants';
 
-import { BibleBook, ReadingPreferences, ReadingHistoryItem, BibleVersion, Theme } from './types';
+import { BibleBook, ReadingPreferences, ReadingHistoryItem, BibleVersion, Theme, FavoriteVerse } from './types';
 import BookSelector from './components/BookSelector';
 import { AdUnit } from './components/AdUnit';
 import { AppFooter, CookieBanner, LegalModal } from './components/LegalComponents';
@@ -139,6 +139,30 @@ function AppContent() {
     }
     return [];
   });
+
+  // Favorites State
+  const [favorites, setFavorites] = useState<FavoriteVerse[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('user_favorites');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
+  // Save Favorites
+  useEffect(() => {
+    localStorage.setItem('user_favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (verse: FavoriteVerse) => {
+    setFavorites(prev => {
+      const exists = prev.some(f => f.id === verse.id);
+      if (exists) {
+        return prev.filter(f => f.id !== verse.id);
+      }
+      return [verse, ...prev];
+    });
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState<any>(null);
@@ -502,6 +526,39 @@ function AppContent() {
                       <BarChart2 size={16} />
                       Meu Progresso
                     </button>
+
+                    {/* Favorites Section */}
+                    <div className="pt-2">
+                      <h3 className={`px-3 text-[10px] font-bold uppercase tracking-widest mb-2 opacity-70 flex items-center gap-1 ${preferences.theme === 'bw' ? 'text-stone-500' : 'text-stone-400'}`}>
+                        <Heart size={10} className="fill-current" /> Favoritos
+                      </h3>
+                      {favorites.length === 0 ? (
+                        <div className="px-3 py-2 text-xs text-stone-500 italic">
+                          Nenhum versículo salvo ainda.
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          {favorites.map(fav => (
+                            <button
+                              key={fav.id}
+                              onClick={() => {
+                                navigate(`/leitura/${normalizeBookName(fav.book)}/${fav.chapter}?verses=${fav.verse}`);
+                                setSidebarOpen(false);
+                              }}
+                              className={`w-full text-left px-3 py-2 rounded-lg transition-colors group
+                                  ${preferences.theme === 'bw' ? 'hover:bg-stone-50' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
+                            >
+                              <div className={`text-xs font-bold mb-0.5 ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-700 dark:text-stone-300'}`}>
+                                {fav.book} {fav.chapter}:{fav.verse}
+                              </div>
+                              <div className="text-[10px] text-stone-500 line-clamp-1 opacity-80">
+                                {fav.text}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </>
 
                 ) : (
@@ -694,6 +751,8 @@ function AppContent() {
                   onUpdatePreferences={setPreferences}
                   user={user}
                   setUser={setUser}
+                  favorites={favorites}
+                  onToggleFavorite={toggleFavorite}
                 />
               </ViewWrapper>
             } />
