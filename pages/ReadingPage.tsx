@@ -419,35 +419,30 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                                     <span className="text-xs font-bold text-stone-400 mr-4 font-serif">A</span>
 
                                     {/* Visual Track & Ticks */}
-                                    <div className="relative flex-1 h-1 bg-stone-300 dark:bg-stone-600 rounded-full flex justify-between items-center px-0.5">
-                                        {[80, 100, 120, 140, 160, 180].map((step) => (
-                                            <div key={step} className={`rounded-full transition-all duration-300 z-10
-                                                ${preferences.fontSize >= step
-                                                    ? (preferences.theme === 'bw' ? 'bg-black w-3 h-3' : 'bg-bible-gold w-3 h-3')
-                                                    : 'bg-stone-400 dark:bg-stone-500 w-2 h-2'}`}
-                                            />
-                                        ))}
+                                    {/* Visual Track (Simple) */}
+                                    <div className="relative flex-1 h-1 bg-stone-300 dark:bg-stone-600 rounded-full flex items-center px-0.5">
                                         {/* Progress Fill */}
                                         <div
                                             className={`absolute left-0 top-0 h-full rounded-full ${preferences.theme === 'bw' ? 'bg-black' : 'bg-bible-gold'}`}
                                             style={{ width: `${((preferences.fontSize - 80) / 100) * 100}%` }}
                                         />
+
+                                        {/* Thumb (Visual only, moves with percentage) */}
+                                        <div
+                                            className={`absolute h-4 w-4 rounded-full shadow-md z-10 pointer-events-none transition-colors
+                                                ${preferences.theme === 'bw' ? 'bg-black' : 'bg-bible-gold'}`}
+                                            style={{ left: `calc(${((preferences.fontSize - 80) / 100) * 100}% - 8px)` }}
+                                        />
                                     </div>
 
-                                    {/* Range Input (Invisible) */}
+                                    {/* Range Input */}
                                     <input
                                         type="range"
                                         min="80"
                                         max="180"
-                                        step="20"
+                                        step="1"
                                         value={preferences.fontSize}
-                                        onChange={(e) => {
-                                            const newVal = parseInt(e.target.value);
-                                            if (newVal !== preferences.fontSize) {
-                                                if (navigator.vibrate) navigator.vibrate(15);
-                                                onUpdatePreferences({ ...preferences, fontSize: newVal });
-                                            }
-                                        }}
+                                        onChange={(e) => onUpdatePreferences({ ...preferences, fontSize: parseInt(e.target.value) })}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 mx-4"
                                     />
 
