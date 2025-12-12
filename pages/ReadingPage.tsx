@@ -441,6 +441,7 @@ const ReadingPage: React.FC<ReadingPageProps> = ({
                                         step="1"
                                         value={preferences.fontSize}
                                         onChange={(e) => onUpdatePreferences({ ...preferences, fontSize: parseInt(e.target.value) })}
+                                        style={{ touchAction: 'none' }}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 mx-4"
                                     />
 
