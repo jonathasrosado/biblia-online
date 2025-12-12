@@ -136,7 +136,7 @@ const ProgressPage: React.FC<ProgressPageProps> = ({ user, theme }) => {
             <div className="space-y-4">
                 {bibleBooks.map((book) => {
                     const stats = getBookProgress(book);
-                    const is expanded = expandedBook === book.name;
+                    const expanded = expandedBook === book.name;
                     const isComplete = stats.percent === 100;
 
                     return (
