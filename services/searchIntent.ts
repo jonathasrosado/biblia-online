@@ -4,7 +4,7 @@ import { characters, CharacterProfile } from '../data/search/characters';
 import { stories, StoryEntry } from '../data/search/stories';
 import { emotions, EmotionEntry } from '../data/search/emotions';
 
-export type SearchIntentType = 'BOOK' | 'CHAPTER' | 'VERSE' | 'RANGE' | 'THEME' | 'QUESTION' | 'CHARACTER' | 'STORY' | 'EMOTION' | 'UNKNOWN';
+export type SearchIntentType = 'BOOK' | 'CHAPTER' | 'VERSE' | 'RANGE' | 'THEME' | 'QUESTION' | 'CHARACTER' | 'STORY' | 'EMOTION' | 'UNKNOWN' | 'TESTAMENT';
 
 export interface SearchIntent {
     type: SearchIntentType;
@@ -19,8 +19,16 @@ export interface SearchIntent {
         character?: CharacterProfile;
         story?: StoryEntry;
         emotion?: EmotionEntry;
+        testament?: 'Old' | 'New';
     };
     confidence: number;
+}
+
+export interface SearchSuggestion {
+    type: SearchIntentType;
+    label: string;
+    subLabel?: string;
+    data: any;
 }
 
 // Map of normalized aliases to canonical book names
@@ -94,7 +102,7 @@ const BOOK_ALIASES: Record<string, string> = {
     'ap': 'Apocalipse', 'apocalipse': 'Apocalipse'
 };
 
-function normalizeStr(s: string): string {
+export function normalizeStr(s: string): string {
     return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, ' ');
 }
 
@@ -111,10 +119,112 @@ function findBook(query: string): BibleBook | undefined {
     return undefined;
 }
 
+export function getSearchSuggestions(query: string): SearchSuggestion[] {
+    const normalized = normalizeStr(query);
+    if (!normalized || normalized.length < 2) return [];
+
+    const results: SearchSuggestion[] = [];
+
+    // 0. Verse/Chapter Reference (High Priority)
+    const refRegex = /^([\d\s]*[a-zA-Zçéáíóúâêôãõ\.]+)\s+(\d+)(?:[:\s](\d+))?(?:[-–](\d+))?$/;
+    const match = query.trim().match(refRegex);
+    if (match) {
+        const bookPart = match[1].trim().replace(/\.$/, '');
+        const chapter = parseInt(match[2], 10);
+        const verse = match[3] ? parseInt(match[3], 10) : undefined;
+        const endVerse = match[4] ? parseInt(match[4], 10) : undefined;
+
+        const book = findBook(bookPart);
+        if (book) {
+            if (verse) {
+                if (endVerse) {
+                    results.push({
+                        type: 'RANGE',
+                        label: `${book.name} ${chapter}:${verse}-${endVerse}`,
+                        subLabel: 'Versículos',
+                        data: { book, chapter, verse, endVerse }
+                    });
+                } else {
+                    results.push({
+                        type: 'VERSE',
+                        label: `${book.name} ${chapter}:${verse}`,
+                        subLabel: 'Versículo',
+                        data: { book, chapter, verse }
+                    });
+                }
+            } else {
+                results.push({
+                    type: 'CHAPTER',
+                    label: `${book.name} ${chapter}`,
+                    subLabel: 'Capítulo',
+                    data: { book, chapter }
+                });
+            }
+        }
+    }
+
+    // 1. Books
+    const matchedBooks = bibleBooks.filter(b => normalizeStr(b.name).includes(normalized));
+    matchedBooks.forEach(b => {
+        results.push({
+            type: 'BOOK',
+            label: b.name,
+            subLabel: 'Livro',
+            data: { book: b }
+        });
+    });
+
+    // 2. Characters
+    Object.entries(characters).forEach(([key, char]) => {
+        if (normalizeStr(char.name).includes(normalized)) {
+            results.push({
+                type: 'CHARACTER',
+                label: char.name,
+                subLabel: char.role,
+                data: { character: char }
+            });
+        }
+    });
+
+    // 3. Stories
+    Object.entries(stories).forEach(([key, story]) => {
+        if (normalizeStr(story.title).includes(normalized) || normalizeStr(key).includes(normalized)) {
+            results.push({
+                type: 'STORY',
+                label: story.title,
+                subLabel: 'História',
+                data: { story }
+            });
+        }
+    });
+
+    // 4. Emotions
+    Object.entries(emotions).forEach(([key, emotion]) => {
+        if (normalizeStr(emotion.title).includes(normalized) || normalizeStr(key).includes(normalized)) {
+            results.push({
+                type: 'EMOTION',
+                label: emotion.title,
+                subLabel: 'Sentimento',
+                data: { emotion }
+            });
+        }
+    });
+
+    return results.slice(0, 8); // Limit to top 8 suggestions
+}
+
 export function parseSearchIntent(query: string): SearchIntent {
     const cleanQuery = query.trim();
     const lowerQuery = cleanQuery.toLowerCase();
     const normalizedQuery = normalizeStr(query);
+
+    // 0. Check for Testaments (High Priority)
+    if (normalizedQuery.includes('antigo testamento') || normalizedQuery.includes('velho testamento')) {
+        return { type: 'TESTAMENT', originalQuery: cleanQuery, data: { testament: 'Old' }, confidence: 1 };
+    }
+    if (normalizedQuery.includes('novo testamento')) {
+        return { type: 'TESTAMENT', originalQuery: cleanQuery, data: { testament: 'New' }, confidence: 1 };
+    }
 
     // 1. Check for Question
     const questionWords = ['quem', 'onde', 'porque', 'por que', 'o que', 'como', 'qual', 'quando', 'significado'];
@@ -183,15 +293,16 @@ export function parseSearchIntent(query: string): SearchIntent {
 
 
     // 5. Verse Reference (Standard Pattern)
-    const refRegex = /^([\d\s]*[a-zA-Zçéáíóúâêôãõ\.]+)\s+(\d+)(?:[:\s](\d+))?(?:-(\d+))?$/;
+    // Supports standard hyphen (-) and en-dash (–)
+    const refRegex = /^([\d\s]*[a-zA-Zçéáíóúâêôãõ\.]+)\s+(\d+)(?:[:\s](\d+))?(?:[-–](\d+))?$/;
     const match = cleanQuery.match(refRegex);
     if (match) {
         const bookPart = match[1].trim().replace(/\.$/, '');
         const chapter = parseInt(match[2], 10);
         const verse = match[3] ? parseInt(match[3], 10) : undefined;
         const endVerse = match[4] ? parseInt(match[4], 10) : undefined;
-        const book = findBook(bookPart);
 
+        const book = findBook(bookPart);
         if (book) {
             if (endVerse && verse) {
                 return { type: 'RANGE', originalQuery: cleanQuery, data: { book, chapter, verse, endVerse }, confidence: 1.0 };

@@ -11,6 +11,7 @@ import { AppFooter, CookieBanner, LegalModal } from './components/LegalComponent
 import Footer from './components/Footer';
 import SettingsModal from './components/SettingsModal';
 import LoginModal from './components/LoginModal';
+import SmartSearch from './components/SmartSearch';
 
 // Pages
 // Pages (Lazy Loaded)
@@ -515,22 +516,13 @@ function AppContent() {
             </div>
 
             <div className="p-3">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
+              <div className="p-3">
+                <SmartSearch
                   placeholder={t.searchPlaceholder}
-                  className={`w-full pl-9 pr-3 py-1.5 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors
-                  ${preferences.theme === 'bw'
-                      ? 'bg-white border-stone-200 focus:ring-black/20 text-black placeholder-stone-500'
-                      : preferences.theme === 'sepia'
-                        ? 'bg-[#efebd6] border-[#d6cba6] placeholder-[#8c7b64] focus:ring-bible-gold/50'
-                        : 'bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 dark:placeholder-stone-500 focus:ring-bible-gold/50'}
-                `}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  theme={preferences.theme}
+                  variant="sidebar"
                 />
-                <Search className="absolute left-2.5 top-2 text-stone-400 w-4 h-4" />
-              </form>
+              </div>
             </div>
 
             <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-4 scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-800">
