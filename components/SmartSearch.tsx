@@ -10,9 +10,10 @@ interface SmartSearchProps {
     theme?: 'light' | 'dark' | 'bw' | 'sepia';
     onClose?: () => void;
     variant?: 'default' | 'sidebar';
+    simpleMode?: boolean;
 }
 
-const SmartSearch: React.FC<SmartSearchProps> = ({ placeholder = "Busque sentimentos, personagens, histórias...", theme = 'light', onClose, variant = 'default' }) => {
+const SmartSearch: React.FC<SmartSearchProps> = ({ placeholder = "Busque sentimentos, personagens, histórias...", theme = 'light', onClose, variant = 'default', simpleMode = false }) => {
     const navigate = useNavigate();
     const [query, setQuery] = useState('');
     const [intent, setIntent] = useState<SearchIntent | null>(null);
@@ -35,11 +36,11 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ placeholder = "Busque sentime
                 return;
             }
 
-            if (variant === 'sidebar') {
+            if (variant === 'sidebar' || simpleMode) {
                 const results = getSearchSuggestions(query);
                 setSuggestions(results);
-                setIntent(null); // Disable intent card in sidebar
-                setSmartSuggestions([]); // Clear smart suggestions for sidebar
+                setIntent(null); // Disable intent card in sidebar/simpleMode
+                setSmartSuggestions([]); // Clear smart suggestions
             } else {
                 let result = parseSearchIntent(query);
 
@@ -180,7 +181,7 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ placeholder = "Busque sentime
         }, 200);
 
         return () => clearTimeout(timer);
-    }, [query]);
+    }, [query, variant, simpleMode]);
 
     // Click Outside
     useEffect(() => {
@@ -615,7 +616,7 @@ const SmartSearch: React.FC<SmartSearchProps> = ({ placeholder = "Busque sentime
                                 </div>
                             )}
                         </div>
-                    ) : variant === 'sidebar' && suggestions.length > 0 ? (
+                    ) : (variant === 'sidebar' || simpleMode) && suggestions.length > 0 ? (
                         <div className="flex flex-col gap-1">
                             {suggestions.map((s, i) => (
                                 <button

@@ -284,7 +284,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
 
                     {/* Search Input */}
                     <div className="mb-10 w-full max-w-2xl mx-auto">
-                        <SmartSearch theme={theme} placeholder="Buscar livro, capítulo ou tema (ex: Gênesis, / Fé)" />
+                        <SmartSearch theme={theme} placeholder="Buscar livro, capítulo ou tema (ex: Gênesis, / Fé)" simpleMode={true} />
                     </div>
 
                     {/* Check if we need to show Testaments or Themes */}
