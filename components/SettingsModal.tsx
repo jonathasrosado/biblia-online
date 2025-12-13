@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, AlignLeft, AlignJustify, Moon, Sun, Coffee, Maximize, Minimize } from 'lucide-react';
-import { ReadingPreferences } from '../types';
+import { ReadingPreferences, BibleVersion } from '../types';
+import { BIBLE_VERSIONS, translations } from '../constants'; // Import translations for version names
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -10,9 +11,21 @@ interface SettingsModalProps {
   isFullScreen?: boolean;
   onToggleFullScreen?: () => void;
   t: any;
+  currentVersion?: BibleVersion;
+  onVersionChange?: (version: BibleVersion) => void;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, preferences, onUpdate, isFullScreen, onToggleFullScreen, t }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen,
+  onClose,
+  preferences,
+  onUpdate,
+  isFullScreen,
+  onToggleFullScreen,
+  t,
+  currentVersion,
+  onVersionChange
+}) => {
   if (!isOpen) return null;
 
   const update = (key: keyof ReadingPreferences, value: any) => {
@@ -36,7 +49,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, preferen
         return {
           modal: 'bg-[#f4ecd8] border-[#e6dcc6]',
           header: 'border-[#e6dcc6] bg-[#efebd6] text-[#5c4b37]',
-          text: 'text-[#5c4b37]',
+          text: 'text-stone-[#5c4b37]',
           subtext: 'text-[#8c7b64]',
           sectionBg: 'bg-[#efebd6]',
           closeBtn: 'hover:bg-[#e6dcc6] text-[#8c7b64]',
@@ -81,6 +94,29 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, preferen
         </div>
 
         <div className="p-5 space-y-5 overflow-y-auto max-h-[75vh]">
+
+          {/* Bible Version Section */}
+          {currentVersion && onVersionChange && (
+            <div>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${themeClasses.subtext}`}>
+                Versão da Bíblia
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {BIBLE_VERSIONS.map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => onVersionChange(v)}
+                    className={`flex items-center justify-center p-2.5 rounded-xl border-2 transition-all text-sm font-medium ${currentVersion === v
+                      ? (preferences.theme === 'bw' ? 'border-black bg-black text-white' : 'border-bible-gold bg-bible-gold text-white')
+                      : (preferences.theme === 'bw' ? 'border-transparent bg-stone-100 text-stone-500 hover:border-black hover:text-black' : 'border-transparent bg-stone-100 dark:bg-stone-800 text-stone-500 hover:border-bible-gold/50 hover:text-bible-gold')
+                      }`}
+                  >
+                    {translations.pt[v] || v.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Theme Section */}
           <div>

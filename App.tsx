@@ -954,6 +954,8 @@ function AppContent() {
         isFullScreen={isFullScreen}
         onToggleFullScreen={() => setIsFullScreen(!isFullScreen)}
         t={t}
+        currentVersion={version}
+        onVersionChange={setVersion}
       />
       <LoginModal
         isOpen={isLoginModalOpen}
