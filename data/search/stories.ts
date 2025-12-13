@@ -1,0 +1,1284 @@
+// stories.ts
+export type StoryEntry = {
+  title: string;
+  ref: string;
+  summary: string;
+  keywords: string[];
+  people: string[];
+  themes: string[];
+};
+
+export const stories: Record<string, StoryEntry> = {
+  "menino gigante": {
+    title: "Davi e Golias",
+    ref: "1 Samuel 17",
+    summary: "Um jovem pastor enfrenta um gigante não com força bruta, mas com fé, coragem e a certeza de que Deus luta por seu povo.",
+    keywords: ["gigante", "pedra", "funda", "coragem", "exército", "filisteus"],
+    people: ["Davi", "Golias", "Saul"],
+    themes: ["fé", "coragem", "confiança em Deus", "impossível"],
+  },
+  "pedra funda": {
+    title: "Davi e Golias",
+    ref: "1 Samuel 17",
+    summary: "A vitória vem quando a confiança está em Deus — a funda vira símbolo de dependência, não de sorte.",
+    keywords: ["funda", "pedra", "gigante"],
+    people: ["Davi", "Golias"],
+    themes: ["fé", "dependência", "ousadia"],
+  },
+  "garoto venceu gigante": {
+    title: "Davi e Golias",
+    ref: "1 Samuel 17",
+    summary: "Deus usa o improvável para expor o orgulho do forte e fortalecer o coração do fraco.",
+    keywords: ["garoto", "gigante", "batalha"],
+    people: ["Davi", "Golias"],
+    themes: ["chamado", "coragem", "Deus usa o pequeno"],
+  },
+
+  "mar abriu": {
+    title: "A Travessia do Mar Vermelho",
+    ref: "Êxodo 14",
+    summary: "O povo encurralado vê Deus abrir caminho onde não havia. Libertação, confiança e um novo começo.",
+    keywords: ["mar", "abriu", "fuga", "egito", "faraó"],
+    people: ["Moisés", "Faraó", "Israel"],
+    themes: ["libertação", "milagre", "fé em crise"],
+  },
+  "mar se abriu": {
+    title: "A Travessia do Mar Vermelho",
+    ref: "Êxodo 14",
+    summary: "Deus transforma beco sem saída em estrada; o impossível vira passagem.",
+    keywords: ["mar", "passagem", "milagre"],
+    people: ["Moisés"],
+    themes: ["provisão", "salvação", "confiança"],
+  },
+  "agua virou parede": {
+    title: "A Travessia do Mar Vermelho",
+    ref: "Êxodo 14",
+    summary: "O mar se torna muro, e o povo atravessa a seco: sinal de que Deus protege e conduz.",
+    keywords: ["parede", "água", "atravessar"],
+    people: ["Moisés", "Israel"],
+    themes: ["proteção", "direção", "milagre"],
+  },
+
+  "fogo ceu": {
+    title: "Elias e os Profetas de Baal",
+    ref: "1 Reis 18",
+    summary: "Deus responde com fogo e revela quem é o verdadeiro Senhor, chamando o povo de volta à fidelidade.",
+    keywords: ["fogo", "altar", "baal", "monte carmelo"],
+    people: ["Elias"],
+    themes: ["idolatria", "arrependimento", "Deus verdadeiro"],
+  },
+  "altar pegou fogo": {
+    title: "Elias e os Profetas de Baal",
+    ref: "1 Reis 18",
+    summary: "A resposta divina expõe o vazio dos ídolos e reacende a fé do povo.",
+    keywords: ["altar", "fogo", "oração"],
+    people: ["Elias"],
+    themes: ["fé", "verdade", "retorno"],
+  },
+
+  "leao cova": {
+    title: "Daniel na Cova dos Leões",
+    ref: "Daniel 6",
+    summary: "Fidelidade sob pressão: Daniel continua orando e Deus o guarda, mesmo quando o sistema tenta calá-lo.",
+    keywords: ["leões", "cova", "rei", "decreto", "oração"],
+    people: ["Daniel", "Dario"],
+    themes: ["fidelidade", "coragem", "oração"],
+  },
+  "jogado aos leoes": {
+    title: "Daniel na Cova dos Leões",
+    ref: "Daniel 6",
+    summary: "A integridade de Daniel revela que Deus é soberano acima de decretos humanos.",
+    keywords: ["leões", "provação", "livramento"],
+    people: ["Daniel"],
+    themes: ["livramento", "integridade", "soberania"],
+  },
+
+  "fornalha fogo": {
+    title: "Os Amigos de Daniel na Fornalha",
+    ref: "Daniel 3",
+    summary: "Três jovens recusam idolatria e enfrentam a fornalha; Deus se faz presente no fogo.",
+    keywords: ["fornalha", "estátua", "adorar", "fogo"],
+    people: ["Sadraque", "Mesaque", "Abede-Nego", "Nabucodonosor"],
+    themes: ["fidelidade", "idolatria", "presença de Deus"],
+  },
+  "homens no fogo e nao queimou": {
+    title: "Os Amigos de Daniel na Fornalha",
+    ref: "Daniel 3",
+    summary: "Deus nem sempre evita o fogo — às vezes Ele entra no fogo com você.",
+    keywords: ["fogo", "milagre", "presença"],
+    people: ["Sadraque", "Mesaque", "Abede-Nego"],
+    themes: ["presença", "coragem", "aliança"],
+  },
+
+  "arca e diluvio": {
+    title: "Noé e o Dilúvio",
+    ref: "Gênesis 6–9",
+    summary: "Noé obedece em meio à incredulidade. Deus julga o mal e preserva vida, renovando aliança.",
+    keywords: ["arca", "chuva", "dilúvio", "aliança", "arco-íris"],
+    people: ["Noé"],
+    themes: ["obediência", "juízo", "aliança"],
+  },
+  "choveu demais e arca": {
+    title: "Noé e o Dilúvio",
+    ref: "Gênesis 6–9",
+    summary: "Deus salva e recomeça: o arco-íris sela uma promessa de misericórdia.",
+    keywords: ["chuva", "arca", "recomeço"],
+    people: ["Noé"],
+    themes: ["salvação", "recomeço", "promessa"],
+  },
+
+  "torre grande linguas": {
+    title: "A Torre de Babel",
+    ref: "Gênesis 11:1-9",
+    summary: "O orgulho humano tenta ‘subir’ sozinho; Deus confunde línguas e espalha, mostrando limites e soberania.",
+    keywords: ["torre", "babel", "línguas", "confusão"],
+    people: ["Povos"],
+    themes: ["orgulho", "limites", "soberania"],
+  },
+  "confusao de linguas": {
+    title: "A Torre de Babel",
+    ref: "Gênesis 11:1-9",
+    summary: "Deus confronta projetos de auto-glória e preserva seu plano maior para as nações.",
+    keywords: ["línguas", "confusão", "nações"],
+    people: ["Povos"],
+    themes: ["humildade", "propósito", "Deus governa"],
+  },
+
+  "sol parou": {
+    title: "O Sol Parou em Gibeão",
+    ref: "Josué 10:12-14",
+    summary: "Em meio à batalha, Deus intervém de forma extraordinária para cumprir sua promessa ao povo.",
+    keywords: ["sol", "parou", "batalha", "gibeão"],
+    people: ["Josué"],
+    themes: ["milagre", "guerra", "promessa"],
+  },
+
+  "muro caiu": {
+    title: "As Muralhas de Jericó",
+    ref: "Josué 6",
+    summary: "Deus derruba muralhas quando o povo obedece de um jeito improvável: fé que marcha e espera.",
+    keywords: ["jericó", "muralha", "trombetas", "marchar"],
+    people: ["Josué"],
+    themes: ["fé", "obediência", "vitória"],
+  },
+  "trombeta e muro": {
+    title: "As Muralhas de Jericó",
+    ref: "Josué 6",
+    summary: "A estratégia divina quebra lógica humana: obediência precede vitória.",
+    keywords: ["trombeta", "muro", "grito"],
+    people: ["Josué", "Israel"],
+    themes: ["obediência", "fé prática", "milagre"],
+  },
+
+  "baleia engoliu": {
+    title: "Jonas e o Grande Peixe",
+    ref: "Jonas 1–2",
+    summary: "Jonas foge do chamado, mas Deus o alcança. No fundo, ele ora e descobre misericórdia.",
+    keywords: ["baleia", "peixe", "fuga", "nínive"],
+    people: ["Jonas"],
+    themes: ["arrependimento", "chamado", "misericórdia"],
+  },
+  "profeta fugiu e peixe": {
+    title: "Jonas e o Grande Peixe",
+    ref: "Jonas 1–2",
+    summary: "Deus transforma fuga em retorno e disciplina em graça.",
+    keywords: ["fuga", "peixe", "oração"],
+    people: ["Jonas"],
+    themes: ["restauração", "graça", "obediência"],
+  },
+
+  "caiu do cavalo": {
+    title: "A Conversão de Paulo",
+    ref: "Atos 9:1-19",
+    summary: "Um perseguidor encontra Cristo e vira mensageiro. Luz, queda e uma vida totalmente reorientada.",
+    keywords: ["damasco", "luz", "queda", "cegueira", "conversão"],
+    people: ["Paulo", "Ananias"],
+    themes: ["transformação", "graça", "chamado"],
+  },
+  "luz forte damasco": {
+    title: "A Conversão de Paulo",
+    ref: "Atos 9:1-19",
+    summary: "Jesus interrompe a violência e cria um novo caminho: de inimigo a irmão.",
+    keywords: ["luz", "jesus", "damasco"],
+    people: ["Paulo"],
+    themes: ["redenção", "novo começo", "missão"],
+  },
+
+  "andou na agua": {
+    title: "Pedro Anda Sobre as Águas",
+    ref: "Mateus 14:22-33",
+    summary: "Pedro pisa no impossível enquanto olha para Jesus. Quando olha para o vento, afunda — e é socorrido.",
+    keywords: ["água", "tempestade", "medo", "fé"],
+    people: ["Pedro", "Jesus"],
+    themes: ["fé", "medo", "socorro"],
+  },
+  "tempestade e barco": {
+    title: "Jesus Acalma a Tempestade",
+    ref: "Marcos 4:35-41",
+    summary: "Jesus fala com o vento e o mar. A pergunta fica: ‘Quem é este?’",
+    keywords: ["tempestade", "barco", "vento", "medo"],
+    people: ["Jesus", "discípulos"],
+    themes: ["autoridade", "paz", "fé"],
+  },
+
+  "multiplicou pao": {
+    title: "A Multiplicação dos Pães e Peixes",
+    ref: "Mateus 14:13-21",
+    summary: "Jesus multiplica pouco em muito: compaixão que alimenta e ensina dependência.",
+    keywords: ["pães", "peixes", "multidão", "milagre"],
+    people: ["Jesus", "discípulos"],
+    themes: ["provisão", "compaixão", "milagre"],
+  },
+  "pao e peixe pra multidão": {
+    title: "A Multiplicação dos Pães e Peixes",
+    ref: "Mateus 14:13-21",
+    summary: "Deus usa o que você tem, não o que você não tem.",
+    keywords: ["pouco", "muito", "provisão"],
+    people: ["Jesus"],
+    themes: ["generosidade", "fé", "provisão"],
+  },
+
+  "agua virou vinho": {
+    title: "Água em Vinho em Caná",
+    ref: "João 2:1-11",
+    summary: "O primeiro sinal: Jesus transforma o comum em algo novo, revelando sua glória.",
+    keywords: ["caná", "vinho", "casamento", "milagre"],
+    people: ["Jesus", "Maria"],
+    themes: ["transformação", "glória", "alegria"],
+  },
+
+  "cego voltou a ver": {
+    title: "O Cego de Nascença",
+    ref: "João 9",
+    summary: "Jesus dá visão física e expõe cegueira espiritual. Cura que confronta e revela.",
+    keywords: ["cego", "cura", "visão", "fariseus"],
+    people: ["Jesus"],
+    themes: ["cura", "fé", "verdade"],
+  },
+  "homem cego curado barro": {
+    title: "O Cego de Nascença",
+    ref: "João 9",
+    summary: "O barro vira sinal: Deus cria de novo e chama para testemunho.",
+    keywords: ["barro", "lavar", "cura"],
+    people: ["Jesus"],
+    themes: ["novo", "testemunho", "luz"],
+  },
+
+  "leproso curado": {
+    title: "A Cura do Leproso",
+    ref: "Marcos 1:40-45",
+    summary: "Jesus toca o intocável. Compaixão que quebra barreiras e restaura dignidade.",
+    keywords: ["lepra", "toque", "pureza", "cura"],
+    people: ["Jesus"],
+    themes: ["compaixão", "restauração", "dignidade"],
+  },
+
+  "mulher tocou manto": {
+    title: "A Mulher do Fluxo de Sangue",
+    ref: "Marcos 5:25-34",
+    summary: "Uma fé tremendo toca Jesus. Ele não a expõe para humilhar, mas para curar por completo.",
+    keywords: ["manto", "cura", "fé", "vergonha"],
+    people: ["Jesus"],
+    themes: ["fé", "cura", "acolhimento"],
+  },
+
+  "lazaro ressuscitou": {
+    title: "A Ressurreição de Lázaro",
+    ref: "João 11",
+    summary: "Jesus chora com os amigos e chama vida para fora do túmulo. Amor e poder juntos.",
+    keywords: ["lázaro", "túmulo", "ressurreição", "marta", "maria"],
+    people: ["Jesus", "Lázaro", "Marta", "Maria"],
+    themes: ["esperança", "vida", "consolo"],
+  },
+  "amigo morreu e voltou": {
+    title: "A Ressurreição de Lázaro",
+    ref: "João 11",
+    summary: "No luto, Jesus se aproxima. Ele não é só resposta — é presença.",
+    keywords: ["morte", "vida", "consolo"],
+    people: ["Jesus"],
+    themes: ["ressurreição", "presença", "esperança"],
+  },
+
+  "filho prodigo": {
+    title: "A Parábola do Filho Pródigo",
+    ref: "Lucas 15:11-32",
+    summary: "Um filho volta quebrado; o pai corre e abraça. Graça que restaura, não humilha.",
+    keywords: ["pródigo", "volta", "pai", "abraço", "arrependimento"],
+    people: ["Pai", "Filho mais novo", "Filho mais velho"],
+    themes: ["graça", "retorno", "perdão"],
+  },
+  "filho voltou pra casa": {
+    title: "A Parábola do Filho Pródigo",
+    ref: "Lucas 15:11-32",
+    summary: "Voltar pra Deus é voltar pra casa — e ser recebido com amor.",
+    keywords: ["voltar", "casa", "perdão"],
+    people: ["Pai"],
+    themes: ["restauração", "filiação", "misericórdia"],
+  },
+
+  "bom samaritano": {
+    title: "A Parábola do Bom Samaritano",
+    ref: "Lucas 10:25-37",
+    summary: "O próximo é quem age com misericórdia. Amor que atravessa barreiras sociais e religiosas.",
+    keywords: ["samaritano", "estrada", "ferido", "misericórdia"],
+    people: ["Samaritano"],
+    themes: ["amor ao próximo", "compaixão", "ética"],
+  },
+  "homem assaltado estrada": {
+    title: "A Parábola do Bom Samaritano",
+    ref: "Lucas 10:25-37",
+    summary: "Religião sem compaixão não cura; misericórdia é prática.",
+    keywords: ["assalto", "ferido", "ajuda"],
+    people: ["Samaritano"],
+    themes: ["misericórdia", "serviço", "amor"],
+  },
+
+  "ovelha perdida": {
+    title: "A Parábola da Ovelha Perdida",
+    ref: "Lucas 15:3-7",
+    summary: "Deus procura quem se perdeu. O valor não é do rebanho, é do amor do Pastor.",
+    keywords: ["ovelha", "perdida", "pastor", "buscar"],
+    people: ["Pastor"],
+    themes: ["cuidado", "busca", "alegria do retorno"],
+  },
+
+  "semente e terreno": {
+    title: "A Parábola do Semeador",
+    ref: "Mateus 13:1-23",
+    summary: "A Palavra encontra corações em diferentes estados. Deus chama para profundidade e frutificação.",
+    keywords: ["semeador", "sementes", "solo", "espinhos"],
+    people: ["Jesus"],
+    themes: ["coração", "discípulado", "fruto"],
+  },
+  "sementes em solos diferentes": {
+    title: "A Parábola do Semeador",
+    ref: "Mateus 13:1-23",
+    summary: "A mesma semente; resultados diferentes. O coração importa.",
+    keywords: ["solo", "fruto", "palavra"],
+    people: ["Jesus"],
+    themes: ["formação", "perseverança", "crescimento"],
+  },
+
+  "fermento massa": {
+    title: "A Parábola do Fermento",
+    ref: "Mateus 13:33",
+    summary: "O Reino cresce por dentro, de forma silenciosa e transformadora.",
+    keywords: ["fermento", "massa", "crescimento"],
+    people: ["Jesus"],
+    themes: ["transformação", "reino", "processo"],
+  },
+
+  "tesouro escondido": {
+    title: "Tesouro Escondido e Pérola de Grande Valor",
+    ref: "Mateus 13:44-46",
+    summary: "O Reino vale mais que tudo: alegria que reorganiza prioridades.",
+    keywords: ["tesouro", "pérola", "valor"],
+    people: ["Jesus"],
+    themes: ["prioridades", "alegria", "reino"],
+  },
+
+  "sermao do monte": {
+    title: "O Sermão do Monte",
+    ref: "Mateus 5–7",
+    summary: "Jesus descreve a vida do Reino: caráter, justiça, oração, confiança e prática real.",
+    keywords: ["bem-aventuranças", "oração", "ansiedade", "amor"],
+    people: ["Jesus"],
+    themes: ["ética do reino", "caráter", "discipulado"],
+  },
+  "bem aventurados": {
+    title: "As Bem-aventuranças",
+    ref: "Mateus 5:1-12",
+    summary: "O Reino vira valores de cabeça pra baixo: felicidade na dependência de Deus.",
+    keywords: ["bem-aventurados", "consolo", "misericórdia"],
+    people: ["Jesus"],
+    themes: ["reino", "esperança", "caráter"],
+  },
+
+  "pai nosso": {
+    title: "A Oração do Pai Nosso",
+    ref: "Mateus 6:9-13",
+    summary: "Uma oração simples, profunda e diária: Deus, pão, perdão, direção e proteção.",
+    keywords: ["pai nosso", "oração", "perdão", "pão"],
+    people: ["Jesus"],
+    themes: ["oração", "dependência", "reino"],
+  },
+
+  "lava pes": {
+    title: "Jesus Lava os Pés dos Discípulos",
+    ref: "João 13:1-17",
+    summary: "O Rei serve. Liderança no Reino é toalha, não pedestal.",
+    keywords: ["lavar", "pés", "serviço", "humildade"],
+    people: ["Jesus", "discípulos"],
+    themes: ["serviço", "humildade", "amor"],
+  },
+
+  "jardim getsemani": {
+    title: "A Agonia no Getsêmani",
+    ref: "Mateus 26:36-46",
+    summary: "Jesus enfrenta angústia profunda e se entrega ao Pai. Dor real com obediência real.",
+    keywords: ["getsêmani", "angústia", "oração", "vontade"],
+    people: ["Jesus"],
+    themes: ["obediência", "sofrimento", "oração"],
+  },
+
+  "cruz e perdão": {
+    title: "Jesus na Cruz e o Perdão",
+    ref: "Lucas 23:33-43",
+    summary: "No meio da dor, Jesus perdoa e salva. Amor que não desiste.",
+    keywords: ["cruz", "perdão", "ladrão", "graça"],
+    people: ["Jesus"],
+    themes: ["salvação", "graça", "perdão"],
+  },
+
+  "ressuscitou no terceiro dia": {
+    title: "A Ressurreição de Jesus",
+    ref: "Mateus 28 / Marcos 16 / Lucas 24 / João 20",
+    summary: "A morte perde o trono. A esperança ganha rosto: Jesus vivo.",
+    keywords: ["ressurreição", "túmulo vazio", "domingo"],
+    people: ["Jesus", "mulheres", "discípulos"],
+    themes: ["esperança", "vitória", "vida"],
+  },
+
+  "pentecostes linguas fogo": {
+    title: "Pentecostes",
+    ref: "Atos 2",
+    summary: "O Espírito Santo capacita a Igreja. Línguas, coragem e missão para as nações.",
+    keywords: ["pentecostes", "espírito", "línguas", "fogo"],
+    people: ["Pedro", "apóstolos"],
+    themes: ["Espírito Santo", "missão", "igreja"],
+  },
+
+  "prisao e terremoto": {
+    title: "Paulo e Silas na Prisão",
+    ref: "Atos 16:16-34",
+    summary: "No louvor dentro da dor, Deus age: portas se abrem e vidas mudam.",
+    keywords: ["prisão", "terremoto", "louvor", "carcereiro"],
+    people: ["Paulo", "Silas"],
+    themes: ["adoração", "livramento", "evangelho"],
+  },
+
+  "sabedoria salomao bebe": {
+    title: "O Julgamento de Salomão",
+    ref: "1 Reis 3:16-28",
+    summary: "Sabedoria para discernir verdade: justiça com inteligência e coração.",
+    keywords: ["salomão", "bebê", "julgamento", "sabedoria"],
+    people: ["Salomão"],
+    themes: ["sabedoria", "justiça", "discernimento"],
+  },
+
+  "caiu de um muro e morreu": {
+    title: "Eutico Cai da Janela",
+    ref: "Atos 20:7-12",
+    summary: "Um jovem adormece, cai e é restaurado. O texto mostra cuidado pastoral e poder de Deus.",
+    keywords: ["janela", "sono", "queda", "ressuscitou"],
+    people: ["Paulo", "Eutico"],
+    themes: ["cuidado", "milagre", "comunidade"],
+  },
+
+  "ladrao na cruz": {
+    title: "O Ladrão na Cruz",
+    ref: "Lucas 23:39-43",
+    summary: "Graça no último instante: fé simples encontra promessa direta.",
+    keywords: ["ladrão", "cruz", "paraíso", "perdão"],
+    people: ["Jesus"],
+    themes: ["graça", "salvação", "misericórdia"],
+  },
+
+  "zakeu na arvore": {
+    title: "Zaqueu",
+    ref: "Lucas 19:1-10",
+    summary: "Jesus chama pelo nome e transforma um coração ganancioso em generosidade e restituição.",
+    keywords: ["zaqueu", "árvore", "cobrador", "casa"],
+    people: ["Jesus", "Zaqueu"],
+    themes: ["transformação", "arrependimento", "restituição"],
+  },
+
+  "maria e marta": {
+    title: "Maria e Marta",
+    ref: "Lucas 10:38-42",
+    summary: "Atividade sem presença vira ansiedade. Jesus chama para prioridade: estar com Ele.",
+    keywords: ["marta", "maria", "casa", "ocupada"],
+    people: ["Jesus", "Maria", "Marta"],
+    themes: ["prioridades", "presença", "discipulado"],
+  },
+
+  "serpente de bronze": {
+    title: "A Serpente de Bronze",
+    ref: "Números 21:4-9",
+    summary: "O povo murmura e sofre; Deus provê cura por um sinal. Um olhar de fé aponta para redenção.",
+    keywords: ["serpente", "bronze", "cura", "deserto"],
+    people: ["Moisés", "Israel"],
+    themes: ["fé", "cura", "graça"],
+  },
+
+  "jose vendido pelos irmaos": {
+    title: "José é Vendido e Depois Exaltado",
+    ref: "Gênesis 37 / 39–50",
+    summary: "Traição vira processo; Deus transforma mal em bem e reconcilia uma família inteira.",
+    keywords: ["josé", "irmãos", "venda", "egito", "perdão"],
+    people: ["José"],
+    themes: ["providência", "perdão", "propósito"],
+  },
+
+  "rute no campo": {
+    title: "Rute e Boaz",
+    ref: "Rute 1–4",
+    summary: "Lealdade e graça em tempos difíceis. Deus escreve esperança na rotina e na bondade.",
+    keywords: ["rute", "boaz", "resgate", "colheita"],
+    people: ["Rute", "Boaz", "Noemi"],
+    themes: ["lealdade", "redenção", "família"],
+  },
+
+  "ester rainha salvou povo": {
+    title: "Ester e a Salvação do Povo",
+    ref: "Ester 4–8",
+    summary: "Coragem no palácio: Ester arrisca a vida e Deus livra seu povo do extermínio.",
+    keywords: ["ester", "rei", "hamã", "jejum"],
+    people: ["Ester", "Mardoqueu"],
+    themes: ["coragem", "providência", "justiça"],
+  },
+
+  "jaco lutou com anjo": {
+    title: "Jacó Luta e Recebe Novo Nome",
+    ref: "Gênesis 32:22-32",
+    summary: "Um encontro que muda identidade. Jacó vira Israel: ferido, mas transformado.",
+    keywords: ["jacó", "luta", "anjo", "israel"],
+    people: ["Jacó"],
+    themes: ["transformação", "identidade", "perseverança"],
+  },
+
+  "sabedoria provérbios": {
+    title: "Sabedoria Prática",
+    ref: "Provérbios (seleções)",
+    summary: "Sabedoria para vida real: fala, trabalho, escolhas, relacionamentos e coração.",
+    keywords: ["provérbios", "sabedoria", "caminho", "língua"],
+    people: ["Salomão"],
+    themes: ["discernimento", "prudência", "vida diária"],
+  },
+
+
+  // =========================
+  // MAIS HISTÓRIAS CONHECIDAS
+  // =========================
+
+  "sarça pegando fogo": {
+    title: "Moisés e a Sarça Ardente",
+    ref: "Êxodo 3",
+    summary: "Deus chama Moisés no deserto e revela seu Nome, transformando um fugitivo em libertador.",
+    keywords: ["sarça", "fogo", "chamado", "deserto", "nome de deus"],
+    people: ["Moisés"],
+    themes: ["chamado", "santidade", "missão", "identidade"],
+  },
+  "deus falou no mato pegando fogo": {
+    title: "Moisés e a Sarça Ardente",
+    ref: "Êxodo 3",
+    summary: "O lugar comum vira sagrado quando Deus fala. Chamado nasce no meio do ordinário.",
+    keywords: ["fogo", "voz", "tirar sandália", "santo"],
+    people: ["Moisés"],
+    themes: ["presença de Deus", "vocação", "obediência"],
+  },
+
+  "dez pragas do egito": {
+    title: "As Dez Pragas do Egito",
+    ref: "Êxodo 7–12",
+    summary: "Deus confronta o poder do Egito, expõe falsos deuses e liberta seu povo com justiça e sinais.",
+    keywords: ["pragas", "egito", "faraó", "sangue", "gafanhotos", "primogênitos"],
+    people: ["Moisés", "Arão", "Faraó", "Israel"],
+    themes: ["libertação", "juízo", "poder de Deus", "justiça"],
+  },
+
+  "sangue na porta": {
+    title: "A Páscoa e o Cordeiro",
+    ref: "Êxodo 12",
+    summary: "O sangue do cordeiro nas portas marca livramento. Memória, aliança e redenção para gerações.",
+    keywords: ["páscoa", "cordeiro", "sangue", "porta", "livramento"],
+    people: ["Moisés", "Israel"],
+    themes: ["redenção", "aliança", "salvação", "memória"],
+  },
+
+  "mandamentos no monte": {
+    title: "Os Dez Mandamentos",
+    ref: "Êxodo 19–20",
+    summary: "Deus forma um povo com identidade e ética: liberdade que vira vida alinhada com o Senhor.",
+    keywords: ["mandamentos", "lei", "monte sinai", "aliança"],
+    people: ["Moisés", "Israel"],
+    themes: ["aliança", "ética", "santidade", "vida comunitária"],
+  },
+
+  "bezerro de ouro": {
+    title: "O Bezerro de Ouro",
+    ref: "Êxodo 32",
+    summary: "Impaciência vira idolatria. Deus confronta o pecado, mas também abre caminho para restauração.",
+    keywords: ["bezerro", "ouro", "idolatria", "murmuração"],
+    people: ["Moisés", "Arão", "Israel"],
+    themes: ["idolatria", "arrependimento", "intercessão", "misericórdia"],
+  },
+
+  "manna do céu": {
+    title: "Maná no Deserto",
+    ref: "Êxodo 16",
+    summary: "Deus sustenta dia após dia. Provisão que ensina dependência e confiança no presente.",
+    keywords: ["maná", "pão do céu", "deserto", "provisão"],
+    people: ["Moisés", "Israel"],
+    themes: ["provisão", "dependência", "fé diária", "gratidão"],
+  },
+  "comida caiu do céu": {
+    title: "Maná no Deserto",
+    ref: "Êxodo 16",
+    summary: "O deserto não é só falta: vira sala de aula da confiança.",
+    keywords: ["comida", "maná", "cada dia", "recolher"],
+    people: ["Israel"],
+    themes: ["confiança", "disciplina", "Deus provê"],
+  },
+
+  "agua saiu da pedra": {
+    title: "Água da Rocha",
+    ref: "Êxodo 17:1-7 / Números 20:1-13",
+    summary: "No limite da sede, Deus provê. Uma crise expõe o coração e revela cuidado do Senhor.",
+    keywords: ["água", "rocha", "sede", "deserto"],
+    people: ["Moisés", "Israel"],
+    themes: ["provisão", "murmuração", "fé", "cuidado"],
+  },
+
+  "jumento falou": {
+    title: "Balaão e a Jumenta",
+    ref: "Números 22:21-35",
+    summary: "Deus bloqueia um caminho perigoso e usa o improvável para abrir os olhos do profeta.",
+    keywords: ["balaão", "jumenta", "anjo", "falou"],
+    people: ["Balaão"],
+    themes: ["direção", "alerta", "humildade", "discernimento"],
+  },
+
+  "espiões e corda vermelha": {
+    title: "Raabe Protege os Espiões",
+    ref: "Josué 2",
+    summary: "Raabe escolhe fé em meio ao medo. A corda escarlate vira sinal de livramento e pertencimento.",
+    keywords: ["raabe", "espias", "corda vermelha", "jericó"],
+    people: ["Raabe"],
+    themes: ["fé", "coragem", "redenção", "misericórdia"],
+  },
+
+  "gideão 300 homens": {
+    title: "Gideão e os 300",
+    ref: "Juízes 6–7",
+    summary: "Deus reduz o exército para deixar claro: vitória não é força humana, é dependência do Senhor.",
+    keywords: ["gideão", "300", "midianitas", "tochas", "vasos"],
+    people: ["Gideão"],
+    themes: ["fé", "dependência", "coragem", "vitória"],
+  },
+  "lã molhada gideao": {
+    title: "O Sinal do Velo de Gideão",
+    ref: "Juízes 6:36-40",
+    summary: "Gideão pede confirmação. Deus lida com a fraqueza humana com paciência e direção.",
+    keywords: ["velo", "lã", "sinal", "confirmar"],
+    people: ["Gideão"],
+    themes: ["direção", "paciência", "fé em construção"],
+  },
+
+  "samson cabelo": {
+    title: "Sansão e Dalila",
+    ref: "Juízes 13–16",
+    summary: "Força sem vigilância vira queda. Deus ainda trabalha no quebrado, mas o pecado cobra preço.",
+    keywords: ["sansão", "dalila", "cabelo", "força", "filisteus"],
+    people: ["Sansão", "Dalila"],
+    themes: ["consagração", "tentação", "queda", "arrependimento"],
+  },
+
+  "ana pediu filho": {
+    title: "Ana e o Nascimento de Samuel",
+    ref: "1 Samuel 1–2",
+    summary: "Dor vira oração. Ana entrega seu pedido a Deus e devolve a Deus o que recebeu.",
+    keywords: ["ana", "samuel", "oração", "esterilidade", "voto"],
+    people: ["Ana", "Samuel", "Eli"],
+    themes: ["oração", "entrega", "promessa", "gratidão"],
+  },
+
+  "arca caiu dagon": {
+    title: "A Arca entre os Filisteus",
+    ref: "1 Samuel 5–6",
+    summary: "A presença de Deus confronta ídolos: Dagon cai, e ninguém “controla” o Santo de Israel.",
+    keywords: ["arca", "dagon", "filisteus", "ídolo caiu"],
+    people: ["Filisteus"],
+    themes: ["soberania", "santidade", "idolatria"],
+  },
+
+  "davi e bate seba": {
+    title: "Davi e Bate-Seba",
+    ref: "2 Samuel 11–12",
+    summary: "Queda moral do rei: desejo, abuso e encobrimento. Deus confronta, disciplina e chama ao arrependimento real.",
+    keywords: ["bateseba", "uriias", "nata", "pecado", "arrependimento"],
+    people: ["Davi", "Bate-Seba", "Urias", "Natã"],
+    themes: ["arrependimento", "justiça", "consequências", "misericórdia"],
+  },
+
+  "salomao construiu templo": {
+    title: "O Templo de Salomão",
+    ref: "1 Reis 5–8",
+    summary: "A construção culmina em adoração: Deus habita com o povo, e a oração liga céu e terra.",
+    keywords: ["templo", "salomão", "glória", "dedicação"],
+    people: ["Salomão"],
+    themes: ["adoração", "aliança", "presença de Deus", "oração"],
+  },
+
+  "elias corvos comida": {
+    title: "Elias é Sustentado pelos Corvos",
+    ref: "1 Reis 17:1-6",
+    summary: "No tempo de seca, Deus sustenta Elias de formas improváveis, mostrando cuidado em crise.",
+    keywords: ["elias", "corvos", "seca", "ribeiro"],
+    people: ["Elias"],
+    themes: ["provisão", "fé", "cuidado", "obediência"],
+  },
+  "farinha nao acabava": {
+    title: "A Viúva de Sarepta",
+    ref: "1 Reis 17:7-16",
+    summary: "Uma família pobre experimenta provisão contínua. O pouco na mão de Deus vira sustento.",
+    keywords: ["viúva", "sarepta", "farinha", "azeite", "milagre"],
+    people: ["Elias", "Viúva de Sarepta"],
+    themes: ["provisão", "generosidade", "fé", "milagre"],
+  },
+
+  "naaman leproso rio": {
+    title: "Naamã é Curado",
+    ref: "2 Reis 5",
+    summary: "Um general orgulhoso aprende obediência simples: mergulhar no Jordão e receber cura.",
+    keywords: ["naama", "jordão", "lepra", "sete vezes", "eliseu"],
+    people: ["Naamã", "Eliseu"],
+    themes: ["humildade", "obediência", "cura", "graça"],
+  },
+
+  "machado flutuou": {
+    title: "O Machado que Flutuou",
+    ref: "2 Reis 6:1-7",
+    summary: "Um problema simples vira cuidado divino. Deus também se importa com o cotidiano.",
+    keywords: ["machado", "ferro", "flutuou", "rio"],
+    people: ["Eliseu"],
+    themes: ["cuidado", "milagre", "Deus no detalhe"],
+  },
+
+  "jonas nínive se arrependeu": {
+    title: "Jonas e o Arrependimento de Nínive",
+    ref: "Jonas 3–4",
+    summary: "Uma cidade violenta muda de rota. Deus mostra misericórdia — e confronta o coração do profeta.",
+    keywords: ["nínive", "arrependimento", "misericórdia", "pregação"],
+    people: ["Jonas"],
+    themes: ["misericórdia", "arrependimento", "justiça", "coração"],
+  },
+
+  "jo ensinou paciencia": {
+    title: "Jó no Sofrimento",
+    ref: "Jó 1–2 / 38–42",
+    summary: "Jó perde quase tudo e luta com perguntas profundas. Deus revela grandeza e restaura com propósito.",
+    keywords: ["jó", "sofrimento", "perdas", "perguntas", "restauração"],
+    people: ["Jó"],
+    themes: ["sofrimento", "perseverança", "fé", "mistério"],
+  },
+
+  "reconstruiu muralha": {
+    title: "Neemias Reconstrói os Muros",
+    ref: "Neemias 1–6",
+    summary: "Lágrima vira plano. Neemias lidera com oração, estratégia e coragem contra oposição.",
+    keywords: ["neemias", "muro", "jerusalém", "oposição", "reconstrução"],
+    people: ["Neemias"],
+    themes: ["liderança", "oração", "trabalho", "perseverança"],
+  },
+
+  "osso seco viveu": {
+    title: "O Vale de Ossos Secos",
+    ref: "Ezequiel 37:1-14",
+    summary: "Deus promete vida onde só há morte. Esperança para o povo quebrado: restauração e novo fôlego.",
+    keywords: ["ossos secos", "vale", "vida", "espírito"],
+    people: ["Ezequiel"],
+    themes: ["restauração", "esperança", "Espírito", "renovo"],
+  },
+
+  "nascimento de jesus manjedoura": {
+    title: "O Nascimento de Jesus",
+    ref: "Lucas 2:1-20 / Mateus 1–2",
+    summary: "O Rei nasce humilde. Pastores ouvem boas notícias: paz de Deus chega perto dos simples.",
+    keywords: ["nascimento", "manjedoura", "pastores", "anjo", "belém"],
+    people: ["Jesus", "Maria", "José", "pastores"],
+    themes: ["encarnação", "humildade", "alegria", "salvação"],
+  },
+
+  "reis magos estrela": {
+    title: "Os Magos e a Estrela",
+    ref: "Mateus 2:1-12",
+    summary: "Sábios seguem a estrela e adoram. Um sinal no céu aponta para o Rei prometido.",
+    keywords: ["magos", "estrela", "ouro", "incenso", "mirra"],
+    people: ["Jesus", "Magos"],
+    themes: ["adoração", "revelação", "busca", "reino"],
+  },
+
+  "batismo de jesus": {
+    title: "O Batismo de Jesus",
+    ref: "Mateus 3:13-17",
+    summary: "Jesus se identifica com o povo. O Pai afirma amor, e o Espírito desce: início público da missão.",
+    keywords: ["batismo", "jordão", "espírito", "voz do céu"],
+    people: ["Jesus", "João Batista"],
+    themes: ["identidade", "missão", "trindade", "obediência"],
+  },
+
+  "tentacao no deserto": {
+    title: "A Tentação no Deserto",
+    ref: "Mateus 4:1-11",
+    summary: "Jesus enfrenta tentações e vence com a Palavra. Firmeza quando a fome e o ego gritam.",
+    keywords: ["tentação", "deserto", "diabo", "jejum", "palavra"],
+    people: ["Jesus"],
+    themes: ["resistência", "disciplina", "verdade", "obediência"],
+  },
+
+  "transfiguracao monte": {
+    title: "A Transfiguração",
+    ref: "Mateus 17:1-8",
+    summary: "A glória de Jesus se revela no monte. O Pai reafirma: ‘Ouçam o Filho’.",
+    keywords: ["transfiguração", "monte", "glória", "moisés", "elias"],
+    people: ["Jesus", "Pedro", "Tiago", "João", "Moisés", "Elias"],
+    themes: ["glória", "revelação", "adoração", "identidade"],
+  },
+
+  "mulher adultera apedrejar": {
+    title: "A Mulher Surpreendida em Adultério",
+    ref: "João 8:1-11",
+    summary: "Jesus desmonta a hipocrisia e oferece misericórdia sem relativizar pecado: verdade e graça juntas.",
+    keywords: ["adultério", "pedra", "condenação", "perdão"],
+    people: ["Jesus"],
+    themes: ["misericórdia", "arrependimento", "justiça", "graça"],
+  },
+
+  "centuriao fe grande": {
+    title: "A Fé do Centurião",
+    ref: "Mateus 8:5-13 / Lucas 7:1-10",
+    summary: "Um oficial reconhece autoridade de Jesus: ‘diga uma palavra’. Fé humilde recebe resposta.",
+    keywords: ["centurião", "servo", "autoridade", "cura"],
+    people: ["Jesus", "Centurião"],
+    themes: ["fé", "humildade", "autoridade", "cura"],
+  },
+
+  "jairo filha ressuscitou": {
+    title: "A Filha de Jairo e a Cura no Caminho",
+    ref: "Marcos 5:21-43",
+    summary: "Entre pressa e atraso, Jesus cura e ressuscita. Para Ele, interrupções também são missão.",
+    keywords: ["jairo", "filha", "ressuscitou", "multidão", "cura"],
+    people: ["Jesus", "Jairo"],
+    themes: ["fé", "esperança", "cura", "vida"],
+  },
+
+  "dez leprosos": {
+    title: "Os Dez Leprosos",
+    ref: "Lucas 17:11-19",
+    summary: "Dez são curados, um volta para agradecer. Jesus valoriza a gratidão que reconhece a fonte.",
+    keywords: ["dez", "leprosos", "cura", "gratidão", "voltou"],
+    people: ["Jesus"],
+    themes: ["gratidão", "fé", "cura", "reconhecimento"],
+  },
+
+  "peixe com moeda": {
+    title: "A Moeda na Boca do Peixe",
+    ref: "Mateus 17:24-27",
+    summary: "Deus provê de forma inesperada. Jesus ensina liberdade e humildade para não escandalizar.",
+    keywords: ["moeda", "peixe", "imposto", "provisão"],
+    people: ["Jesus", "Pedro"],
+    themes: ["provisão", "humildade", "liberdade", "sabedoria"],
+  },
+
+  "anania safira morreu": {
+    title: "Ananias e Safira",
+    ref: "Atos 5:1-11",
+    summary: "Mentira religiosa é desmascarada. O texto mostra seriedade da integridade na comunidade.",
+    keywords: ["ananias", "safira", "mentira", "oferta", "igreja"],
+    people: ["Pedro", "Ananias", "Safira"],
+    themes: ["integridade", "temor", "verdade", "comunidade"],
+  },
+
+  "estevao apedrejado": {
+    title: "O Martírio de Estêvão",
+    ref: "Atos 6–7",
+    summary: "Estêvão testemunha com coragem e perdoa ao morrer. A perseguição espalha a missão.",
+    keywords: ["estêvão", "apedrejado", "perseguição", "perdão"],
+    people: ["Estêvão", "Saulo"],
+    themes: ["coragem", "testemunho", "perdão", "missão"],
+  },
+
+  "felipe eunuco": {
+    title: "Filipe e o Eunuco Etíope",
+    ref: "Atos 8:26-40",
+    summary: "Deus guia um encontro no caminho. A Escritura é explicada, e nasce fé com batismo.",
+    keywords: ["filipe", "eunuco", "isaías", "carruagem", "batismo"],
+    people: ["Filipe", "Eunuco etíope"],
+    themes: ["evangelho", "direção", "discipulado", "Escrituras"],
+  },
+
+  "pedro libertado da prisao": {
+    title: "Pedro é Libertado por um Anjo",
+    ref: "Atos 12:1-19",
+    summary: "A igreja ora, e Deus abre portas. Correntes caem enquanto a missão continua.",
+    keywords: ["pedro", "prisão", "anjo", "correntes", "oração"],
+    people: ["Pedro"],
+    themes: ["oração", "livramento", "soberania", "perseverança"],
+  },
+
+  "cornelio visao": {
+    title: "Cornélio e o Evangelho aos Gentios",
+    ref: "Atos 10",
+    summary: "Deus quebra barreiras culturais. Pedro entende: o evangelho é para todas as nações.",
+    keywords: ["cornélio", "visão", "lençol", "gentios", "espírito santo"],
+    people: ["Pedro", "Cornélio"],
+    themes: ["inclusão", "missão", "Espírito Santo", "reino"],
+  },
+
+  "naufragio paulo": {
+    title: "O Naufrágio de Paulo",
+    ref: "Atos 27",
+    summary: "Em meio à tempestade, Paulo encoraja: Deus permanece soberano e fiel às promessas.",
+    keywords: ["tempestade", "navio", "naufrágio", "malta", "coragem"],
+    people: ["Paulo"],
+    themes: ["coragem", "providência", "esperança", "liderança"],
+  },
+
+  "abraao saiu da terra": {
+    title: "O Chamado de Abraão",
+    ref: "Gênesis 12:1-9",
+    summary: "Deus chama Abraão para sair do conhecido e viver por promessa. Fé é caminhar sem mapa completo.",
+    keywords: ["abraão", "chamado", "promessa", "terra", "fé"],
+    people: ["Abraão", "Sara"],
+    themes: ["fé", "promessa", "obediência", "nova jornada"],
+  },
+
+  "isac quase sacrificado": {
+    title: "Abraão Oferece Isaque",
+    ref: "Gênesis 22",
+    summary: "Abraão enfrenta o teste mais duro. Deus provê o cordeiro e reafirma a promessa.",
+    keywords: ["isaque", "sacrifício", "monte", "cordeiro", "provisão"],
+    people: ["Abraão", "Isaque"],
+    themes: ["fé", "provisão", "obediência", "confiança"],
+  },
+
+  "sodoma e gomorra": {
+    title: "Sodoma e Gomorra",
+    ref: "Gênesis 18–19",
+    summary: "Deus julga a perversidade e ainda assim oferece saída. Justiça e misericórdia aparecem lado a lado.",
+    keywords: ["sodoma", "gomorra", "ló", "fogo", "sal"],
+    people: ["Ló", "Abraão"],
+    themes: ["justiça", "misericórdia", "juízo", "livramento"],
+  },
+
+  "escada de jacó": {
+    title: "O Sonho de Jacó (A Escada)",
+    ref: "Gênesis 28:10-22",
+    summary: "Jacó encontra Deus no caminho. O Senhor promete presença e futuro, mesmo para quem está fugindo.",
+    keywords: ["jacó", "escada", "sonho", "betel", "promessa"],
+    people: ["Jacó"],
+    themes: ["presença de Deus", "promessa", "identidade", "recomeço"],
+  },
+
+  "irmão trocou por comida": {
+    title: "Esaú Vende a Primogenitura",
+    ref: "Gênesis 25:29-34",
+    summary: "Um momento de impulso troca futuro por alívio imediato. O texto alerta sobre escolhas de curto prazo.",
+    keywords: ["esaú", "jacó", "primogenitura", "ensopado", "troca"],
+    people: ["Esaú", "Jacó"],
+    themes: ["prioridades", "impulsividade", "valor espiritual", "escolhas"],
+  },
+
+  "maria engravidou do espirito": {
+    title: "O Anúncio a Maria",
+    ref: "Lucas 1:26-38",
+    summary: "Deus chama uma jovem comum para um propósito extraordinário. ‘Eis aqui a serva’ marca rendição.",
+    keywords: ["anjo", "gabriel", "maria", "espírito santo", "promessa"],
+    people: ["Maria", "Gabriel"],
+    themes: ["obediência", "encarnação", "fé", "propósito"],
+  },
+
+  "pescaria milagrosa": {
+    title: "A Pesca Maravilhosa",
+    ref: "Lucas 5:1-11 / João 21:1-14",
+    summary: "Redes vazias viram abundância com a palavra de Jesus. Chamado nasce quando Ele entra no barco.",
+    keywords: ["peixe", "rede", "barco", "milagre", "pescaria"],
+    people: ["Jesus", "Pedro", "discípulos"],
+    themes: ["chamado", "provisão", "fé", "missão"],
+  },
+
+  "peter negou jesus": {
+    title: "Pedro Nega Jesus",
+    ref: "Lucas 22:54-62",
+    summary: "Medo leva à negação. O olhar de Jesus expõe, mas também aponta para restauração.",
+    keywords: ["negação", "galo", "medo", "lágrimas"],
+    people: ["Pedro", "Jesus"],
+    themes: ["fraqueza", "arrependimento", "restauração", "graça"],
+  },
+
+  "tomas duvidou": {
+    title: "Tomé e a Dúvida",
+    ref: "João 20:24-29",
+    summary: "Tomé pede prova, e Jesus responde com presença. Fé cresce quando a dúvida é trazida para a luz.",
+    keywords: ["tomé", "duvidou", "marcas", "ressurreição"],
+    people: ["Tomé", "Jesus"],
+    themes: ["fé", "dúvida", "evidência", "confiança"],
+  },
+
+  // =========================
+  // CONTINUAÇÃO (sem repetir)
+  // =========================
+
+  "cain matou abel": {
+    title: "Caim e Abel",
+    ref: "Gênesis 4:1-16",
+    summary: "Ciúme e orgulho crescem até virar violência. Deus confronta Caim e mostra que o pecado 'bate à porta'.",
+    keywords: ["caim", "abel", "ciúme", "oferta", "assassinato", "pecado"],
+    people: ["Caim", "Abel"],
+    themes: ["ciúme", "pecado", "responsabilidade", "alerta"],
+  },
+
+  "lote esposa virou sal": {
+    title: "A Fuga de Ló e a Mulher que Virou Sal",
+    ref: "Gênesis 19:15-26",
+    summary: "Na saída urgente do juízo, olhar para trás revela apego. Um alerta sobre hesitar quando Deus chama para seguir.",
+    keywords: ["ló", "sal", "olhar pra trás", "fuga", "anjo"],
+    people: ["Ló", "Esposa de Ló"],
+    themes: ["desapego", "obediência", "alerta", "juízo"],
+  },
+
+  "hagar no deserto": {
+    title: "Agar no Deserto",
+    ref: "Gênesis 16 / 21:8-21",
+    summary: "Agar é vista por Deus na dor e recebe promessa. No deserto, Deus provê água e futuro.",
+    keywords: ["agar", "ismael", "deserto", "água", "promessa"],
+    people: ["Agar", "Ismael"],
+    themes: ["cuidado", "Deus vê", "provisão", "esperança"],
+  },
+
+  "angeliovisitou sara riu": {
+    title: "Sara Ri e Deus Promete Isaque",
+    ref: "Gênesis 18:1-15",
+    summary: "Deus visita e promete vida onde parecia tarde demais. O riso vira sinal: nada é impossível para o Senhor.",
+    keywords: ["sara", "riu", "promessa", "anjo", "impossível"],
+    people: ["Sara", "Abraão"],
+    themes: ["promessa", "fé", "impossível", "esperança"],
+  },
+
+  "rebecca escolheu servo": {
+    title: "Rebeca e o Encontro no Poço",
+    ref: "Gênesis 24",
+    summary: "Um encontro simples revela caráter e direção divina. Deus guia o caminho com detalhes do cotidiano.",
+    keywords: ["rebeca", "poço", "camelos", "servo", "casamento"],
+    people: ["Rebeca", "Isaque", "Servo de Abraão"],
+    themes: ["direção", "caráter", "providência", "aliança"],
+  },
+
+  "irlandas sangue porta": {
+    title: "O Anjo da Morte e o Livramento da Páscoa",
+    ref: "Êxodo 12:21-30",
+    summary: "O sangue marca as casas e a morte não entra. Um marco de redenção que vira memória anual.",
+    keywords: ["páscoa", "sangue", "porta", "livramento", "primogênito"],
+    people: ["Moisés", "Israel", "Faraó"],
+    themes: ["redenção", "salvação", "memória", "aliança"],
+  },
+
+  "coluna de fogo e nuvem": {
+    title: "A Coluna de Nuvem e Fogo",
+    ref: "Êxodo 13:21-22",
+    summary: "Deus guia de dia e de noite. Direção constante para um povo em transição.",
+    keywords: ["coluna", "nuvem", "fogo", "guia", "deserto"],
+    people: ["Israel"],
+    themes: ["direção", "presença de Deus", "segurança", "caminho"],
+  },
+
+  "tenda encontro gloria": {
+    title: "A Glória de Deus no Tabernáculo",
+    ref: "Êxodo 40:34-38",
+    summary: "A glória enche o tabernáculo e confirma: Deus habita com seu povo e conduz a jornada.",
+    keywords: ["tabernáculo", "glória", "presença", "tenda"],
+    people: ["Moisés", "Israel"],
+    themes: ["presença de Deus", "adoração", "aliança", "direção"],
+  },
+
+  "balaam abencoou israel": {
+    title: "Balaão Abençoa Israel",
+    ref: "Números 23–24",
+    summary: "O que era para ser maldição vira bênção. Deus frustra intenções humanas e protege seu povo.",
+    keywords: ["balaão", "balque", "bênção", "maldição", "oráculo"],
+    people: ["Balaão", "Balaque"],
+    themes: ["proteção", "soberania", "bênção", "Deus governa"],
+  },
+
+  "miriam ficou leprosa": {
+    title: "Miriã é Ferida e Restaurada",
+    ref: "Números 12",
+    summary: "Crítica e inveja contra a liderança trazem disciplina. Deus também restaura e reintegra.",
+    keywords: ["miriã", "arão", "lepra", "crítica", "murmuração"],
+    people: ["Miriã", "Arão", "Moisés"],
+    themes: ["humildade", "disciplina", "restauração", "liderança"],
+  },
+
+  "calebe e josue confiou": {
+    title: "Josué e Calebe Confiam Contra o Medo",
+    ref: "Números 13–14",
+    summary: "Enquanto a maioria se rende ao pânico, Josué e Calebe enxergam promessa. Fé contra a mentalidade de derrota.",
+    keywords: ["espias", "gigantes", "terra prometida", "medo", "promessa"],
+    people: ["Josué", "Calebe"],
+    themes: ["fé", "coragem", "promessa", "visão"],
+  },
+
+  "corah se rebelou terra abriu": {
+    title: "A Rebelião de Corá",
+    ref: "Números 16",
+    summary: "Rebelião contra a liderança e contra Deus termina em juízo severo. Um alerta sobre orgulho espiritual.",
+    keywords: ["corá", "rebelião", "terra abriu", "juízo", "orgulho"],
+    people: ["Corá", "Moisés", "Arão"],
+    themes: ["orgulho", "autoridade", "juízo", "temor"],
+  },
+
+  "josue sucessor moisés": {
+    title: "O Chamado de Josué",
+    ref: "Josué 1",
+    summary: "Deus comissiona Josué: coragem, obediência e meditação na Palavra para liderar o povo.",
+    keywords: ["josué", "coragem", "não temas", "liderança", "lei"],
+    people: ["Josué"],
+    themes: ["liderança", "coragem", "obediência", "palavra"],
+  },
+
+  "acã pecado jerico": {
+    title: "O Pecado de Acã",
+    ref: "Josué 7",
+    summary: "Ganância escondida enfraquece o povo inteiro. Deus expõe o oculto e chama para santidade comunitária.",
+    keywords: ["acã", "roubo", "anatema", "ai", "pecado escondido"],
+    people: ["Acã", "Josué", "Israel"],
+    themes: ["santidade", "consequências", "verdade", "comunidade"],
+  },
+
+  "debora e baraque": {
+    title: "Débora e Baraque",
+    ref: "Juízes 4–5",
+    summary: "Uma profetisa lidera Israel e Deus dá vitória. Coragem e obediência em tempos de opressão.",
+    keywords: ["débora", "baraque", "sísera", "vitória", "profetisa"],
+    people: ["Débora", "Baraque", "Sísera"],
+    themes: ["liderança", "coragem", "libertação", "fé"],
+  },
+
+  "jael cravou estaca": {
+    title: "Jael Derrota Sísera",
+    ref: "Juízes 4:17-22",
+    summary: "Deus usa uma mulher improvável para finalizar a libertação. Vitória por caminhos inesperados.",
+    keywords: ["jael", "sísera", "estaca", "tenda"],
+    people: ["Jael", "Sísera"],
+    themes: ["coragem", "improvável", "vitória", "justiça"],
+  },
+
+  "jefté voto": {
+    title: "Jefté e o Voto",
+    ref: "Juízes 11",
+    summary: "Um líder faz um voto precipitado e colhe dor. A história alerta sobre impulsos travestidos de fé.",
+    keywords: ["jefté", "voto", "precipitado", "tragédia"],
+    people: ["Jefté"],
+    themes: ["prudência", "palavras", "consequências", "liderança"],
+  },
+
+  "samuel ouviu voz": {
+    title: "Samuel Ouve a Voz de Deus",
+    ref: "1 Samuel 3",
+    summary: "Um menino aprende a reconhecer a voz do Senhor: 'Fala, porque teu servo ouve'.",
+    keywords: ["samuel", "voz", "chamado", "noite", "eli"],
+    people: ["Samuel", "Eli"],
+    themes: ["chamado", "escuta", "formação", "obediência"],
+  },
+
+  "saul perdeu reino": {
+    title: "Saul Desobedece e Perde o Reino",
+    ref: "1 Samuel 13 / 15",
+    summary: "Pressa e medo levam à desobediência. Deus busca um coração alinhado, não só rituais.",
+    keywords: ["saul", "desobediência", "sacrifício", "rejeitado"],
+    people: ["Saul", "Samuel"],
+    themes: ["obediência", "temor", "liderança", "coração"],
+  },
+
+  "davi ungido": {
+    title: "Davi é Ungido",
+    ref: "1 Samuel 16",
+    summary: "Deus escolhe o improvável. Enquanto olham aparência, Deus vê o coração.",
+    keywords: ["ungido", "azeite", "pastor", "coração"],
+    people: ["Davi", "Samuel", "Jessé"],
+    themes: ["chamado", "identidade", "coração", "Deus vê"],
+  },
+
+  "arca levada e uzza morreu": {
+    title: "Uzá Toca na Arca",
+    ref: "2 Samuel 6:1-11",
+    summary: "O sagrado não é banal. Um gesto 'bem-intencionado' revela irreverência e alerta sobre santidade.",
+    keywords: ["uzá", "arca", "tocou", "morreu", "santidade"],
+    people: ["Uzá", "Davi"],
+    themes: ["santidade", "temor", "reverência", "adoração"],
+  },
+
+  "absalao traiu davi": {
+    title: "Absalão se Rebela Contra Davi",
+    ref: "2 Samuel 15–18",
+    summary: "Feridas não tratadas viram rebelião. Uma história de poder, família e dor com consequências profundas.",
+    keywords: ["absalão", "rebelião", "traição", "rei", "guerra"],
+    people: ["Davi", "Absalão"],
+    themes: ["família", "consequências", "poder", "dor"],
+  },
+
+  "senaqueribe anjo matou": {
+    title: "Deus Livra Jerusalém de Senaqueribe",
+    ref: "2 Reis 18–19",
+    summary: "Ezequias ora em crise nacional. Deus responde e livra Jerusalém do império assírio.",
+    keywords: ["ezequias", "senaqueribe", "assíria", "livramento", "oração"],
+    people: ["Ezequias", "Isaías"],
+    themes: ["oração", "livramento", "confiança", "soberania"],
+  },
+
+  "rei ezequias ficou doente": {
+    title: "Ezequias e a Cura",
+    ref: "2 Reis 20:1-11",
+    summary: "Ezequias chora e ora, e Deus acrescenta dias. Um sinal confirma: Deus ouve e responde.",
+    keywords: ["ezequias", "doença", "cura", "sinal", "sombra"],
+    people: ["Ezequias", "Isaías"],
+    themes: ["oração", "misericórdia", "vida", "sinal"],
+  },
+
+  "josias achou livro lei": {
+    title: "Josias Redescobre a Lei",
+    ref: "2 Reis 22–23",
+    summary: "Ao ouvir a Palavra, Josias se quebra e reforma a nação. Avivamento começa com Escritura.",
+    keywords: ["josias", "livro", "lei", "reforma", "aliança"],
+    people: ["Josias"],
+    themes: ["arrependimento", "palavra", "reforma", "avivamento"],
+  },
+
+  "isaías visao trono": {
+    title: "A Visão de Isaías no Templo",
+    ref: "Isaías 6",
+    summary: "Isaías vê a santidade de Deus, é purificado e enviado: ‘Eis-me aqui, envia-me’.",
+    keywords: ["isaías", "trono", "serafins", "santo", "envio"],
+    people: ["Isaías"],
+    themes: ["santidade", "chamado", "purificação", "missão"],
+  },
+
+  "jeremias chamado jovem": {
+    title: "O Chamado de Jeremias",
+    ref: "Jeremias 1",
+    summary: "Deus chama um jovem tímido e promete presença. Vocação vem com capacitação.",
+    keywords: ["jeremias", "jovem", "chamado", "boca", "profeta"],
+    people: ["Jeremias"],
+    themes: ["chamado", "coragem", "presença de Deus", "missão"],
+  },
+
+  "daniel na cova dos leoes de novo": {
+    title: "Daniel na Cova dos Leões (pressão política)",
+    ref: "Daniel 6",
+    summary: "Fidelidade pública em ambiente hostil: Daniel não negocia sua oração e Deus o sustenta.",
+    keywords: ["decreto", "inveja", "oração", "leões"],
+    people: ["Daniel", "Dario"],
+    themes: ["fidelidade", "integridade", "coragem", "livramento"],
+  },
+
+  "os três reis na fornalha": {
+    title: "A Fornalha e a Fidelidade",
+    ref: "Daniel 3",
+    summary: "Recusar idolatria tem custo, mas Deus se faz presente na provação e honra quem permanece fiel.",
+    keywords: ["fornalha", "idolatria", "estátua", "fogo", "livramento"],
+    people: ["Sadraque", "Mesaque", "Abede-Nego", "Nabucodonosor"],
+    themes: ["fidelidade", "presença", "coragem", "adoração"],
+  },
+};
+

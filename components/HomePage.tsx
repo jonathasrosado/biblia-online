@@ -9,6 +9,7 @@ import versesRaw from '../src/data/daily_verses.json';
 
 import { Theme } from '../types';
 import { ReaderDemo } from './ReaderDemo';
+import SmartSearch from './SmartSearch';
 
 interface HomePageProps {
     language: string;
@@ -55,7 +56,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
         }
     };
 
-    const [localQuery, setLocalQuery] = useState('');
+
     const [dailyVerse, setDailyVerse] = useState(DAILY_VERSES[0]);
     const [isSharing, setIsSharing] = useState(false);
     const [activeTestament, setActiveTestament] = useState<'OT' | 'NT'>('NT'); // Default to New Testament as it's often more popular for quick reading
@@ -84,45 +85,7 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
             .catch(err => console.error("Failed to load posts", err));
     }, []);
 
-    const handleSearchSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const query = localQuery.trim();
-        if (!query) return;
 
-        // 1. Try to parse as Bible Reference
-        const sortedBooks = [...bibleBooks].sort((a, b) => b.name.length - a.name.length);
-        const lowerQuery = query.toLowerCase();
-
-        for (const book of sortedBooks) {
-            const bookLower = book.name.toLowerCase();
-            // Check if query starts with book name
-            if (lowerQuery.startsWith(bookLower)) {
-                // Check remainder for chapter/verse
-                const remainder = lowerQuery.slice(bookLower.length).trim();
-
-                // Allow " 5", " 5:1", " 5 1", or just ""
-                const match = remainder.match(/^(\d+)?(?:[:\s](\d+))?$/);
-
-                if (match || remainder === '') {
-                    const chapter = match?.[1] || '1';
-                    const verse = match?.[2];
-
-                    const bookSlug = normalizeBookName(book.name);
-                    let url = `/leitura/${bookSlug}/${chapter}`;
-
-                    if (verse) {
-                        url += `#v${verse}`;
-                    }
-
-                    navigate(url);
-                    return;
-                }
-            }
-        }
-
-        // 2. Fallback: Chat for themes/questions
-        navigate(`/chat?p=${encodeURIComponent(query)}`);
-    };
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -320,38 +283,8 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                     </div>
 
                     {/* Search Input */}
-                    <div className="mb-10">
-                        <form onSubmit={handleSearchSubmit} className="relative group">
-                            <div className="relative flex items-center">
-                                <Search className={`absolute left-5 w-5 h-5 transition-colors z-10
-                                    ${theme === 'bw' ? 'text-stone-400' : 'text-stone-400 group-focus-within:text-bible-gold'}
-                                `} />
-                                <input
-                                    type="text"
-                                    value={localQuery}
-                                    onChange={(e) => setLocalQuery(e.target.value)}
-                                    placeholder="Buscar livro, capítulo ou tema (ex: Gênesis, / Fé)"
-                                    className={`w-full p-4 pl-12 pr-14 rounded-2xl border outline-none transition-all text-base
-                                        ${theme === 'bw'
-                                            ? 'bg-white border-stone-300 text-black placeholder-stone-400 focus:border-black focus:ring-1 focus:ring-black'
-                                            : isDark
-                                                ? 'bg-stone-950 border-stone-800 text-stone-100 placeholder-stone-600 focus:border-bible-gold/50'
-                                                : 'bg-white border-stone-200 text-stone-800 placeholder-stone-400 focus:border-bible-gold/50 shadow-sm'}
-                                    `}
-                                />
-                                {/* Submit Button */}
-                                <button
-                                    type="submit"
-                                    className={`absolute right-2 p-2 rounded-xl transition-all
-                                        ${theme === 'bw'
-                                            ? 'bg-stone-100 text-black hover:bg-stone-200'
-                                            : 'bg-bible-gold/10 text-bible-gold hover:bg-bible-gold hover:text-white'}
-                                    `}
-                                >
-                                    <ArrowRight size={20} />
-                                </button>
-                            </div>
-                        </form>
+                    <div className="mb-10 w-full max-w-2xl mx-auto">
+                        <SmartSearch theme={theme} placeholder="Buscar livro, capítulo ou tema (ex: Gênesis, / Fé)" />
                     </div>
 
                     {/* Check if we need to show Testaments or Themes */}
