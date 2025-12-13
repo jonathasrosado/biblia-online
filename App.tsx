@@ -125,9 +125,9 @@ function AppContent() {
   const [version, setVersion] = useState<BibleVersion>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('bibleVersion') as BibleVersion;
-      return (BIBLE_VERSIONS.includes(saved) ? saved : 'acf') as BibleVersion;
+      return (BIBLE_VERSIONS.includes(saved) ? saved : 'blivre') as BibleVersion;
     }
-    return 'acf';
+    return 'blivre';
   });
 
   useEffect(() => {

@@ -6,7 +6,7 @@ export interface BibleBook {
 
 export type Theme = 'light' | 'dark' | 'bw' | 'sepia';
 
-export type BibleVersion = 'nvi' | 'acf' | 'ntlh' | 'ara' | 'arc' | 'as21' | 'jfaa' | 'kja' | 'kjf' | 'naa' | 'nbv' | 'nvt' | 'tb';
+export type BibleVersion = 'blivre' | 'acf';
 
 export interface Verse {
   number: number;

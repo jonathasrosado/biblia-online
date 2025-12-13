@@ -1,19 +1,7 @@
 [
   {
-    "id": "0",
-    "autorarquivo": "Everson Silva",
-    "representante": "everScript",
-    "data de criação": "17 de janeiro de 2023",
-    "autorversão": "Projeto Bíblia Livre: (https://sites.google.com/site/biblialivre). Para mais informações sobre todos os direitos sobre a versão, visite o site. O meu trabalho foi a formatação do arquivo em JSon",
-    "objetivo": "Criei este arquivo para me auxiliar em um projeto e decidi compartilhá-lo para facilitar a vida de outras pessoas. Percebi a necessidade, quando eu mesmo procurei e não achei uma Bíblia Livre em JSon",
-    "intrucoes": "Você pode fazer o que quizer com este arquivo, manipulá-lo, modificá-lo, editá-lo, apagá-lo... e até apagar este objeto que me dá os créditos, caso ele te atrapalhe na criação do seu projeto... não preciso de créditos ou reconhecimentos por uma ação tão pequena. Importante entender que estas instruções se referem ao arquivo e sua estrutura em si. Você pode modificar a estrutura do arquivo. Sobre a tradução da Bíblia Livre e sua estrutura, não tenho poder para autorizar tais modificações. Não tenho poder, nem gabarito para isso. Que estas palavras, continas neste livro, sejam propagadas ao máximo de pessoas possível. Da mesma forma que os tradutores da Bíblia Livre não buscam ganhos financeiros por criá-la, eu criei este arquivo sem nenhum interesse (não que estas duas ações tenham qualquer semelhança em seu peso de importância, demorei só um dia para criar este arquivo, mas se é esta a forma de eu participar... aí está!). Faça bom proveito!"
-  },
-  {
-    "id": "1",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Gênesis",
-    "abrev": "gn",
-    "capitulos": [
+    "abbrev": "gn",
+    "chapters": [
       [
         "No princípio criou Deus os céus e a terra.",
         "E a terra estava desordenada e vazia, e as trevas estavam sobre a face do abismo, e o Espírito de Deus se movia sobre a face das águas.",
@@ -1647,14 +1635,12 @@
         "E fez jurar José aos filhos de Israel, dizendo: Deus certamente vos visitará, e fareis levar daqui meus ossos.",
         "E morreu José da idade de cento e dez anos; e embalsamaram-no, e foi posto num caixão no Egito."
       ]
-    ]
+    ],
+    "name": "Gênesis"
   },
   {
-    "id": "2",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Êxodo",
-    "abrev": "êx",
-    "capitulos": [
+    "abbrev": "êx",
+    "chapters": [
       [
         "Estes são os nomes dos filhos de Israel que entraram em Egito com Jacó; cada um entrou com sua família:",
         "Rúben, Simeão, Levi e Judá;",
@@ -2948,14 +2934,12 @@
         "Porém se a nuvem não se erguia, não se partiam até o dia em que ela se erguia.",
         "Porque a nuvem do SENHOR estava de dia sobre o tabernáculo, e o fogo estava de noite nele, à vista de toda a casa de Israel, em todas as suas jornadas."
       ]
-    ]
+    ],
+    "name": "Êxodo"
   },
   {
-    "id": "3",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Levítico",
-    "abrev": "lv",
-    "capitulos": [
+    "abbrev": "lv",
+    "chapters": [
       [
         "E chamou o SENHOR a Moisés, e falou com ele desde o tabernáculo do testemunho, dizendo:",
         "Fala aos filhos de Israel, e dize-lhes: Quando algum dentre vós oferecer oferta ao SENHOR, de gado vacum ou ovelha fareis vossa oferta.",
@@ -3869,14 +3853,12 @@
         "Não olhará se é bom ou mau, nem o trocará; e se o trocar, ele e o seu trocado serão consagrados; não se resgatará.",
         "Esses são os mandamentos que o SENHOR ordenou a Moisés para os filhos de Israel, no monte Sinai."
       ]
-    ]
+    ],
+    "name": "Levítico"
   },
   {
-    "id": "4",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Números",
-    "abrev": "nm",
-    "capitulos": [
+    "abbrev": "nm",
+    "chapters": [
       [
         "E o SENHOR falou a Moisés no deserto de Sinai, no tabernáculo do testemunho, no primeiro dia do mês segundo, no segundo ano de sua saída da terra do Egito, dizendo:",
         "Tomai o censo de toda a congregação dos filhos de Israel por suas famílias, pelas casas de seus pais, com a conta dos nomes, todos os homens por suas cabeças:",
@@ -5237,14 +5219,12 @@
         "Da família dos filhos de Manassés, filho de José, foram mulheres; e a herança delas ficou na tribo da família de seu pai.",
         "Estes são os mandamentos e os estatutos que mandou o SENHOR por meio de Moisés aos filhos de Israel nos campos de Moabe, junto ao Jordão de Jericó."
       ]
-    ]
+    ],
+    "name": "Números"
   },
   {
-    "id": "5",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Deuteronômio",
-    "abrev": "dt",
-    "capitulos": [
+    "abbrev": "dt",
+    "chapters": [
       [
         "Estas são as palavras que falou Moisés a todo Israel desta parte do Jordão no deserto, na planície diante do mar Vermelho, entre Parã, e Tofel, e Labã, e Hazerote, e Di-Zaabe.",
         "Onze jornadas há desde Horebe, caminho do monte de Seir, até Cades-Barneia.",
@@ -6272,14 +6252,12 @@
         "Em todos os sinais e prodígios que lhe enviou o SENHOR a fazer em terra do Egito a Faraó, e a todos os seus servos, e a toda sua terra;",
         "E em toda aquela mão poderosa, e em todo o grande espanto que Moisés causou à vista de todo Israel."
       ]
-    ]
+    ],
+    "name": "Deuteronômio"
   },
   {
-    "id": "6",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Josué",
-    "abrev": "js",
-    "capitulos": [
+    "abbrev": "js",
+    "chapters": [
       [
         "E aconteceu depois da morte de Moisés servo do SENHOR, que o SENHOR falou a Josué filho de Num, assistente de Moisés, dizendo:",
         "Meu servo Moisés é morto: levanta-te, pois, agora, e passa este Jordão, tu e todo este povo, à terra que eu lhes dou aos filhos de Israel.",
@@ -6986,14 +6964,12 @@
         "E enterraram em Siquém os ossos de José que os filhos de Israel haviam trazido do Egito, na parte do campo que Jacó comprou dos filhos de Hamor, pai de Siquém, por cem peças de prata; e foi em possessão aos filhos de José.",
         "Também morreu Eleazar, filho de Arão; ao qual enterraram no morro de Fineias seu filho, que lhe foi dado no monte de Efraim."
       ]
-    ]
+    ],
+    "name": "Josué"
   },
   {
-    "id": "7",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Juízes",
-    "abrev": "jz",
-    "capitulos": [
+    "abbrev": "jz",
+    "chapters": [
       [
         "E aconteceu depois da morte de Josué, que os filhos de Israel consultaram ao SENHOR, dizendo: Quem subirá por nós primeiro para lutar contra os cananeus?",
         "E o SENHOR respondeu: Judá subirá; eis que eu entreguei a terra em suas mãos.",
@@ -7654,14 +7630,12 @@
         "Então os filhos de Israel se foram também dali, cada um à sua tribo e à sua família, saindo dali cada um à sua propriedade.",
         "Nestes dias não havia rei em Israel; cada um fazia o que era correto diante de seus olhos."
       ]
-    ]
+    ],
+    "name": "Juízes"
   },
   {
-    "id": "8",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Rute",
-    "abrev": "rt",
-    "capitulos": [
+    "abbrev": "rt",
+    "chapters": [
       [
         "E aconteceu nos dias que governavam os juízes, que houve fome na terra. E um homem de Belém de Judá, foi a peregrinar nos campos de Moabe, ele e sua mulher, e dois filhos seus.",
         "O nome daquele homem era Elimeleque, e o de sua mulher Noemi; e os nomes de seus dois filhos eram Malom e Quiliom, efrateus de Belém de Judá. Chegaram, pois, aos campos de Moabe, e assentaram ali.",
@@ -7755,14 +7729,12 @@
         "E Salmom gerou a Boaz, e Boaz gerou a Obede;",
         "E Obede gerou a Jessé, e Jessé gerou a Davi."
       ]
-    ]
+    ],
+    "name": "Rute"
   },
   {
-    "id": "9",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "1 Samuel",
-    "abrev": "1 sm",
-    "capitulos": [
+    "abbrev": "1 sm",
+    "chapters": [
       [
         "Houve um homem de Ramataim de Zofim, do monte de Efraim, que se chamava Elcana, filho de Jeroão, filho de Eliú, filho de Toú, filho de Zufe, efraimita.",
         "E tinha ele duas mulheres; o nome da uma era Ana, e o nome da outra Penina. E Penina tinha filhos, mas Ana não os tinha.",
@@ -8635,14 +8607,12 @@
         "Todos os homens valentes se levantaram, e andaram toda aquela noite, e tiraram o corpo de Saul e os corpos de seus filhos do muro de Bete-Seã; e vindo a Jabes, queimaram-nos ali.",
         "E tomando seus ossos, sepultaram-nos debaixo de uma árvore em Jabes, e jejuaram durante sete dias."
       ]
-    ]
+    ],
+    "name": "1 Samuel"
   },
   {
-    "id": "10",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "2 Samuel",
-    "abrev": "2 sm",
-    "capitulos": [
+    "abbrev": "2 sm",
+    "chapters": [
       [
         "E aconteceu depois da morte de Saul, que quando Davi voltou da derrota dos amalequitas, ficou dois dias em Ziclague;",
         "E ao terceiro dia aconteceu, que veio um do acampamento de Saul, rasgadas suas roupas, e terra sobre sua cabeça: e chegando a Davi, prostrou-se em terra, e fez reverência.",
@@ -9386,14 +9356,12 @@
         "E o rei disse a Araúna: Não, mas por preço o comprarei de ti; porque não oferecerei ao SENHOR meu Deus holocaustos gastando nada. Então Davi comprou a eira e os bois por cinquenta siclos de prata.",
         "E ali Davi edificou um altar ao SENHOR, e sacrificou holocaustos e ofertas pacíficas; e o SENHOR se aplacou com a terra, e cessou a praga de Israel."
       ]
-    ]
+    ],
+    "name": "2 Samuel"
   },
   {
-    "id": "11",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "1 Reis",
-    "abrev": "1 Rs",
-    "capitulos": [
+    "abbrev": "1 Rs",
+    "chapters": [
       [
         "Quando o rei Davi era velho, e de idade avançada, cobriam-lhe de roupas, mas não se aquecia.",
         "Disseram-lhe portanto seus servos: Busquem a meu senhor o rei uma moça virgem, para que esteja diante do rei, e o abrigue, e durma a seu lado, e aquecerá a meu senhor o rei.",
@@ -10254,14 +10222,12 @@
         "E fez o que era mau aos olhos do SENHOR, e andou no caminho de seu pai, e no caminho de sua mãe, e no caminho de Jeroboão filho de Nebate, que fez pecar a Israel:",
         "Porque serviu a Baal, e o adorou, e provocou à ira o SENHOR Deus de Israel, conforme todas as coisas que seu pai havia feito."
       ]
-    ]
+    ],
+    "name": "1 Reis"
   },
   {
-    "id": "12",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "2 Reis",
-    "abrev": "2 rs",
-    "capitulos": [
+    "abbrev": "2 rs",
+    "chapters": [
       [
         "Depois da morte de Acabe, Moabe rebelou-se contra Israel.",
         "E Acazias caiu pela sacada de uma sala da casa que tinha em Samaria; e estando enfermo enviou mensageiros, e disse-lhes: Ide, e consultai a Baal-Zebube deus de Ecrom, se sararei desta minha enfermidade.",
@@ -11031,14 +10997,12 @@
         "E mudou-lhe as roupas de sua prisão, e comeu sempre diante dele todos os dias de sua vida.",
         "E foi-lhe continuamente dada a sua subsistência diária da parte do rei, por todos os dias de sua vida."
       ]
-    ]
+    ],
+    "name": "2 Reis"
   },
   {
-    "id": "13",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "1 Crônicas",
-    "abrev": "1 cr",
-    "capitulos": [
+    "abbrev": "1 cr",
+    "chapters": [
       [
         "Adão, Sete, Enos,",
         "Cainã, Maalalel, Jarede,",
@@ -12039,14 +12003,12 @@
         "E os feitos do rei Davi, primeiros e últimos, estão escritos no livro das crônicas de Samuel vidente, e nas crônicas do profeta Natã, e nas crônicas de Gade vidente,",
         "Com todo o relato de seu reinado, e seu poder, e os tempos que passaram sobre ele, e sobre Israel, e sobre todos os reinos daquelas aquelas terras."
       ]
-    ]
+    ],
+    "name": "1 Crônicas"
   },
   {
-    "id": "14",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "2 Crônicas",
-    "abrev": "2 cr",
-    "capitulos": [
+    "abbrev": "2 cr",
+    "chapters": [
       [
         "E Salomão filho de Davi foi estabelecido em seu reino; e o SENHOR seu Deus foi com ele, e lhe engrandeceu muito.",
         "E chamou Salomão a todo Israel, comandantes, líderes de centenas, e juízes, e a todos os príncipes de todo Israel, cabeças de famílias.",
@@ -12941,14 +12903,12 @@
         "Mas ao primeiro ano de Ciro rei dos persas, para que se cumprisse a palavra do SENHOR por boca de Jeremias, o SENHOR induziu o espírito de Ciro rei dos persas, o qual fez apregoar por todo seu reino, e também por escrito, dizendo:",
         "Assim diz Ciro rei dos persas: o SENHOR, o Deus dos céus, me deu todos os reinos da terra; e ele me encarregou que lhe edifique casa em Jerusalém, que é em Judá. Quem houver de vós de todo seu povo, o SENHOR seu Deus seja com o tal, e suba."
       ]
-    ]
+    ],
+    "name": "2 Crônicas"
   },
   {
-    "id": "15",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Esdras",
-    "abrev": "ed",
-    "capitulos": [
+    "abbrev": "ed",
+    "chapters": [
       [
         "No primeiro ano de Ciro rei da Pérsia, para que se cumprisse a palavra do SENHOR pela boca de Jeremias, o SENHOR despertou o espírito de Ciro rei da Pérsia, o qual mandou proclamar por todo o seu reino, e também por escrito, dizendo:",
         "Assim diz Ciro, rei da Pérsia: O SENHOR, Deus dos céus, me deu todos os reinos da terra; e ele me mandou que lhe edificasse uma casa em Jerusalém, que está em Judá.",
@@ -13249,14 +13209,12 @@
         "E dos filhos de Nebo: Jeiel, Matitias, Zabade, Zebina, Jadai, Joel, e Benaías.",
         "Todos estes haviam tomado mulheres estrangeiras; e alguns deles tiveram filhos com tais mulheres."
       ]
-    ]
+    ],
+    "name": "Esdras"
   },
   {
-    "id": "16",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Neemias",
-    "abrev": "ne",
-    "capitulos": [
+    "abbrev": "ne",
+    "chapters": [
       [
         "Palavras de Neemias, filho de Hacalias.E aconteceu no mês de Quisleu, no ano vigésimo, enquanto eu estava na fortaleza de Susã,",
         "Veio Hanani, um de meus irmãos, ele e alguns homens de Judá, e perguntei-lhes pelos judeus que haviam escapado, que restaram do cativeiro, e por Jerusalém.",
@@ -13689,14 +13647,12 @@
         "Assim eu os limpei de todo estrangeiro, e ordenei as responsabilidades dos sacerdotes e dos levitas, cada um em sua obra;",
         "Como também para as ofertas de lenha em tempos determinados, e para as primícias. Lembra-te de mim, meu Deus, para o bem."
       ]
-    ]
+    ],
+    "name": "Neemias"
   },
   {
-    "id": "17",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Ester",
-    "abrev": "et",
-    "capitulos": [
+    "abbrev": "et",
+    "chapters": [
       [
         "E aconteceu nos dias de Assuero (o Assuero que reinou desde a Índia até Cuxe sobre cento e vinte e sete províncias),",
         "Que naqueles dias, quando o rei Assuero se sentou sobre o trono de seu reino, na fortaleza de Susã,",
@@ -13884,14 +13840,12 @@
         "E todas as obras de seu poder e de seu valor, e a declaração da grandeza de Mardoqueu, a quem o rei engrandeceu, por acaso não estão escritas no livro das crônicas dos reis da Média e da Pérsia?",
         "Pois o judeu Mardoqueu foi o segundo depois do rei Assuero, e grande entre os judeus, e agradável à multidão de seus irmãos, procurando o bem de seu povo, e falando prosperidade para todo o seu povo."
       ]
-    ]
+    ],
+    "name": "Ester"
   },
   {
-    "id": "18",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Jó",
-    "abrev": "jó",
-    "capitulos": [
+    "abbrev": "jó",
+    "chapters": [
       [
         "Havia um homem na terra de Uz, cujo nome era Jó; e este homem era íntegro e correto, temente a Deus, e que se afastava do mal.",
         "E nasceram-lhe sete filhos e três filhas.",
@@ -15046,14 +15000,12 @@
         "E depois disto Jó viveu cento e quarenta anos; e viu seus filhos, e os filhos de seus filhos, até quatro gerações.",
         "Então Jó morreu, velho, e farto de dias."
       ]
-    ]
+    ],
+    "name": "Jó"
   },
   {
-    "id": "19",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Salmos",
-    "abrev": "sl",
-    "capitulos": [
+    "abbrev": "sl",
+    "chapters": [
       [
         "Bem-aventurado o homem que não anda no conselho dos maus, nem fica parado no caminho dos pecadores, nem se senta junto dos escarnecedores.",
         "Mas sim, que tem seu prazer na Lei do SENHOR; e medita em sua Lei de dia e de noite.",
@@ -17815,14 +17767,12 @@
         "Louvai-o com címbalos bem sonoros; louvai-o com címbalos de sons de alegria.",
         "Tudo quanto tem fôlego, louve ao SENHOR! Aleluia!"
       ]
-    ]
+    ],
+    "name": "Salmos"
   },
   {
-    "id": "20",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Provérbios",
-    "abrev": "pv",
-    "capitulos": [
+    "abbrev": "pv",
+    "chapters": [
       [
         "Provérbios de Salomão, filho de Davi, rei de Israel.",
         "Para conhecer a sabedoria e a instrução; para entender as palavras da prudência;",
@@ -18800,14 +18750,12 @@
         "A beleza é enganosa, e a formosura é passageira; mas a mulher que teme ao SENHOR, essa será louvada.",
         "Dai a ela conforme o fruto de suas mãos, e que suas obras a louvem às portas da cidade."
       ]
-    ]
+    ],
+    "name": "Provérbios"
   },
   {
-    "id": "21",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Eclesiastes",
-    "abrev": "ec",
-    "capitulos": [
+    "abbrev": "ec",
+    "chapters": [
       [
         "Palavras do Pregador, filho de Davi, rei em Jerusalém.",
         "Futilidade das futilidades! - diz o Pregador - futilidade das futilidades! Tudo é fútil!",
@@ -19054,14 +19002,12 @@
         "De tudo o que foi ouvido, a conclusão é: teme a Deus, e guarda os mandamentos dele; porque isto é o dever de todo homem.",
         "Porque Deus trará a julgamento toda obra, até mesmo tudo o que está encoberto, seja bom ou mal."
       ]
-    ]
+    ],
+    "name": "Eclesiastes"
   },
   {
-    "id": "22",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Cantares",
-    "abrev": "ct",
-    "capitulos": [
+    "abbrev": "ct",
+    "chapters": [
       [
         "Cântico dos cânticos, que é de Salomão.",
         "Ela : Beije-me ele com os beijos de sua boca, porque teu amor é melhor do que o vinho.",
@@ -19195,14 +19141,12 @@
         "Ele : Ó tu que habitas nos jardins, teus colegas prestam atenção à tua voz: faze com que eu também possa ouvi-la.",
         "Ela : Vem depressa, meu amado! E faze-te semelhante ao corço, ao filhote de cervos, nas montanhas de ervas aromáticas!"
       ]
-    ]
+    ],
+    "name": "Cantares"
   },
   {
-    "id": "23",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Isaías",
-    "abrev": "is",
-    "capitulos": [
+    "abbrev": "is",
+    "chapters": [
       [
         "Visão de Isaías, filho de Amoz, a qual ele viu sobre Judá e Jerusalém, nos dias de Uzias, Jotão, Acaz e Ezequias, reis de Judá.",
         "Ouvi, ó céus; e escutai tu, terra, porque o SENHOR está falando: Eu criei filhos, e os fiz crescerem; porém eles se rebelaram contra mim.",
@@ -20627,14 +20571,12 @@
         "E será que, desde uma lua nova até a outra, e desde um sábado até o outro, todos virão para adorar perante mim,diz o SENHOR.",
         "E sairão, e verão os cadáveres dos homens que se rebelaram contra mim; porque o verme deles nunca morrerá, nem seu fogo se apagará; e serão horríveis a todos."
       ]
-    ]
+    ],
+    "name": "Isaías"
   },
   {
-    "id": "24",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Jeremias",
-    "abrev": "jr",
-    "capitulos": [
+    "abbrev": "jr",
+    "chapters": [
       [
         "Palavras de Jeremias, filho de Hilquias, um dos sacerdotes que estiveram em Anatote, na terra de Benjamim.",
         "Ao qual veio a palavra do SENHOR nos dias de Josias, filho de Amom, rei de Judá, no décimo terceiro ano de seu reinado.",
@@ -22103,14 +22045,12 @@
         "E mudou-lhe também as roupas de sua prisão, e continuamente comeu pão diante dele, todos os dias de sua vida.",
         "E continuamente foi-lhe dada provisão pelo rei da Babilônia, uma porção diária, até o dia de sua morte, por todos os dias de sua vida."
       ]
-    ]
+    ],
+    "name": "Jeremias"
   },
   {
-    "id": "25",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Lamentações",
-    "abrev": "lm",
-    "capitulos": [
+    "abbrev": "lm",
+    "chapters": [
       [
         "Como se senta solitária a cidade que era tão populosa! A grande entre as nações tornou-se como viúva, a senhora de províncias passou a ser escrava.",
         "Amargamente chora na noite, suas lágrimas em seu rosto; entre todos os seus amantes não há quem a console; todos os seus amigos a traíram, inimigos se tornaram.",
@@ -22275,14 +22215,12 @@
         "Converte-nos, SENHOR, a ti, e seremos convertidos; renova o nossos dias como antes;",
         "A não ser que tenhas nos rejeitado totalmente, e estejas enfurecido contra nós ao extremo."
       ]
-    ]
+    ],
+    "name": "Lamentações"
   },
   {
-    "id": "26",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Ezequiel",
-    "abrev": "ez",
-    "capitulos": [
+    "abbrev": "ez",
+    "chapters": [
       [
         "E sucedeu que, aos trinta anos, no quarto mês , aos cinco do mês, estando eu em meio dos exilados, junto ao rio Quebar, os céus se abriram, e vi visões de Deus.",
         "Aos cinco do mês, que foi no quinto ano do cativeiro do rei Joaquim,",
@@ -23652,14 +23590,12 @@
         "E ao lado do ocidente quatro mil e quinhentos côvados ,e suas três portas: uma porta de Gade, uma porta de Aser, e uma porta de Naftali.",
         "Ao redor terá dezoito mil côvados . E o nome da cidade desde aquele dia será: O SENHOR Está Ali."
       ]
-    ]
+    ],
+    "name": "Ezequiel"
   },
   {
-    "id": "27",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Daniel",
-    "abrev": "dn",
-    "capitulos": [
+    "abbrev": "dn",
+    "chapters": [
       [
         "No ano terceiro do reinado de Jeoaquim, rei de Judá, Nabucodonosor, rei da Babilônia, veio a Jerusalém, e a cercou.",
         "E o Senhor entregou em suas mãos a Jeoaquim, rei de Judá, e uma parte dos vasos da casa de Deus, e os trouxe à terra de Sinar, para a casa de seu deus; e pôs os vasos na casa do tesouro de seu deus.",
@@ -24041,14 +23977,12 @@
         "Bem-aventurado o que esperar, e chegar até mil trezentos e trinta e cinco dias.",
         "Tu, porém, caminha até o fim; porque repousarás, e ressuscitarás em tua herança no fim dos dias."
       ]
-    ]
+    ],
+    "name": "Daniel"
   },
   {
-    "id": "28",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Oséias",
-    "abrev": "os",
-    "capitulos": [
+    "abbrev": "os",
+    "chapters": [
       [
         "A palavra do SENHOR que veio a Oseias, filho de Beeri, nos dias de Uzias, Jotão, Acaz, e Ezequias, reis de Judá, e nos dias de Joeroboão, filho de Joás, rei de Israel.",
         "O princípio da palavra do SENHOR por Oseias.Disse, pois, o SENHOR a Oseias: Vai, toma para ti uma mulher de prostituição, e filhos de prostituições; porque a terra se prostitui munto, afastando-se do SENHOR.",
@@ -24274,14 +24208,12 @@
         "Ó Efraim, o que mais eu tenho a ver com os ídolos? Eu o responderei, e dele cuidarei; serei a ele como a faia verde; de mim vem o teu fruto.",
         "Quem é sábio entenda estas coisas, e o prudente as reconheça; porque os caminhos do SENHOR são retos, e os justos andarão neles; mas os transgressores neles cairão."
       ]
-    ]
+    ],
+    "name": "Oséias"
   },
   {
-    "id": "29",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Joel",
-    "abrev": "jl",
-    "capitulos": [
+    "abbrev": "jl",
+    "chapters": [
       [
         "Palavra do SENHOR que veio a Joel, filho de Petuel.",
         "Ouvi isto, anciãos, e escutai, todos os moradores desta terra. Por acaso isto aconteceu em vossos dias, ou nos dias dos vossos pais?",
@@ -24361,14 +24293,12 @@
         "Mas Judá permanecerá para sempre, e Jerusalém de geração em geração.",
         "E purificarei o sangue que não tinha purificado; e o SENHOR habitará em Sião."
       ]
-    ]
+    ],
+    "name": "Joel"
   },
   {
-    "id": "30",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Amós",
-    "abrev": "am",
-    "capitulos": [
+    "abbrev": "am",
+    "chapters": [
       [
         "As palavras de Amós, que estava entre os pastores de Tecoa, as quais ele viu sobre Israel nos dias de Uzias rei de Judá, e nos dias de Jeroboão, filho de Joás, rei de Israel, dois anos antes do terremoto.",
         "E disse: O SENHOR bramará desde Sião, e dará sua voz desde Jerusalém; e as habitações dos pastores se prantearão, e o topo do Carmelo se secará.",
@@ -24533,14 +24463,12 @@
         "E restaurarei meu povo Isarael de seu infortúnio; então reconstruirão as cidades assoladas, e nelas habitarão; e plantarão vinhas, e beberão o vinho delas; e farão jardins, e comerão o fruto deles.",
         "Pois eu os plantarei em sua terra, e nunca mais serão arrancados de sua terra, que eu lhes dei, diz o SENHOR, teu Deus."
       ]
-    ]
+    ],
+    "name": "Amós"
   },
   {
-    "id": "31",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Obadias",
-    "abrev": "ob",
-    "capitulos": [
+    "abbrev": "ob",
+    "chapters": [
       [
         "Visão de Obadias. Assim diz o Senhor DEUS quanto a Edom: Temos ouvido notícias do SENHOR, e mensageiro foi enviado entre as nações; levantai-vos, e nos levantaremos em batalha contra ela.",
         "Eis que eu te faço pequeno entre as nações; tu és muito desprezado.",
@@ -24564,14 +24492,12 @@
         "E os cativos deste exército dos filhos de Israel possuirão o que era dos cananeus até Sarepta; e os cativos de Jerusalém, que estão em Sefarade, possuirão as cidades do Negueve.",
         "E salvadores se levantarão no monte de Sião, para julgarem ao monte de Esaú; e o reino pertencerá ao SENHOR."
       ]
-    ]
+    ],
+    "name": "Obadias"
   },
   {
-    "id": "32",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Jonas",
-    "abrev": "jn",
-    "capitulos": [
+    "abbrev": "jn",
+    "chapters": [
       [
         "E veio a palavra do SENHOR a Jonas, filho de Amitai, dizendo:",
         "Levanta-te, vai à grande cidade de Nínive, e prega contra ela; porque sua maldade subiu diante de mim.",
@@ -24628,14 +24554,12 @@
         "E o SENHOR disse: Tu tiveste pena da planta, na qual não trabalhaste, nem tu a fizeste crescer, que em uma noite nasceu, e em outra noite pereceu;",
         "E não teria eu pena de Nínive, aquela grande cidade onde há mais de cem e vinte mil pessoas que não sabem a diferença entre sua mão direita e a esquerda, e muitos animais?"
       ]
-    ]
+    ],
+    "name": "Jonas"
   },
   {
-    "id": "33",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Miqueias",
-    "abrev": "mq",
-    "capitulos": [
+    "abbrev": "mq",
+    "chapters": [
       [
         "Palavra do SENHOR que veio a Miqueias, o morastita, nos dias de Jotão, Acaz, e Ezequias, reis de Judá; que ele viu sobre Samaria e Jerusalém.",
         "Ouvi vós todos os povos; presta atenção tu, ó terra, e tudo o que nela há; pois o Senhor DEUS será testemunha contra vós, o Senhor desde seu santo templo.",
@@ -24755,14 +24679,12 @@
         "Ele voltará a ter misericórdia de nós; ele esmagará nossas maldades. Tu lançarás os pecados deles nas profundezas do mar.",
         "Tu concederás a Jacó a fidelidade, e a Abraão a bondade, que juraste a nossos pais desde os dias antigos."
       ]
-    ]
+    ],
+    "name": "Miqueias"
   },
   {
-    "id": "34",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Naum",
-    "abrev": "na",
-    "capitulos": [
+    "abbrev": "na",
+    "chapters": [
       [
         "Revelação sobre Nínive. Livro da visão de Naum o elcosita.",
         "O SENHOR é Deus zeloso e vingador; o SENHOR é vingador e furioso; o SENHOR se vinga de seus adversários, e que guarda ira contra seus inimigos.",
@@ -24816,14 +24738,12 @@
         "Teus pastores cochilam, ó rei da Assíria, teus nobres descansam; teu povo se espalhou pelos montes, e ninguém o ajuntará.",
         "Não há cura para tua ferida; tua chaga é fatal; todos os que ouviram tua fama baterão palmas por causa de ti, pois sobre quem tua maldade não passou continuamente?"
       ]
-    ]
+    ],
+    "name": "Naum"
   },
   {
-    "id": "35",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Habacuque",
-    "abrev": "hc",
-    "capitulos": [
+    "abbrev": "hc",
+    "chapters": [
       [
         "Revelação que o profeta Habacuque viu.",
         "Até quando, SENHOR, eu clamarei, e tu não ouvirás? Até quando gritarei a ti: Violência!, e tu não salvarás?",
@@ -24886,14 +24806,12 @@
         "Mesmo assim eu me alegrarei no SENHOR, terei prazer no Deus de minha salvação.",
         "DEUS, o Senhor, é minha fortaleza; ele fará meus pés como os das corças, e me fará andar sobre meus lugares altos.(Para o regente, com instrumentos de cordas)."
       ]
-    ]
+    ],
+    "name": "Habacuque"
   },
   {
-    "id": "36",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Sofonias",
-    "abrev": "sf",
-    "capitulos": [
+    "abbrev": "sf",
+    "chapters": [
       [
         "Palavra do SENHOR que veio a Sofonias filho de Cuxi, filho de Gedalias, filho de Amarias, filho de Ezequias, nos dias de Josias filho de Amom, rei de Judá.",
         "Destruirei tudo de sobre a face da terra,diz o SENHOR.",
@@ -24953,14 +24871,12 @@
         "Eis que naquele tempo acabarei com todos os teus opressores; e salvarei a manca, e ajuntarei a expulsa; e os tornarei louvor e renome em toda terra em que foram envergonhados.",
         "Naquele tempo eu vos trarei de volta, naquele tempo eu vos ajuntarei; pois vos tornarei renome e louvor entre todos os povos da terra, quando eu vos resutaurar de vosso infortúnio diante de vossos olhos, diz o SENHOR."
       ]
-    ]
+    ],
+    "name": "Sofonias"
   },
   {
-    "id": "37",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Ageu",
-    "abrev": "ag",
-    "capitulos": [
+    "abbrev": "ag",
+    "chapters": [
       [
         "No segundo ano segundo do rei Dario, no sexto mês, no primeiro dia do mês, veio a palavra do SENHOR, por meio do profeta Ageu, a Zorobabel filho de Sealtiel, governador de Judá, e a Josué filho de Jeozadaque, sumo sacerdote, dizendo:",
         "Assim fala o SENHOR dos exércitos: Este povo diz: O tempo não chegou, o tempo da casa do SENHOR ser reconstruída.",
@@ -25003,14 +24919,12 @@
         "E transtornarei o trono dos reinos, e destruirei a força dos reinos das nações; e transtornarei as carruagens, e os que nelas se sentam; e os cavalos e os que neles montam cairão, cada um pela espada de seu irmão.",
         "Naquele dia, diz o SENHOR dos exércitos, eu te tomarei, Zorobabel, filho de Sealtiel, servo meu, diz o SENHOR, e te porei como anel de selar; porque eu te escolhi, diz o SENHOR dos exércitos."
       ]
-    ]
+    ],
+    "name": "Ageu"
   },
   {
-    "id": "38",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Zacarias",
-    "abrev": "zc",
-    "capitulos": [
+    "abbrev": "zc",
+    "chapters": [
       [
         "No oitavo mês do segundo ano de Dario, a palavra do SENHOR veio ao profeta Zacarias, filho de Berequias, filho de Ido, dizendo:",
         "O SENHOR se irou muito contra vossos pais.",
@@ -25250,14 +25164,12 @@
         "Naquele tempo sobre as sinos dos cavalos estará: CONSAGRADO AO SENHOR; e as panelas na casa do SENHOR serão como as bacias diante do altar.",
         "E todas as panelas em Jerusalém e em Judá serão consagradas ao SENHOR dos exércitos, de modo que todos os que sacrificarem, virão e delas tomarão, e nelas cozerão; e naquele dia não haverá mais cananeu algum na casa do SENHOR dos exércitos."
       ]
-    ]
+    ],
+    "name": "Zacarias"
   },
   {
-    "id": "39",
-    "periodo": "Antigo Testamento - AT",
-    "nome": "Malaquias",
-    "abrev": "ml",
-    "capitulos": [
+    "abbrev": "ml",
+    "chapters": [
       [
         "Revelação da palavra do SENHOR a Israel, por meio de Malaquias.",
         "Eu vos tenho amado,diz o SENHOR; mas vos dizeis: Em que nos amaste? Não era Esaú irmão de Jacó?, diz o SENHOR, todavia amei a Jacó,",
@@ -25321,14 +25233,12 @@
         "Eis que eu vos envio o profeta Elias, antes que venha o grande e temível dia do SENHOR.",
         "Ele converterá o coração dos pais aos filhos, e o coração dos filhos aos pais; para que eu não venha e fira a terra com maldição."
       ]
-    ]
+    ],
+    "name": "Malaquias"
   },
   {
-    "id": "40",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Mateus",
-    "abrev": "mt",
-    "capitulos": [
+    "abbrev": "mt",
+    "chapters": [
       [
         "Livro da geração de Jesus Cristo, filho de Davi, filho de Abraão.",
         "Abraão gerou a Isaque; e Isaque gerou a Jacó; e Jacó gerou a Judá e a seus irmãos.",
@@ -26456,14 +26366,12 @@
         "Portanto ide, fazei discípulos a todas as nações, batizando-os em nome do Pai, do Filho, e do Espírito Santo,",
         "ensinando-lhes a guardar todas as coisas que eu vos tenho mandado. E eis que eu estou convosco todos os dias, até o fim dos tempos."
       ]
-    ]
+    ],
+    "name": "Mateus"
   },
   {
-    "id": "41",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Marcos",
-    "abrev": "mc",
-    "capitulos": [
+    "abbrev": "mc",
+    "chapters": [
       [
         "Princípio do Evangelho de Jesus Cristo, Filho de Deus.",
         "Como está escrito no profeta Isaías: Eis que eu envio o meu mensageiro diante de tua face, que preparará o teu caminho .",
@@ -27174,14 +27082,12 @@
         "Então o Senhor, depois de haver lhes falado, foi recebido acima no céu, e sentou-se à direita de Deus.",
         "E eles saíram e pregaram por todas as partes, com o Senhor operando com eles, e confirmando a palavra com os sinais que se seguiam. Amém."
       ]
-    ]
+    ],
+    "name": "Marcos"
   },
   {
-    "id": "42",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Lucas",
-    "abrev": "lc",
-    "capitulos": [
+    "abbrev": "lc",
+    "chapters": [
       [
         "Como muitos empreenderam pôr em ordem o relato das coisas que entre nós se cumpriram,",
         "conforme os que as viram que desde o princípio, e foram servidores das palavra, nos transmitiram,",
@@ -28381,14 +28287,12 @@
         "E eles, adorando-o, voltaram para Jerusalém com grande alegria;",
         "E estavam sempre no Templo, louvando e bendizendo a Deus. Amém."
       ]
-    ]
+    ],
+    "name": "Lucas"
   },
   {
-    "id": "43",
-    "periodo": "Novo Testamento - NT",
-    "nome": "João",
-    "abrev": "jo",
-    "capitulos": [
+    "abbrev": "jo",
+    "chapters": [
       [
         "No princípio era a Palavra, e a Palavra estava junto de Deus, e a Palavra era Deus.",
         "Esta estava no princípio junto de Deus.",
@@ -29310,14 +29214,12 @@
         "Este é o discípulo que testemunha destas coisas, e estas coisas escreveu; e sabemos que seu testemunho é verdadeiro.",
         "Ainda há, porém, muitas outras coisas que Jesus fez, que se sobre cada uma delas se escrevessem, penso que nem mesmo o mundo poderia caber os livros escritos. Amém."
       ]
-    ]
+    ],
+    "name": "João"
   },
   {
-    "id": "44",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Atos",
-    "abrev": "at",
-    "capitulos": [
+    "abbrev": "at",
+    "chapters": [
       [
         "Eu fiz o primeiro livro, ó Teófilo, sobre todas as coisas que Jesus começou, tanto a fazer como a ensinar;",
         "Até o dia em que ele foi recebido acima, depois de pelo Espírito Santo ter dado mandamentos aos apóstolos que tinha escolhido;",
@@ -30381,14 +30283,12 @@
         "E Paulo ficou dois anos inteiros em sua própria casa alugada; e recebia a todos quantos vinham a ele;",
         "Pregando o Reino de Deus, e ensinando com ousadia a doutrina do Senhor Jesus Cristo, sem impedimento algum."
       ]
-    ]
+    ],
+    "name": "Atos"
   },
   {
-    "id": "45",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Romanos",
-    "abrev": "rm",
-    "capitulos": [
+    "abbrev": "rm",
+    "chapters": [
       [
         "Paulo, servo de Cristo Jesus, chamado para ser apóstolo, separado para o evangelho de Deus,",
         "que antes havia prometido por meio dos seus profetas nas santas Escrituras,",
@@ -30854,14 +30754,12 @@
         "Mas agora se manifestou, e se tornou conhecido pelas Escrituras dos profetas, segundo o mandado do Deus eterno, para a obediência da fé entre todas as nações;",
         "Ao único Deus sábio seja a glória, por meio de Jesus Cristo, para todo o sempre! Amém!"
       ]
-    ]
+    ],
+    "name": "Romanos"
   },
   {
-    "id": "46",
-    "periodo": "Novo Testamento - NT",
-    "nome": "1 Coríntios",
-    "abrev": "1 co",
-    "capitulos": [
+    "abbrev": "1 co",
+    "chapters": [
       [
         "Paulo, chamado apóstolo de Jesus Cristo pela vontade de Deus, e o irmão Sóstenes,",
         "À igreja de Deus que está em Corinto, aos santificados em Cristo Jesus, chamados santos, com todos os que em todo lugar invocam o nome de nosso Senhor Jesus Cristo, Senhor deles, e nosso;",
@@ -31331,14 +31229,12 @@
         "A graça do Senhor Jesus Cristo esteja convosco.",
         "Meu amor esteja com todos vós em Cristo Jesus. Amém."
       ]
-    ]
+    ],
+    "name": "1 Coríntios"
   },
   {
-    "id": "47",
-    "periodo": "Novo Testamento - NT",
-    "nome": "2 Coríntios",
-    "abrev": "2 co",
-    "capitulos": [
+    "abbrev": "2 co",
+    "chapters": [
       [
         "Paulo, apóstolo de Jesus Cristo, pela vontade de Deus, e o irmão Timóteo, para a igreja de Deus que está em Corinto, com todos os santos que estão em toda a Acaia.",
         "Graça e paz de Deus nosso Pai, e do Senhor Jesus Cristo.",
@@ -31622,14 +31518,12 @@
         "Todos os santos vos saúdam.",
         "A graça do Senhor Jesus Cristo, e o amor de Deus, e a comunhão do Espírito Santo seja com todos vós. Amém."
       ]
-    ]
+    ],
+    "name": "2 Coríntios"
   },
   {
-    "id": "48",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Gálatas",
-    "abrev": "gl",
-    "capitulos": [
+    "abbrev": "gl",
+    "chapters": [
       [
         "Paulo, apóstolo (não da parte dos seres humanos, nem por meio de homem algum, mas sim por Jesus Cristo, e por Deus Pai, que o ressuscitou dos mortos),",
         "e todos os irmãos que estão comigo, para as igrejas da Galácia.",
@@ -31791,14 +31685,12 @@
         "De agora em diante, ninguém me perturbe, porque trago no meu corpo as marcas de Jesus.",
         "A graça do nosso Senhor Jesus Cristo seja com o vosso espírito, irmãos. Amém!"
       ]
-    ]
+    ],
+    "name": "Gálatas"
   },
   {
-    "id": "49",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Efésios",
-    "abrev": "ef",
-    "capitulos": [
+    "abbrev": "ef",
+    "chapters": [
       [
         "Paulo, apóstolo de Cristo Jesus pela vontade de Deus, aos santos que estão em Éfeso, e fiéis em Cristo Jesus.",
         "Graça e paz, de Deus nosso Pai, e do Senhor Jesus Cristo, sejam convosco.",
@@ -31966,14 +31858,12 @@
         "Paz seja com os irmãos, e amor com fé, da parte de Deus Pai, e do Senhor Jesus Cristo.",
         "A graça seja com todos os que amam ao nosso Senhor Jesus Cristo com amor que não falha."
       ]
-    ]
+    ],
+    "name": "Efésios"
   },
   {
-    "id": "50",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Filipenses",
-    "abrev": "fp",
-    "capitulos": [
+    "abbrev": "fp",
+    "chapters": [
       [
         "Paulo e Timóteo, servos de Cristo Jesus, a todos os santos em Cristo Jesus, que estão em Filipos, com os supervisores e servidores.",
         "Haja convosco a graça e paz de Deus nosso Pai, e do Senhor Jesus Cristo.",
@@ -32086,14 +31976,12 @@
         "Todos os santos vos saúdam, mas principalmente os da casa de César.",
         "A graça do Senhor Jesus Cristo esteja com o vosso espírito."
       ]
-    ]
+    ],
+    "name": "Filipenses"
   },
   {
-    "id": "51",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Colossenses",
-    "abrev": "Cl",
-    "capitulos": [
+    "abbrev": "Cl",
+    "chapters": [
       [
         "Paulo, apóstolo de Cristo Jesus pela vontade de Deus, e o irmão Timóteo,",
         "aos santos e fiéis irmãos em Cristo, que estão em Colossos. Haja em vós a graça e paz da parte de Deus nosso Pai.",
@@ -32197,14 +32085,12 @@
         "E dizei a Árquipo: Presta atenção ao trabalho que recebeste do Senhor, para que o cumpras.",
         "Esta saudação é da minha mão, de Paulo. Lembrai-vos das minhas prisões. A graça esteja convosco."
       ]
-    ]
+    ],
+    "name": "Colossenses"
   },
   {
-    "id": "52",
-    "periodo": "Novo Testamento - NT",
-    "nome": "1 Tessalonicenses",
-    "abrev": "1 ts",
-    "capitulos": [
+    "abbrev": "1 ts",
+    "chapters": [
       [
         "Paulo, Silvano, e Timóteo, à igreja dos tessalonicenses, em Deus Pai, e no Senhor Jesus Cristo; haja convosco a graça e a paz.",
         "Sempre damos graças a Deus por todos vós, fazendo menção de vós em nossas orações.",
@@ -32304,14 +32190,12 @@
         "Eu vos mando pelo Senhor que esta carta seja lida a todos os irmãos.",
         "A graça de nosso Senhor Jesus Cristo seja convosco."
       ]
-    ]
+    ],
+    "name": "1 Tessalonicenses"
   },
   {
-    "id": "53",
-    "periodo": "Novo Testamento - NT",
-    "nome": "2 Tessalonicenses",
-    "abrev": "2 ts",
-    "capitulos": [
+    "abbrev": "2 ts",
+    "chapters": [
       [
         "Paulo, e Silvano, e Timóteo, à igreja dos tessalonicenses, em Deus nosso Pai, e no Senhor Jesus Cristo.",
         "Haja entre vós graça e paz de nosso Pai, e do Senhor Jesus Cristo.",
@@ -32365,14 +32249,12 @@
         "A saudação de minha própria mão, Paulo, que é minha assinatura em toda carta; assim escrevo.",
         "A graça de nosso Senhor Jesus Cristo seja com todos vós. Amém."
       ]
-    ]
+    ],
+    "name": "2 Tessalonicenses"
   },
   {
-    "id": "54",
-    "periodo": "Novo Testamento - NT",
-    "nome": "1 Timóteo",
-    "abrev": "1 tm",
-    "capitulos": [
+    "abbrev": "1 tm",
+    "chapters": [
       [
         "Paulo, apóstolo de Cristo Jesus segundo o mandado de Deus, nosso Salvador, e do Senhor Jesus Cristo, nossa esperança.",
         "Para Timóteo, meu verdadeiro filho na fé. Graça, misericórdia e paz da parte de Deus Pai, e de Cristo Jesus, nosso Senhor.",
@@ -32498,14 +32380,12 @@
         "Timóteo, guarda o depósito que te foi confiado, evitando conversas vãs e profanas, e controvérsias do que é falsamente chamado de “conhecimento”;",
         "que alguns declararam seguir, e se desviaram da fé. A graça seja convosco."
       ]
-    ]
+    ],
+    "name": "1 Timóteo"
   },
   {
-    "id": "55",
-    "periodo": "Novo Testamento - NT",
-    "nome": "2 Timóteo",
-    "abrev": "2 tm",
-    "capitulos": [
+    "abbrev": "2 tm",
+    "chapters": [
       [
         "Paulo, apóstolo de Cristo Jesus, pela vontade de Deus, segundo a promessa da vida que está em Cristo Jesus,",
         "a Timóteo, meu amado filho. Graça, misericórdia, e paz, da parte de Deus Pai, e de Cristo Jesus, nosso Senhor.",
@@ -32597,14 +32477,12 @@
         "Procura vir antes do inverno. Êubulo, Pudente, Lino, Cláudia e todos os irmãos te cumprimentam.",
         "O Senhor seja com o teu espírito. A graça seja convosco."
       ]
-    ]
+    ],
+    "name": "2 Timóteo"
   },
   {
-    "id": "56",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Tito",
-    "abrev": "tt",
-    "capitulos": [
+    "abbrev": "tt",
+    "chapters": [
       [
         "Paulo, servo de Deus e apóstolo de Jesus Cristo, segundo a fé dos escolhidos de Deus, e o conhecimento da verdade, que é segundo a devoção divina;",
         "em esperança da vida eterna, a qual Deus, que não pode mentir, prometeu antes dos princípios dos tempos,",
@@ -32657,14 +32535,12 @@
         "E que também os nossos aprendam a se dedicarem às boas obras para os usos necessários, para que não sejam infrutíferos.",
         "Todos os que estão comigo te saúdam. Saúda tu aos que nos amam na fé. A graça seja com todos vós. Amém!"
       ]
-    ]
+    ],
+    "name": "Tito"
   },
   {
-    "id": "57",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Filemom",
-    "abrev": "fm",
-    "capitulos": [
+    "abbrev": "fm",
+    "chapters": [
       [
         "Paulo, prisioneiro de Cristo Jesus, e o irmão Timóteo, a Filemom, o amado, e nosso cooperador;",
         "E à irmã Ápia, e a Arquipo nosso companheiro de batalha, e à igreja que está em tua casa;",
@@ -32692,14 +32568,12 @@
         "Marcos, Aristarco, Demas e Lucas (meus cooperadores).",
         "A graça de nosso Senhor Jesus Cirsto seja com vosso espírito. Amém!"
       ]
-    ]
+    ],
+    "name": "Filemom"
   },
   {
-    "id": "58",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Hebreus",
-    "abrev": "hb",
-    "capitulos": [
+    "abbrev": "hb",
+    "chapters": [
       [
         "Deus falou antigamente muitas vezes, e de muitas maneiras, aos ancestrais pelos profetas.",
         "Mas nestes últimos falou a nós por meio do seu Filho, a quem constituiu por herdeiro de todas as coisas, e pelo qual também fez o universo.",
@@ -33029,14 +32903,12 @@
         "Saudai a todos os vossos líderes, e a todos os santos. Os da Itália vos saúdam.",
         "A graça seja com todos vós."
       ]
-    ]
+    ],
+    "name": "Hebreus"
   },
   {
-    "id": "59",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Tiago",
-    "abrev": "tg",
-    "capitulos": [
+    "abbrev": "tg",
+    "chapters": [
       [
         "Tiago, servo de Deus e do Senhor Jesus Cristo, às doze tribos que estão na dispersão, saudações!",
         "Meus irmãos, tende toda alegria quando vos encontrardes em várias provações,",
@@ -33155,14 +33027,12 @@
         "Meus irmãos, se algum entre vós houver se desviado da verdade, e alguém o converter,",
         "saiba que aquele que converter um pecador do erro de seu caminho, salvará a sua alma da morte, e cobrirá uma multidão de pecados."
       ]
-    ]
+    ],
+    "name": "Tiago"
   },
   {
-    "id": "60",
-    "periodo": "Novo Testamento - NT",
-    "nome": "1 Pedro",
-    "abrev": "1 pe",
-    "capitulos": [
+    "abbrev": "1 pe",
+    "chapters": [
       [
         "Pedro, apóstolo de Jesus Cristo, aos forasteiros que estão espalhados em Ponto, Galácia, Capadócia, Ásia e Bitínia,",
         "escolhidos segundo o pré-conhecimento de Deus Pai, por meio da santificação do Espírito, para a obediência e a aspersão do sangue de Jesus Cristo. Que a graça e a paz vos sejam multiplicadas.",
@@ -33278,14 +33148,12 @@
         "Saúda-vos a igreja escolhida convosco, que está na Babilônia, e também o meu filho Marcos.",
         "Saudai-vos uns aos outros com beijo de amor. A paz seja com todos vós que estais em Cristo"
       ]
-    ]
+    ],
+    "name": "1 Pedro"
   },
   {
-    "id": "61",
-    "periodo": "Novo Testamento - NT",
-    "nome": "2 Pedro",
-    "abrev": "2 pe",
-    "capitulos": [
+    "abbrev": "2 pe",
+    "chapters": [
       [
         "Simão Pedro, servo e apóstolo de Jesus Cristo, aos que obtiveram conosco a igualmente preciosa fé pela justiça de nosso Deus e Salvador Jesus Cristo;",
         "Graça e paz vos seja multiplicada pelo conhecimento de Deus, e de Jesus nosso Senhor.",
@@ -33353,14 +33221,12 @@
         "Portanto vós, amados, sabendo disto com antecedência, guardai-vos para que, pelo engano dos maus, não sejais juntamente arrebatados, e caiais de vossa firmeza.",
         "Mas crescei em graça e conhecimento de nosso Senhor e Salvador Jesus Cristo. A ele seja a glória, tanto agora como no dia da eternidade, Amém!"
       ]
-    ]
+    ],
+    "name": "2 Pedro"
   },
   {
-    "id": "62",
-    "periodo": "Novo Testamento - NT",
-    "nome": "1 João",
-    "abrev": "1 jo",
-    "capitulos": [
+    "abbrev": "1 jo",
+    "chapters": [
       [
         "O que era desde o princípio, o que ouvimos, o que vimos com os nossos olhos, o que temos contemplado, e nossas mãos tocaram, quanto à Palavra da vida,",
         "(pois a vida já foi manifesta, e nós a vimos, demos testemunho, e vos anunciamos a vida eterna, que estava com o Pai, e a nós foi manifesta)",
@@ -33476,14 +33342,12 @@
         "E sabemos que o Filho de Deus veio, e nos deu entendimento para conhecermos o Verdadeiro; e no Verdadeiro estamos, em seu Filho Jesus Cristo. Este é o verdadeiro Deus, e a vida eterna.",
         "Filhinhos, guardai-vos dos ídolos."
       ]
-    ]
+    ],
+    "name": "1 João"
   },
   {
-    "id": "63",
-    "periodo": "Novo Testamento - NT",
-    "nome": "2 João",
-    "abrev": "2 jo",
-    "capitulos": [
+    "abbrev": "2 jo",
+    "chapters": [
       [
         "O ancião, à senhora eleita, e a seus filhos, aos quais eu amo em verdade; e não somente eu, mas também todos os que têm conhecido a verdade;",
         "Por causa da verdade que está em nós, e estará para sempre conosco.",
@@ -33499,14 +33363,12 @@
         "Eu tenho muitas coisas para vos escrever, porém não quis fazê-lo com papel e tinta; mas espero vir até vós, e falar convosco face a face, para que a nossa alegria seja completa.",
         "Os filhos de tua irmã, a eleita, te saúdam. Amém."
       ]
-    ]
+    ],
+    "name": "2 João"
   },
   {
-    "id": "64",
-    "periodo": "Novo Testamento - NT",
-    "nome": "3 João",
-    "abrev": "3 jo",
-    "capitulos": [
+    "abbrev": "3 jo",
+    "chapters": [
       [
         "O ancião, ao amado Gaio, a quem amo em verdade.",
         "Amado, eu desejo que estejas bem em todas as coisas, e que tenhas saúde, assim como bem está a tua alma.",
@@ -33523,14 +33385,12 @@
         "Eu tinha muitas coisas para escrever, porém não quero escrever a ti sobre elas com tinta e pena;",
         "mas espero te ver em breve, e falaremos face a face. Paz seja contigo. Os amigos daqui te saúdam. Saúda os amigos daí , cada um por nome."
       ]
-    ]
+    ],
+    "name": "3 João"
   },
   {
-    "id": "65",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Judas",
-    "abrev": "jd",
-    "capitulos": [
+    "abbrev": "jd",
+    "chapters": [
       [
         "Judas, servo de Jesus Cristo, e irmão de Tiago, para aqueles que foram chamados, amados por Deus Pai, e guardados por Jesus Cristo.",
         "Misericórdia a vós, e a paz e o amor vos sejam multiplicados.",
@@ -33558,14 +33418,12 @@
         "E para aquele que é poderoso para vos guardar de tropeçar, e vos apresentar irrepreensíveis com alegria diante de sua glória;",
         "Ao único Deus, nosso Salvador, por meio de Jesus Cristo nosso Senhor, seja a glória e majestade, poder e autoridade, agora, e para todo o sempre, Amém!"
       ]
-    ]
+    ],
+    "name": "Judas"
   },
   {
-    "id": "66",
-    "periodo": "Novo Testamento - NT",
-    "nome": "Apocalipse",
-    "abrev": "ap",
-    "capitulos": [
+    "abbrev": "ap",
+    "chapters": [
       [
         "Revelação de Jesus Cristo, a qual Deus lhe deu, para mostrar a seus servos as coisas que devem acontecer em breve; e as enviou por meio de seu anjo, e as informou ao seu servo João.",
         "O qual deu testemunho da palavra de Deus, e do testemunho de Jesus Cristo, e de tudo o que ele viu.",
@@ -34014,6 +33872,7 @@
         "Aquele que dá testemunho destas coisas diz: “Certamente logo venho.” Amém! Sim, vem, Senhor Jesus!",
         "A graça do nosso Senhor Jesus Cristo seja com todos."
       ]
-    ]
+    ],
+    "name": "Apocalipse"
   }
 ]

@@ -71,23 +71,12 @@ export const bibleBooks: BibleBook[] = [
   { name: 'Apocalipse', chapters: 22, testament: 'New' },
 ];
 
-export const BIBLE_VERSIONS: BibleVersion[] = ['nvi', 'acf', 'ntlh', 'ara', 'arc', 'as21', 'jfaa', 'kja', 'kjf', 'naa', 'nbv', 'nvt', 'tb'];
+export const BIBLE_VERSIONS: BibleVersion[] = ['blivre', 'acf'];
 
 export const translations = {
   pt: {
+    blivre: "Bíblia Livre",
     acf: "Almeida Corrigida Fiel",
-    nvi: "Nova Versão Internacional",
-    ntlh: "Nova Tradução na Linguagem de Hoje",
-    ara: "Almeida Revista e Atualizada",
-    arc: "Almeida Revista e Corrigida",
-    as21: "Almeida Século 21",
-    jfaa: "João Ferreira de Almeida Atualizada",
-    kja: "King James Atualizada",
-    kjf: "King James Fiel",
-    naa: "Nova Almeida Atualizada",
-    nbv: "Nova Bíblia Viva",
-    nvt: "Nova Versão Transformadora",
-    tb: "Tradução Brasileira",
     appTitle: "Bíblia Online",
     devotional: "Devocional Diário",
     chat: "Chat Teológico",
