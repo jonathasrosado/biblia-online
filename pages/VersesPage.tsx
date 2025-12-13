@@ -1,334 +1,112 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Book, Heart, Shield, Sun, Cloud, Anchor, Users, Zap, Star, MessageCircle, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Heart, Shield, Sun, Cloud, Calendar, MessageCircle, DollarSign, Brain, Hourglass } from 'lucide-react';
 import SEO from '../components/SEO';
-import { bibleBooks, normalizeBookName } from '../constants';
 
 const themes = [
+    { name: 'Ansiedade', slug: 'ansiedade', icon: Brain, color: 'text-purple-500' },
+    { name: 'Dinheiro', slug: 'dinheiro', icon: DollarSign, color: 'text-green-500' },
     { name: 'Amor', slug: 'amor', icon: Heart, color: 'text-red-500' },
-    { name: 'Fé', slug: 'fé', icon: Shield, color: 'text-blue-500' },
-    { name: 'Esperança', slug: 'esperança', icon: Anchor, color: 'text-teal-500' },
-    { name: 'Paz', slug: 'paz', icon: Cloud, color: 'text-sky-400' },
-    { name: 'Cura', slug: 'cura', icon: Sun, color: 'text-orange-500' },
-    { name: 'Família', slug: 'família', icon: Users, color: 'text-indigo-500' },
-    { name: 'Força', slug: 'força', icon: Zap, color: 'text-yellow-500' },
-    { name: 'Sabedoria', slug: 'sabedoria', icon: Star, color: 'text-purple-500' },
+    { name: 'Saúde', slug: 'saude', icon: Sun, color: 'text-orange-500' },
+    { name: 'Medo', slug: 'medo', icon: Shield, color: 'text-blue-500' },
+    { name: 'Futuro', slug: 'futuro', icon: Hourglass, color: 'text-teal-500' },
 ];
 
-const faqs = [
-    {
-        question: "Como encontrar um versículo específico?",
-        answer: "Você pode usar nossa barra de busca inteligente no topo da página. Digite temas como 'amor' ou referências como 'João 3:16' para ir direto ao que procura."
-    },
-    {
-        question: "Qual a importância de ler versículos diariamente?",
-        answer: "A leiutra diária da Bíblia fortalece a fé, traz paz ao coração e oferece direção para as decisões da vida. É um momento de conexão direta com Deus."
-    },
-    {
-        question: "Por onde começar a ler a Bíblia?",
-        answer: "Recomendamos começar pelos Evangelhos, como João ou Marcos, para conhecer a vida de Jesus. O livro de Salmos também é ótimo para devocionais diários."
-    },
-    {
-        question: "Posso compartilhar os versículos?",
-        answer: "Sim! Ao acessar qualquer capítulo, você pode clicar nos versículos para copiar, criar imagens personalizadas e compartilhar com amigos e familiares."
-    }
-];
-
-interface VersesPageProps {
-    theme?: 'light' | 'dark' | 'sepia' | 'bw';
-}
-
-const VersesPage: React.FC<VersesPageProps> = ({ theme }) => {
-    const isBw = theme === 'bw';
+const VersesPage: React.FC = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
-    const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchTerm.trim()) {
-            navigate(`/busca?q=${encodeURIComponent(searchTerm)}`);
+            navigate(`/chat?p=${encodeURIComponent(searchTerm)}`);
         }
-    };
-
-    const oldTestamentBooks = bibleBooks.filter(b => b.testament === 'Old');
-    const newTestamentBooks = bibleBooks.filter(b => b.testament === 'New');
-
-    const toggleFaq = (index: number) => {
-        setOpenFaqIndex(openFaqIndex === index ? null : index);
     };
 
     return (
         <div className="min-h-screen bg-stone-50 dark:bg-stone-950 pb-20 transition-colors">
             <SEO
-                title="Versículos da Bíblia por Tema e Livro - Estudo Bíblico Online"
-                description="Explore nossa coleção completa de versículos bíblicos organizados por temas e livros. Encontre conforto, sabedoria e direção na Palavra de Deus hoje."
+                title="Versículos da Bíblia por Tema - Estudo Bíblico Online"
+                description="Encontre palavras da Bíblia para o que você está vivendo agora. Versículos sobre ansiedade, dinheiro, amor, saúde, medo e futuro."
                 url="https://bibliaonline.me/versiculos"
-                schema={{
-                    "@context": "https://schema.org",
-                    "@type": "FAQPage",
-                    "mainEntity": faqs.map(faq => ({
-                        "@type": "Question",
-                        "name": faq.question,
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": faq.answer
-                        }
-                    }))
-                }}
             />
 
             {/* Header / Hero */}
-            <div className={`pt-20 pb-16 px-4 shadow-sm relative overflow-hidden border-b
-              ${isBw
-                    ? 'bg-white border-black text-black'
-                    : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
-            `}>
-                {!isBw && (
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-bible-gold via-yellow-400 to-bible-gold opacity-50"></div>
-                )}
+            <div className="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 pt-20 pb-16 px-4 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-bible-gold via-yellow-400 to-bible-gold opacity-50"></div>
 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <span className={`inline-block py-1 px-3 rounded-full text-xs font-bold uppercase tracking-widest mb-4
-                      ${isBw
-                            ? 'bg-black text-white'
-                            : 'bg-bible-gold/10 text-bible-accent dark:text-bible-gold'}
-                    `}>
+                    <span className="inline-block py-1 px-3 rounded-full bg-bible-gold/10 text-bible-accent dark:text-bible-gold text-xs font-bold uppercase tracking-widest mb-4">
                         Biblioteca Sagrada
                     </span>
-                    <h1 className={`text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight
-                      ${isBw ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}
-                    `}>
-                        Encontre Inspiração na<br />Palavra de Deus
+                    <h1 className="text-4xl md:text-6xl font-serif font-bold text-bible-accent dark:text-bible-gold mb-4 leading-tight">
+                        Versículos por Tema
                     </h1>
-                    <p className={`text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed
-                      ${isBw ? 'text-black/80' : 'text-stone-600 dark:text-stone-400'}
-                    `}>
-                        Seja buscando conforto em momentos difíceis ou sabedoria para grandes decisões,
-                        nossa coleção organizada de versículos está aqui para guiar sua jornada espiritual.
+                    <p className="text-lg md:text-xl text-stone-600 dark:text-stone-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+                        Encontre palavras da Bíblia para o que você está vivendo agora
                     </p>
 
+                    {/* Themes Grid - ABOVE Search */}
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-8 max-w-3xl mx-auto">
+                        {themes.map((theme) => (
+                            <button
+                                key={theme.slug}
+                                onClick={() => navigate(`/chat?p=versiculos-que-falam-sobre-${theme.slug}`)}
+                                className="group flex flex-col items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-white dark:hover:bg-stone-700 border border-stone-100 dark:border-stone-700 hover:border-bible-gold/30 hover:shadow-md transition-all duration-300"
+                            >
+                                <div className={`p-2 rounded-full bg-white dark:bg-stone-900 shadow-sm ${theme.color} group-hover:scale-110 transition-transform`}>
+                                    <theme.icon size={20} />
+                                </div>
+                                <span className="text-sm font-medium text-stone-600 dark:text-stone-300 group-hover:text-bible-accent dark:group-hover:text-bible-gold">
+                                    {theme.name}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Search Input - BELOW Themes */}
                     <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto transform transition-all hover:-translate-y-1">
                         <input
                             type="text"
-                            placeholder="O que você está buscando hoje? (ex: ansiedade, fé, Salmos 23)"
-                            className={`w-full pl-14 pr-4 py-5 rounded-2xl border-2 text-lg focus:outline-none transition-all shadow-lg
-                              ${isBw
-                                    ? 'bg-white border-black text-black placeholder-black/50 focus:ring-4 focus:ring-black/10'
-                                    : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 focus:ring-4 focus:ring-bible-gold/20 focus:border-bible-gold placeholder-stone-400 dark:text-stone-100'}
-                            `}
+                            placeholder="Buscar outros temas (ex: paz, gratidão, sabedoria)"
+                            className="w-full pl-14 pr-4 py-4 rounded-2xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-base focus:outline-none focus:ring-2 focus:ring-bible-gold/20 focus:border-bible-gold transition-all shadow-sm focus:shadow-md placeholder-stone-400"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <Search className={`absolute left-5 top-1/2 -translate-y-1/2 ${isBw ? 'text-black' : 'text-bible-gold'}`} size={24} />
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-stone-400" size={20} />
                     </form>
                 </div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 py-16 space-y-20">
 
-                {/* Themes Section */}
+                {/* Emotional States - "How are you feeling?" */}
                 <section>
-                    <div className="text-center mb-10">
-                        <h2 className="text-3xl font-serif font-bold text-stone-800 dark:text-stone-200 mb-4">
-                            Explore por Temas
+                    <div className="text-center mb-8">
+                        <h2 className="text-2xl font-serif font-bold text-stone-800 dark:text-stone-200 mb-2">
+                            Como você está se sentindo hoje?
                         </h2>
-                        <p className="text-stone-600 dark:text-stone-400 max-w-xl mx-auto">
-                            Selecionamos as passagens mais poderosas para cada momento da sua vida.
+                        <p className="text-stone-600 dark:text-stone-400">
+                            Escolha uma opção e veja versículos relacionados
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                        {themes.map((theme) => (
+                    <div className="flex flex-wrap md:flex-nowrap justify-center gap-3 overflow-x-auto pb-4 px-4 -mx-4 md:mx-0 md:pb-0 scrollbar-hide">
+                        {[
+                            { label: '😖 Ansioso', slug: 'ansiedade' },
+                            { label: '😨 Com medo', slug: 'medo' },
+                            { label: '😢 Triste', slug: 'tristeza' },
+                            { label: '😫 Cansado', slug: 'cansaco' },
+                            { label: '🤔 Perdido', slug: 'direcao' },
+                            { label: '🥰 Grato', slug: 'gratidao' },
+                        ].map((feeling) => (
                             <button
-                                key={theme.slug}
-                                onClick={() => navigate(`/busca?q=${encodeURIComponent(theme.name)}`)}
-                                className="group bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200 dark:border-stone-800 hover:shadow-xl hover:border-bible-gold/50 dark:hover:border-bible-gold/50 transition-all duration-300 flex flex-col items-center gap-4 text-center"
+                                key={feeling.label}
+                                onClick={() => navigate(`/chat?p=versiculos-que-falam-sobre-${feeling.slug}`)}
+                                className="whitespace-nowrap px-6 py-3 rounded-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-bible-gold hover:text-white dark:hover:text-stone-900 hover:border-bible-gold active:scale-95 transition-all shadow-sm hover:shadow-md flex-shrink-0 font-medium"
                             >
-                                <div className={`p-4 rounded-full bg-stone-50 dark:bg-stone-800 group-hover:scale-110 group-hover:bg-white dark:group-hover:bg-stone-700 transition-all duration-300 shadow-sm ${theme.color}`}>
-                                    <theme.icon size={32} />
-                                </div>
-                                <span className="font-bold text-lg text-stone-700 dark:text-stone-300 group-hover:text-bible-accent dark:group-hover:text-bible-gold transition-colors">
-                                    {theme.name}
-                                </span>
+                                {feeling.label}
                             </button>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Why Read / Value Proposition */}
-                <section className={`rounded-3xl p-8 md:p-12 shadow-sm border
-                  ${isBw
-                        ? 'bg-white border-black'
-                        : 'bg-bible-paper dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
-                `}>
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-6">
-                            <h2 className={`text-3xl font-serif font-bold ${isBw ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
-                                Por que estudar os versículos bíblicos?
-                            </h2>
-                            <div className={`prose dark:prose-invert text-lg leading-relaxed space-y-4
-                              ${isBw ? 'text-black/80' : 'text-stone-600 dark:text-stone-400'}
-                            `}>
-                                <p>
-                                    A Bíblia não é apenas um livro antigo, mas uma fonte viva de sabedoria que atravessa gerações.
-                                    Ler as escrituras diariamente pode transformar sua perspectiva, trazendo <strong>paz interior</strong> e
-                                    clareza mental em meio ao caos do cotidiano.
-                                </p>
-                                <p>
-                                    Cada versículo carrega uma promessa ou um ensinamento. Ao memorizar e meditar nessas palavras,
-                                    você constrói um alicerce espiritual sólido, capaz de resistir às tempestades da vida.
-                                    É o alimento para a alma que nos lembra do amor incondicional de Deus.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="grid gap-4">
-                            {[
-                                { icon: Shield, title: 'Fortaleza Espiritual', desc: 'Encontre força e coragem nas histórias de fé dos grandes heróis bíblicos.' },
-                                { icon: Sun, title: 'Clareza e Direção', desc: 'Versículos de sabedoria que iluminam o caminho para decisões sábias.' },
-                                { icon: Heart, title: 'Consolo e Esperança', desc: 'Palavras de conforto para os momentos de angústia e incerteza.' }
-                            ].map((item, i) => (
-                                <div key={i} className={`p-6 rounded-xl shadow-sm border
-                                  ${isBw
-                                        ? 'bg-white border-black text-black'
-                                        : 'bg-white dark:bg-stone-800 border-stone-100 dark:border-stone-700'}
-                                `}>
-                                    <h3 className={`font-bold mb-2 flex items-center gap-2 ${isBw ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}`}>
-                                        <item.icon size={20} /> {item.title}
-                                    </h3>
-                                    <p className={`text-sm ${isBw ? 'text-black/70' : 'text-stone-600 dark:text-stone-400'}`}>{item.desc}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Study Tools */}
-                <section>
-                    <h2 className="text-3xl font-serif font-bold text-stone-800 dark:text-stone-200 mb-8 text-center">
-                        Ferramentas de Estudo
-                    </h2>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <button
-                            onClick={() => navigate('/chat')}
-                            className="group relative overflow-hidden bg-gradient-to-br from-stone-900 to-stone-800 rounded-2xl p-8 text-left shadow-lg"
-                        >
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                                <MessageCircle size={120} className="text-white" />
-                            </div>
-                            <div className="relative z-10">
-                                <div className="bg-white/10 w-fit p-3 rounded-lg mb-4 text-bible-gold backdrop-blur-sm">
-                                    <MessageCircle size={24} />
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Chat Teológico</h3>
-                                <p className="text-stone-300 mb-6 max-w-xs">
-                                    Tire suas dúvidas sobre passagens complexas com nossa Inteligência Artificial especializada em teologia.
-                                </p>
-                                <span className="inline-flex items-center text-bible-gold font-bold group-hover:translate-x-2 transition-transform">
-                                    Começar Conversa →
-                                </span>
-                            </div>
-                        </button>
-
-                        <button
-                            onClick={() => navigate('/devocional')}
-                            className={`group relative overflow-hidden rounded-2xl p-8 text-left shadow-lg border
-                              ${isBw
-                                    ? 'bg-white border-black text-black'
-                                    : 'bg-gradient-to-br from-bible-gold to-yellow-600 text-white border-transparent'}
-                            `}
-                        >
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                                <Calendar size={120} className={isBw ? 'text-black' : 'text-white'} />
-                            </div>
-                            <div className="relative z-10">
-                                <div className={`w-fit p-3 rounded-lg mb-4 backdrop-blur-sm
-                                  ${isBw ? 'bg-black text-white' : 'bg-white/10 text-white'}
-                                `}>
-                                    <Calendar size={24} />
-                                </div>
-                                <h3 className={`text-2xl font-bold mb-2 ${isBw ? 'text-black' : 'text-white'}`}>Devocional Diário</h3>
-                                <p className={`mb-6 max-w-xs ${isBw ? 'text-black/80' : 'text-white/90'}`}>
-                                    Receba uma reflexão inspiradora todos os dias para começar sua manhã conectado com Deus.
-                                </p>
-                                <span className={`inline-flex items-center font-bold group-hover:translate-x-2 transition-transform
-                                  ${isBw ? 'text-black' : 'text-white'}
-                                `}>
-                                    Ler Devocional →
-                                </span>
-                            </div>
-                        </button>
-                    </div>
-                </section>
-
-                {/* Books Section */}
-                <div className="grid md:grid-cols-2 gap-12 pt-8">
-                    {/* Old Testament */}
-                    <section>
-                        <h2 className="text-2xl font-serif font-bold text-stone-800 dark:text-stone-200 mb-6 flex items-center gap-3 pb-4 border-b border-stone-200 dark:border-stone-800">
-                            <Book className="text-bible-type-old" size={24} />
-                            Antigo Testamento
-                        </h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            {oldTestamentBooks.map((book) => (
-                                <button
-                                    key={book.name}
-                                    onClick={() => navigate(`/leitura/${normalizeBookName(book.name)}`)}
-                                    className="text-left px-4 py-3 rounded-lg hover:bg-white dark:hover:bg-stone-800 hover:shadow-md transition-all text-stone-600 dark:text-stone-400 hover:text-bible-accent dark:hover:text-bible-gold font-medium text-sm border border-transparent hover:border-stone-100 dark:hover:border-stone-700"
-                                >
-                                    {book.name}
-                                </button>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* New Testament */}
-                    <section>
-                        <h2 className="text-2xl font-serif font-bold text-stone-800 dark:text-stone-200 mb-6 flex items-center gap-3 pb-4 border-b border-stone-200 dark:border-stone-800">
-                            <Book className="text-bible-type-new" size={24} />
-                            Novo Testamento
-                        </h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            {newTestamentBooks.map((book) => (
-                                <button
-                                    key={book.name}
-                                    onClick={() => navigate(`/leitura/${normalizeBookName(book.name)}`)}
-                                    className="text-left px-4 py-3 rounded-lg hover:bg-white dark:hover:bg-stone-800 hover:shadow-md transition-all text-stone-600 dark:text-stone-400 hover:text-bible-accent dark:hover:text-bible-gold font-medium text-sm border border-transparent hover:border-stone-100 dark:hover:border-stone-700"
-                                >
-                                    {book.name}
-                                </button>
-                            ))}
-                        </div>
-                    </section>
-                </div>
-
-                {/* FAQ Section */}
-                <section className="pt-8 max-w-3xl mx-auto">
-                    <h2 className="text-3xl font-serif font-bold text-stone-800 dark:text-stone-200 mb-8 text-center">
-                        Perguntas Frequentes
-                    </h2>
-                    <div className="space-y-4">
-                        {faqs.map((faq, index) => (
-                            <div
-                                key={index}
-                                className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden transition-all duration-300"
-                            >
-                                <button
-                                    onClick={() => toggleFaq(index)}
-                                    className="w-full text-left p-6 flex items-center justify-between font-bold text-stone-800 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
-                                >
-                                    {faq.question}
-                                    {openFaqIndex === index ?
-                                        <ChevronUp className="text-bible-gold" size={20} /> :
-                                        <ChevronDown className="text-stone-400" size={20} />
-                                    }
-                                </button>
-                                <div
-                                    className={`px-6 text-stone-600 dark:text-stone-400 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-40 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
-                                >
-                                    {faq.answer}
-                                </div>
-                            </div>
                         ))}
                     </div>
                 </section>

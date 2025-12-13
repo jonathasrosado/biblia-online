@@ -13,6 +13,7 @@ const loadBibleData = async (version: BibleVersion): Promise<BibleBookJson[]> =>
         switch (version) {
             case 'blivre': return (await import('../src/data/bible_blivre.json')).default as BibleBookJson[];
             case 'acf': return (await import('../src/data/bible_acf.json')).default as BibleBookJson[];
+            case 'jra': return (await import('../src/data/bible_jra.json')).default as BibleBookJson[];
             default: return (await import('../src/data/bible_blivre.json')).default as BibleBookJson[];
         }
     } catch (error) {

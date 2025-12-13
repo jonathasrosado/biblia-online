@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { searchBible, searchBlogPosts, getDetailedAnswer } from '../services/geminiService';
+import { searchBlogPosts } from '../services/geminiService';
+import { searchBibleLocal } from '../services/localBibleService';
+import { parseSearchIntent, SearchIntent, getSearchSuggestions, SearchSuggestion } from '../services/searchIntent';
 import { normalizeBookName } from '../constants';
 import { ReadingPreferences, BlogPost } from '../types';
 import { AdUnit } from '../components/AdUnit';
-import { Sparkles, BookOpen, FileText, ArrowRight, MessageCircle } from 'lucide-react';
+import { Sparkles, BookOpen, FileText, ArrowRight, MessageCircle, User, Scroll, Heart, HelpCircle, Hash, Search } from 'lucide-react';
 
 interface SearchPageProps {
     language: string;
@@ -20,51 +22,107 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
 
     const [verseResults, setVerseResults] = useState<any[]>([]);
     const [postResults, setPostResults] = useState<BlogPost[]>([]);
-    const [aiAnswer, setAiAnswer] = useState<string>('');
+
+    // Aggregated Results State
+    const [bookResults, setBookResults] = useState<SearchSuggestion[]>([]);
+    const [characterResults, setCharacterResults] = useState<SearchSuggestion[]>([]);
+    const [storyResults, setStoryResults] = useState<SearchSuggestion[]>([]);
+    const [emotionResults, setEmotionResults] = useState<SearchSuggestion[]>([]);
+    const [themeResults, setThemeResults] = useState<SearchSuggestion[]>([]);
 
     const [isSearching, setIsSearching] = useState(false);
-    const [loadingAi, setLoadingAi] = useState(false);
 
     useEffect(() => {
         const performSearch = async () => {
             if (!query.trim()) return;
 
             setIsSearching(true);
-            setLoadingAi(true);
             setVerseResults([]);
             setPostResults([]);
-            setAiAnswer('');
+            setBookResults([]);
+            setCharacterResults([]);
+            setStoryResults([]);
+            setEmotionResults([]);
+            setThemeResults([]);
 
             try {
-                // 1. Parallel Fetch of Content
+                // 1. Get Smart Suggestions (Books, Characters, Stories, Emotions)
+                const suggestions = getSearchSuggestions(query);
+
+                // Group suggestions by type
+                const books = suggestions.filter(s => s.type === 'BOOK');
+                const chars = suggestions.filter(s => s.type === 'CHARACTER');
+                const stories = suggestions.filter(s => s.type === 'STORY');
+                const emotions = suggestions.filter(s => s.type === 'EMOTION');
+                const themes = suggestions.filter(s => s.type === 'THEME');
+
+                setBookResults(books);
+                setCharacterResults(chars);
+                setStoryResults(stories);
+                setEmotionResults(emotions);
+                setThemeResults(themes);
+
+                // 2. Parallel Fetch of Content (Verses & Posts)
                 const [verses, posts] = await Promise.all([
-                    searchBible(query, language),
+                    searchBibleLocal(query),
                     searchBlogPosts(query)
                 ]);
 
                 setVerseResults(verses);
                 setPostResults(posts);
 
-                // 2. Determine if AI Answer is needed (Intelligent Intent)
-                try {
-                    const answer = await getDetailedAnswer(query, language);
-                    setAiAnswer(answer);
-                } catch (e) {
-                    console.error("AI Answer failed", e);
-                }
-
             } catch (error) {
                 console.error("Search failed", error);
             } finally {
                 setIsSearching(false);
-                setLoadingAi(false);
             }
         };
 
         performSearch();
     }, [query, language]);
 
-    const hasResults = verseResults.length > 0 || postResults.length > 0 || aiAnswer;
+    const hasResults = verseResults.length > 0 || postResults.length > 0 ||
+        bookResults.length > 0 || characterResults.length > 0 ||
+        storyResults.length > 0 || emotionResults.length > 0;
+
+    // Helper to render a generic result card
+    const renderCard = (
+        title: string,
+        subtitle: string,
+        icon: any,
+        onClick: () => void,
+        colorClass = "bg-white",
+        iconClass = "text-stone-500",
+        additionalContent?: React.ReactNode
+    ) => (
+        <div
+            onClick={onClick}
+            className={`
+                group p-5 rounded-xl border cursor-pointer transition-all hover:-translate-y-1
+                ${preferences.theme === 'bw'
+                    ? 'bg-white border-black border-2 shadow-none hover:bg-stone-50'
+                    : `border-stone-200 dark:border-stone-800 hover:shadow-lg ${preferences.theme === 'dark' ? 'bg-stone-900 hover:border-bible-gold/30' : 'bg-white hover:border-bible-gold/50'}`}
+            `}
+        >
+            <div className="flex items-start gap-4">
+                <div className={`p-3 rounded-full shrink-0 ${iconClass} ${preferences.theme === 'dark' ? 'bg-stone-800' : 'bg-stone-100'}`}>
+                    {React.createElement(icon, { size: 24 })}
+                </div>
+                <div className="flex-1 min-w-0">
+                    <h3 className={`text-lg font-serif font-bold truncate mb-1 ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-800 dark:text-stone-100'}`}>
+                        {title}
+                    </h3>
+                    <p className={`text-sm opacity-70 line-clamp-2 ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-600 dark:text-stone-400'}`}>
+                        {subtitle}
+                    </p>
+                    {additionalContent}
+                </div>
+                <div className={`self-center opacity-0 group-hover:opacity-100 transition-opacity ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`}>
+                    <ArrowRight size={20} />
+                </div>
+            </div>
+        </div>
+    );
 
     return (
         <div className="max-w-4xl mx-auto p-6 md:p-12 pb-24">
@@ -80,113 +138,110 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
             {isSearching ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
                     <div className="w-12 h-12 border-4 border-bible-gold border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-stone-500 animate-pulse">Buscando na sabedoria antiga...</p>
+                    <p className="text-stone-500 animate-pulse">Buscando...</p>
                 </div>
             ) : (
                 <div className="space-y-12">
-                    {/* Chat Suggestion - ALWAYS VISIBLE now per user request */}
-                    <div className="animate-slideUp">
-                        <div className="flex items-center gap-3 mb-4">
-                            <MessageCircle size={18} className="text-bible-gold" />
-                            <h3 className="font-bold text-sm uppercase tracking-widest text-stone-500">Aprofunde no Chat</h3>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                            <button
-                                onClick={() => navigate(`/chat?p=${encodeURIComponent(query)}`)}
-                                className="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-bible-gold hover:text-white transition-all text-sm border border-stone-200 dark:border-stone-700"
-                            >
-                                💬 Conversar sobre "{query}"
-                            </button>
-                            <button
-                                onClick={() => navigate(`/chat?p=${encodeURIComponent("O que a Bíblia diz sobre " + query + "?")}`)}
-                                className="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-bible-gold hover:text-white transition-all text-sm border border-stone-200 dark:border-stone-700"
-                            >
-                                📖 O que a Bíblia diz?
-                            </button>
-                            <button
-                                onClick={() => navigate(`/chat?p=${encodeURIComponent("Versículos sobre " + query)}`)}
-                                className="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-bible-gold hover:text-white transition-all text-sm border border-stone-200 dark:border-stone-700"
-                            >
-                                ✨ Versículos sobre {query}
-                            </button>
-                        </div>
-                    </div>
 
-                    {!hasResults && !aiAnswer ? (
+                    {!hasResults ? (
                         <div className="text-center py-12 opacity-60">
                             <p className="text-xl mb-4">{t.noResults}</p>
                             <button onClick={() => navigate('/')} className="text-bible-gold hover:underline">Voltar ao Início</button>
                         </div>
                     ) : (
                         <>
-                            {/* 1. AI Intelligent Answer (Top Priority) */}
-                            {aiAnswer && (
+                            {/* 1. Books Section */}
+                            {bookResults.length > 0 && (
                                 <div className="animate-slideUp">
-                                    <div className={`rounded-2xl p-8 border shadow-sm relative overflow-hidden
-                                ${preferences.theme === 'sepia'
-                                            ? 'bg-gradient-to-br from-[#fcf9ee] to-[#f4ecd8] border-[#e6dcc6]'
-                                            : preferences.theme === 'bw'
-                                                ? 'bg-white border-2 border-black shadow-none'
-                                                : 'bg-gradient-to-br from-white to-stone-50 dark:from-stone-900 dark:to-stone-900 border-bible-gold/30 dark:border-bible-gold/20'}
-                            `}>
-                                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                                            <Sparkles size={64} className={`
-                                                ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}
-                                            `} />
-                                        </div>
-
-                                        <div className={`flex items-center gap-3 mb-4
-                                            ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}
-                                        `}>
-                                            <Sparkles size={20} className="animate-pulse" />
-                                            <h3 className="font-bold uppercase tracking-widest text-xs">Resumo do Tema</h3>
-                                        </div>
-
-                                        <div className={`prose dark:prose-invert max-w-none leading-relaxed
-                                    ${preferences.fontFamily === 'serif' ? 'font-serif' : 'font-sans'}
-                                    ${preferences.theme === 'bw' ? 'text-black prose-p:text-black prose-strong:text-black' : ''}
-                                `}>
-                                            {aiAnswer.split('\n').map((para, i) => (
-                                                <p key={i} className="mb-3" dangerouslySetInnerHTML={{
-                                                    __html: para.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                                }}></p>
-                                            ))}
-                                        </div>
+                                    <div className="flex items-center gap-3 mb-4 border-b border-stone-200 dark:border-stone-800 pb-2">
+                                        <BookOpen size={20} className="text-bible-gold" />
+                                        <h3 className="text-xl font-bold dark:text-stone-200">Livros</h3>
                                     </div>
-                                </div>
-                            )}
-
-                            {/* 2. Blog Posts Results */}
-                            {postResults.length > 0 && (
-                                <div className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
-                                    <div className="flex items-center gap-3 mb-6 border-b border-stone-200 dark:border-stone-800 pb-2">
-                                        <FileText size={20} className={`${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`} />
-                                        <h3 className={`text-xl font-bold ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-700 dark:text-stone-300'}`}>Artigos e Estudos</h3>
-                                    </div>
-
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {postResults.map(post => (
-                                            <Link key={post.id} to={`/blog/${post.slug}`}
-                                                className={`block p-5 rounded-xl border transition-all hover:-translate-y-1 hover:shadow-lg
-                                        ${preferences.theme === 'sepia'
-                                                        ? 'bg-white border-[#e6dcc6]'
-                                                        : preferences.theme === 'bw'
-                                                            ? 'bg-white border-black border-2 shadow-none hover:bg-stone-50'
-                                                            : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
-                                    `}>
-                                                <h4 className={`font-bold text-lg mb-2 line-clamp-1
-                                                    ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}
-                                                `}>{post.title}</h4>
-                                                <p className={`text-sm opacity-70 line-clamp-2
-                                                    ${preferences.theme === 'bw' ? 'text-black' : ''}
-                                                `}>{post.excerpt}</p>
-                                            </Link>
+                                        {bookResults.map((item, idx) => (
+                                            renderCard(
+                                                item.label,
+                                                `${item.data.book.testament === 'Old' ? 'Antigo' : 'Novo'} Testamento`,
+                                                BookOpen,
+                                                () => navigate(`/leitura/${normalizeBookName(item.label)}`),
+                                                "",
+                                                "text-blue-500"
+                                            )
                                         ))}
                                     </div>
                                 </div>
                             )}
 
-                            {/* 3. Bible Verses Results */}
+                            {/* 2. Character Section */}
+                            {characterResults.length > 0 && (
+                                <div className="animate-slideUp" style={{ animationDelay: '0.05s' }}>
+                                    <div className="flex items-center gap-3 mb-4 border-b border-stone-200 dark:border-stone-800 pb-2">
+                                        <User size={20} className="text-bible-gold" />
+                                        <h3 className="text-xl font-bold dark:text-stone-200">Personagens</h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {characterResults.map((item, idx) => (
+                                            renderCard(
+                                                item.label,
+                                                item.subLabel || "Personagem Bíblico",
+                                                User,
+                                                () => navigate(`/chat?p=${encodeURIComponent(`Quem foi ${item.label}?`)}`),
+                                                "",
+                                                "text-purple-500",
+                                                <div className="mt-2 text-xs flex gap-2">
+                                                    <span className="bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded text-stone-500">💬 Chat Hall</span>
+                                                </div>
+                                            )
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 3. Story Section */}
+                            {storyResults.length > 0 && (
+                                <div className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
+                                    <div className="flex items-center gap-3 mb-4 border-b border-stone-200 dark:border-stone-800 pb-2">
+                                        <Scroll size={20} className="text-bible-gold" />
+                                        <h3 className="text-xl font-bold dark:text-stone-200">Histórias</h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {storyResults.map((item, idx) => (
+                                            renderCard(
+                                                item.label,
+                                                item.data.story.ref,
+                                                Scroll,
+                                                () => navigate(`/chat?p=${encodeURIComponent(`Conte-me a história: ${item.label}`)}`),
+                                                "",
+                                                "text-amber-500"
+                                            )
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 4. Emotions Section */}
+                            {emotionResults.length > 0 && (
+                                <div className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
+                                    <div className="flex items-center gap-3 mb-4 border-b border-stone-200 dark:border-stone-800 pb-2">
+                                        <Heart size={20} className="text-bible-gold" />
+                                        <h3 className="text-xl font-bold dark:text-stone-200">Sentimentos</h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {emotionResults.map((item, idx) => (
+                                            renderCard(
+                                                item.label,
+                                                "Encontre conforto na palavra",
+                                                Heart,
+                                                () => navigate(`/chat?p=${encodeURIComponent(`Versículos sobre ${item.label}`)}`),
+                                                "",
+                                                "text-pink-500"
+                                            )
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 5. Bible Verses Results (Existing Layout) */}
                             {verseResults.length > 0 && (
                                 <div className="animate-slideUp" style={{ animationDelay: '0.2s' }}>
                                     <div className="flex items-center gap-3 mb-6 border-b border-stone-200 dark:border-stone-800 pb-2">
@@ -200,10 +255,8 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                                             let linkTarget = '#';
 
                                             if (res.context === 'Livro Completo') {
-                                                // Handle Book Link
                                                 linkTarget = `/leitura/${normalizeBookName(res.reference)}`;
                                             } else {
-                                                // Handle Verse Link
                                                 try {
                                                     const lastColon = res.reference.lastIndexOf(':');
                                                     if (lastColon !== -1) {
@@ -214,7 +267,6 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                                                         const book = rest.substring(0, lastSpace);
                                                         linkTarget = `/leitura/${normalizeBookName(book)}/${chapter}?verses=${verse}`;
                                                     } else {
-                                                        // Fallback for just "Book Chapter" references (no colon)
                                                         const match = res.reference.match(/^(.+)\s+(\d+)$/);
                                                         if (match) {
                                                             const book = match[1];
@@ -269,6 +321,35 @@ const SearchPage: React.FC<SearchPageProps> = ({ language, t, preferences }) => 
                                                 </Link>
                                             );
                                         })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 6. Blog Posts Results */}
+                            {postResults.length > 0 && (
+                                <div className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
+                                    <div className="flex items-center gap-3 mb-6 border-b border-stone-200 dark:border-stone-800 pb-2">
+                                        <FileText size={20} className={`${preferences.theme === 'bw' ? 'text-black' : 'text-bible-gold'}`} />
+                                        <h3 className={`text-xl font-bold ${preferences.theme === 'bw' ? 'text-black' : 'text-stone-700 dark:text-stone-300'}`}>Artigos e Estudos</h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {postResults.map(post => (
+                                            <Link key={post.id} to={`/blog/${post.slug}`}
+                                                className={`block p-5 rounded-xl border transition-all hover:-translate-y-1 hover:shadow-lg
+                                        ${preferences.theme === 'sepia'
+                                                        ? 'bg-white border-[#e6dcc6]'
+                                                        : preferences.theme === 'bw'
+                                                            ? 'bg-white border-black border-2 shadow-none hover:bg-stone-50'
+                                                            : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800'}
+                                    `}>
+                                                <h4 className={`font-bold text-lg mb-2 line-clamp-1
+                                                    ${preferences.theme === 'bw' ? 'text-black' : 'text-bible-accent dark:text-bible-gold'}
+                                                `}>{post.title}</h4>
+                                                <p className={`text-sm opacity-70 line-clamp-2
+                                                    ${preferences.theme === 'bw' ? 'text-black' : ''}
+                                                `}>{post.excerpt}</p>
+                                            </Link>
+                                        ))}
                                     </div>
                                 </div>
                             )}

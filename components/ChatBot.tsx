@@ -31,10 +31,15 @@ const ChatBot: React.FC<ChatBotProps> = ({ language, t, initialMessage, preferen
 
   useEffect(() => {
     // Reset messages if language changes
-    setMessages([
-      { id: '1', role: 'model', text: t.chatWelcome }
-    ]);
-  }, [language, t]);
+    // If we have an initial message (deep link), we don't show the welcome message
+    if (initialMessage) {
+      setMessages([]);
+    } else {
+      setMessages([
+        { id: '1', role: 'model', text: t.chatWelcome }
+      ]);
+    }
+  }, [language, t, initialMessage]);
 
   // Handle Initial Message (from URL)
   useEffect(() => {

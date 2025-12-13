@@ -71,12 +71,13 @@ export const bibleBooks: BibleBook[] = [
   { name: 'Apocalipse', chapters: 22, testament: 'New' },
 ];
 
-export const BIBLE_VERSIONS: BibleVersion[] = ['blivre', 'acf'];
+export const BIBLE_VERSIONS: BibleVersion[] = ['blivre', 'acf', 'jra'];
 
 export const translations = {
   pt: {
     blivre: "Bíblia Livre",
     acf: "Almeida Corrigida Fiel",
+    jra: "JRA",
     appTitle: "Bíblia Online",
     devotional: "Devocional Diário",
     chat: "Chat Teológico",

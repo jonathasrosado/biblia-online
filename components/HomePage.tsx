@@ -59,7 +59,10 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
 
     const [dailyVerse, setDailyVerse] = useState(DAILY_VERSES[0]);
     const [isSharing, setIsSharing] = useState(false);
-    const [activeTestament, setActiveTestament] = useState<'OT' | 'NT'>('NT'); // Default to New Testament as it's often more popular for quick reading
+    const [activeTab, setActiveTab] = useState<'RECOMMENDED' | 'OT' | 'NT'>('RECOMMENDED');
+
+    const recommendedBooks = ['Gênesis', 'Mateus', 'Salmos', 'Provérbios', 'João', 'Romanos'];
+
     const [settings, setSettings] = useState<SiteSettings>({ siteTitle: '', siteDescription: '' });
     const [posts, setPosts] = useState<BlogPost[]>([]);
 
@@ -84,8 +87,6 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
             })
             .catch(err => console.error("Failed to load posts", err));
     }, []);
-
-
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -287,16 +288,24 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                         <SmartSearch theme={theme} placeholder="Buscar livro, capítulo ou tema (ex: Gênesis, / Fé)" simpleMode={true} />
                     </div>
 
-                    {/* Check if we need to show Testaments or Themes */}
-
-                    {/* Testament Toggles */}
-                    <div className={`flex p-1 rounded-xl mb-8 w-full md:w-fit mx-auto
+                    {/* Book Tabs */}
+                    <div className={`flex flex-wrap p-1 rounded-xl mb-8 w-full md:w-fit mx-auto gap-1
                         ${isDark ? 'bg-stone-950 border border-stone-800' : 'bg-stone-50 border border-stone-100'}
                     `}>
                         <button
-                            onClick={() => setActiveTestament('OT')}
-                            className={`flex-1 md:flex-none px-8 py-3 rounded-lg text-sm font-bold transition-all
-                                ${activeTestament === 'OT'
+                            onClick={() => setActiveTab('RECOMMENDED')}
+                            className={`flex-1 md:flex-none px-6 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap
+                                ${activeTab === 'RECOMMENDED'
+                                    ? (theme === 'bw' ? 'bg-white text-black shadow-sm border border-stone-200' : isDark ? 'bg-stone-800 text-bible-gold shadow-sm' : 'bg-white text-bible-gold shadow-sm')
+                                    : 'text-stone-400 hover:text-stone-500'}
+                            `}
+                        >
+                            Recomendados
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('OT')}
+                            className={`flex-1 md:flex-none px-6 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap
+                                ${activeTab === 'OT'
                                     ? (theme === 'bw' ? 'bg-white text-black shadow-sm border border-stone-200' : isDark ? 'bg-stone-800 text-bible-gold shadow-sm' : 'bg-white text-bible-gold shadow-sm')
                                     : 'text-stone-400 hover:text-stone-500'}
                             `}
@@ -304,9 +313,9 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
                             Antigo Testamento
                         </button>
                         <button
-                            onClick={() => setActiveTestament('NT')}
-                            className={`flex-1 md:flex-none px-8 py-3 rounded-lg text-sm font-bold transition-all
-                                ${activeTestament === 'NT'
+                            onClick={() => setActiveTab('NT')}
+                            className={`flex-1 md:flex-none px-6 py-3 rounded-lg text-sm font-bold transition-all whitespace-nowrap
+                                ${activeTab === 'NT'
                                     ? (theme === 'bw' ? 'bg-white text-black shadow-sm border border-stone-200' : isDark ? 'bg-stone-800 text-bible-gold shadow-sm' : 'bg-white text-bible-gold shadow-sm')
                                     : 'text-stone-400 hover:text-stone-500'}
                             `}
@@ -317,77 +326,60 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
 
                     {/* Book Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
-                        {bibleBooks
-                            .filter(b => b.testament === (activeTestament === 'OT' ? 'Old' : 'New'))
-                            .slice(0, 5)
-                            .map((book) => (
-                                <button
-                                    key={book.name}
-                                    onClick={() => navigate(`/leitura/${normalizeBookName(book.name)}`)}
-                                    className={`p-4 rounded-2xl text-center transition-all border hover:-translate-y-1
-                                    ${theme === 'bw'
-                                            ? 'bg-white border-stone-200 text-black hover:bg-stone-50 hover:border-stone-400'
-                                            : isDark
-                                                ? 'bg-stone-950 border-stone-800 text-stone-400 hover:text-bible-gold hover:border-bible-gold/30'
-                                                : 'bg-white border-stone-100 text-stone-600 hover:text-bible-gold hover:border-bible-gold/30 hover:shadow-sm'}
-                                `}
-                                >
-                                    <div className="font-bold mb-1 text-sm">{book.name}</div>
-                                    <div className="text-[10px] opacity-50 uppercase tracking-wider">{book.chapters} Caps</div>
-                                </button>
-                            ))}
-
-                        <button
-                            onClick={() => navigate(activeTestament === 'OT' ? '/antigo-testamento' : '/novo-testamento')}
-                            className={`p-4 rounded-2xl text-center transition-all border group flex flex-col items-center justify-center gap-2
-                                ${theme === 'bw'
-                                    ? 'bg-stone-100 border-stone-200 text-black hover:bg-stone-200'
-                                    : isDark
-                                        ? 'bg-bible-gold/10 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/20'
-                                        : 'bg-bible-gold/5 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/10'}
-                            `}
-                        >
-                            <ArrowRight size={20} />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">Ver Todos</span>
-                        </button>
-                    </div>
-
-                    {/* Divider / Theme Label */}
-                    <div className="text-center mb-6">
-                        <span className={`text-sm font-medium
-                            ${theme === 'bw' ? 'text-stone-400' : 'text-stone-400'}
-                        `}>
-                            Ou comece por um tema:
-                        </span>
-                    </div>
-
-                    {/* Quick Chips (Themes) */}
-                    <div className="flex flex-wrap justify-center gap-2">
-                        {['Fé', 'Amor', 'Ansiedade', 'Perdão', 'Esperança'].map((s) => (
+                        {/* Logic: 
+                            If RECOMMENDED: map recommendedBooks finding data in bibleBooks.
+                            If OT/NT: filter bibleBooks by testament, slice(0, 5).
+                        */}
+                        {(activeTab === 'RECOMMENDED'
+                            ? recommendedBooks.map(name => bibleBooks.find(b => b.name === name)).filter(Boolean) as typeof bibleBooks
+                            : bibleBooks
+                                .filter(b => b.testament === (activeTab === 'OT' ? 'Old' : 'New'))
+                                .slice(0, 5)
+                        ).map((book) => (
                             <button
-                                key={s}
-                                onClick={() => navigate(`/busca?q=${encodeURIComponent(s)}`)}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all hover:-translate-y-0.5
+                                key={book.name}
+                                onClick={() => navigate(`/leitura/${normalizeBookName(book.name)}`)}
+                                className={`p-4 rounded-2xl text-center transition-all border hover:-translate-y-1
                                     ${theme === 'bw'
-                                        ? 'bg-stone-100 text-black border border-stone-200 hover:bg-stone-200'
+                                        ? 'bg-white border-stone-200 text-black hover:bg-stone-50 hover:border-stone-400'
                                         : isDark
-                                            ? 'bg-stone-950 text-stone-400 hover:text-bible-gold border border-stone-800'
-                                            : 'bg-stone-50 text-stone-600 hover:text-bible-gold border border-stone-100 hover:bg-bible-gold/5'}
+                                            ? 'bg-stone-950 border-stone-800 text-stone-400 hover:text-bible-gold hover:border-bible-gold/30'
+                                            : 'bg-white border-stone-100 text-stone-600 hover:text-bible-gold hover:border-bible-gold/30 hover:shadow-sm'}
                                 `}
                             >
-                                {s}
+                                <div className="font-bold mb-1 text-sm">{book.name}</div>
+                                <div className="text-[10px] opacity-50 uppercase tracking-wider">{book.chapters} Caps</div>
                             </button>
                         ))}
+
+                        {/* "Ver Todos" button - ONLY for OT/NT */}
+                        {activeTab !== 'RECOMMENDED' && (
+                            <button
+                                onClick={() => navigate(activeTab === 'OT' ? '/antigo-testamento' : '/novo-testamento')}
+                                className={`p-4 rounded-2xl text-center transition-all border group flex flex-col items-center justify-center gap-2
+                                    ${theme === 'bw'
+                                        ? 'bg-stone-100 border-stone-200 text-black hover:bg-stone-200'
+                                        : isDark
+                                            ? 'bg-bible-gold/10 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/20'
+                                            : 'bg-bible-gold/5 border-bible-gold/20 text-bible-gold hover:bg-bible-gold/10'}
+                                `}
+                            >
+                                <ArrowRight size={20} />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Ver Todos</span>
+                            </button>
+                        )}
                     </div>
 
-                </div>
-            </div>
+
+
+                </div >
+            </div >
 
 
 
 
             {/* 3. FEATURED SECTIONS - SEO Pages */}
-            <div className="mb-8 animate-slideUp" style={{ animationDelay: '0.5s' }}>
+            < div className="mb-8 animate-slideUp" style={{ animationDelay: '0.5s' }}>
                 <div className="text-center mb-10 px-4">
                     <h3 className={`text-2xl font-serif font-bold mb-2
                         ${theme === 'bw' ? 'text-black' : isDark ? 'text-stone-100' : 'text-stone-800'}
@@ -623,8 +615,8 @@ const HomePage: React.FC<HomePageProps> = ({ language, t, theme, history = [] })
 
 
 
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 
