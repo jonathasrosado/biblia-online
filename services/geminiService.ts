@@ -47,7 +47,7 @@ const getAI = async (): Promise<{ ai: GoogleGenAI, Type: any, Modality: any }> =
   return { ai: aiInstance, Type: GenAIType, Modality: GenAIModality };
 };
 
-const modelName = 'gemini-1.5-flash';
+const modelName = 'gemini-2.0-flash-exp';
 
 // --- CACHE HELPERS ---
 const CACHE_PREFIX = 'bible_app_v1_';

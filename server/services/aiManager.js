@@ -3,6 +3,11 @@ import path from 'path';
 import https from 'https';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+// Load environment variables from the root .env file
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -130,8 +135,21 @@ export class AIManager {
         const provider = featureConfig?.provider || 'gemini';
         const model = modelOverride || featureConfig?.model || 'gemini-2.0-flash-exp';
 
-        console.log(`[AIManager] Generating for ${feature} using ${provider}/${model}`);
-        fs.appendFileSync(path.join(process.cwd(), 'debug_ai.log'), `[${new Date().toISOString()}] Provider: ${provider}, Model: ${model}\n`);
+        // --- DEBUG LOGGING ---
+        const debugMsg = `[AIManager] Request: ${feature} | Provider: ${provider} | Model: ${model}\n`;
+        console.log(debugMsg.trim());
+        fs.appendFileSync(path.join(process.cwd(), 'server-debug.log'), debugMsg);
+
+        // Log API Key Status (Masked)
+        const geminiKey = this.config.apiKeys.gemini || process.env.GEMINI_API_KEY;
+        const openrouterKey = this.config.apiKeys.openrouter || process.env.OPENROUTER_API_KEY;
+
+        if (provider === 'gemini') {
+            console.log(`[AIManager] Gemini Key present: ${!!geminiKey} (Ends with: ${geminiKey ? geminiKey.slice(-4) : 'N/A'})`);
+        } else if (provider === 'openrouter') {
+            console.log(`[AIManager] OpenRouter Key present: ${!!openrouterKey}`);
+        }
+        // ---------------------
 
 
 
@@ -146,7 +164,7 @@ export class AIManager {
             : prompt;
 
         // Gemini Generation
-        const apiKey = this.config.apiKeys.gemini || process.env.GEMINI_API_KEY;
+        const apiKey = process.env.GEMINI_API_KEY || (this.config.apiKeys.gemini !== 'ENV_VAR' ? this.config.apiKeys.gemini : null);
         if (!apiKey) throw new Error("Gemini API Key missing");
 
         const ai = new GoogleGenerativeAI(apiKey);
@@ -183,7 +201,7 @@ export class AIManager {
     }
 
     async _generateOpenRouterText(prompt, model, systemInstruction = '', responseFormat = null) {
-        const rawKey = process.env.OPENROUTER_API_KEY || this.config.apiKeys.openrouter;
+        const rawKey = process.env.OPENROUTER_API_KEY || (this.config.apiKeys.openrouter !== 'ENV_VAR' ? this.config.apiKeys.openrouter : null);
         const apiKey = rawKey ? rawKey.trim() : null;
 
         if (!apiKey) throw new Error("OpenRouter API Key missing");
